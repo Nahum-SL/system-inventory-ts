@@ -13,7 +13,9 @@
     "migrate:make": "pnpm knex migrate:make",
     "migrate:latest": "pnpm knex migrate:latest",
     "migrate:rollback": "pnpm knex migrate:rollback",
-    "migrate:status": "pnpm knex migrate:status"
+    "migrate:status": "pnpm knex migrate:status",
+    "seed:make": "pnpm knex seed:make",
+    "seed:run": "pnpm knex seed:run"
   },
 
   "keywords": [],
