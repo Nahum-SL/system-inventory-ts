@@ -7,6 +7,11 @@ import cors from "cors";
 // de algunas vulnerabilidades web conocidas al establecer encabezados HTTP apropiados.
 import helmet from "helmet";
 
+// Importa la clase NotFoundError desde el archivo de errores personalizado
+import { NotFoundError } from "./shared/errors/AppError.js";
+// Importa el middleware de manejo de errores desde el archivo correspondiente
+import { errorHandler } from "./shared/middlewares/error.middleware.js";
+
 const app = express();
 
 // ======================================
@@ -30,5 +35,16 @@ app.get("/api/health", (_req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
+
+// 404 handler - Middleware para manejar rutas no encontradas
+app.use((req, _res, next) => {
+  next(
+    new NotFoundError(
+      `Route ${req.method} ${req.originalUrl} not found`,
+    ),
+  );
+});
+
+app.use(errorHandler);
 
 export default app;
