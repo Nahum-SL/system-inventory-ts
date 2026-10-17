@@ -16,6 +16,7 @@
     "migrate:status": "pnpm knex migrate:status",
     "seed:make": "pnpm knex seed:make",
     "seed:run": "pnpm knex seed:run"
+    
   },
 
   "keywords": [],
