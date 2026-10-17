@@ -1,5 +1,4 @@
 import express from "express";
-import { z } from "zod";
 
 // CORS (Cross-Origin Resource Sharing) es un mecanismo que permite que los recursos de 
 // una aplicación web sean solicitados desde otro dominio distinto al que sirve la aplicación.
@@ -21,11 +20,6 @@ import authRoutes from "./modules/auth/auth.routes.js";
 import { NotFoundError } from "./shared/errors/AppError.js";
 // Importa el middleware de manejo de errores
 import { errorHandler } from "./shared/middlewares/error.middleware.js";
-
-// Importa el middleware de validación
-import { validate } from "./shared/middlewares/validate.middleware.js";
-
-
 
 const app = express();
 
@@ -53,27 +47,6 @@ app.get("/api/health", (_req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
-
-// =====================
-// TEMPORAL
-// **************
-
-// Validar la estructura de los datos de prueba utilizando Zod
-const testSchema = z.object({
-  name: z.string().min(3),
-});
-
-// Endpoint para probar la validación de datos utilizando Zod
-app.post("/api/test-validation", validate(testSchema), (req, res) => {
-  res.status(200).json({
-    status: "ok",
-    message: "Validation passed",
-    data: req.body,
-  });
-});
-
-// **************
-// =====================
 
 // 404 handler - Middleware para manejar rutas no encontradas
 app.use((req, _res, next) => {
