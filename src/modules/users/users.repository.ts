@@ -124,6 +124,36 @@ export class UsersRepository {
   }
 
   /**
+   * Realiza una busqueda por ID de la tabla "personas" (no de usuario), para verificar que existe
+   * en la BD, devolviendo un booleano
+   * @param personaId 
+   * @returns 
+   */
+  async personExists(personaId: number): Promise<boolean> {
+    const row = await db("personas")
+      .select("id")
+      .where({ id: personaId })
+      .first();
+
+    return Boolean(row);
+  }
+
+  /**
+   * Realiza una busqueda por ID de la tabla "usuarios" (no de persona), para verificar que existe
+   * en la BD, devolviendo un booleano
+   * @param personaId 
+   * @returns 
+   */
+  async personHasUser(personaId: number): Promise<boolean> {
+    const row = await db("usuarios")
+      .select("id")
+      .where({ persona_id: personaId })
+      .first();
+
+    return Boolean(row);
+  }
+
+  /**
    * crea una cuenta y devuelve únicamente sus datos públicos.
    * @param data
    * @returns
