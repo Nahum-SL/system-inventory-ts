@@ -11,7 +11,7 @@ import { UnauthorizedError } from "../errors/AppError.js";
 
 /**
  * Constante que servira para comprobar que exista
- * Encabezado,
+ * Encabezado Authorization,
  * Formato Bearer Token,
  * La firma sea válida y el token no haya expirado,
  * El ID, nombre y rol de usuario tengan el formato esperado
