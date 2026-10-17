@@ -11,6 +11,8 @@ const envSchema = z.object({
     DB_NAME: z.string().min(1).default("system_inventory"),
     DB_USER: z.string().min(1).default("root"),
     DB_PASSWORD: z.string().default(""),
+    JWT_SECRET: z.string().min(32),
+    JWT_EXPIRES_IN: z.coerce.number().int().positive().default(3600),
 });
 // Parsea y valida las variables de entorno
 const parsedEnv = envSchema.safeParse(process.env);
