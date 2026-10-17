@@ -1,5 +1,4 @@
 import express from "express";
-import { z } from "zod";
 // CORS (Cross-Origin Resource Sharing) es un mecanismo que permite que los recursos de 
 // una aplicación web sean solicitados desde otro dominio distinto al que sirve la aplicación.
 import cors from "cors";
@@ -7,14 +6,17 @@ import cors from "cors";
 // de algunas vulnerabilidades web conocidas al establecer encabezados HTTP apropiados.
 import helmet from "helmet";
 // ===========
+// MODULOS
+// ===========
+// Auth
+import authRoutes from "./modules/auth/auth.routes.js";
+// ===========
 // MIDDLEWARES
 // ===========
 // Importa la clase NotFoundError desde el archivo de errores personalizado
 import { NotFoundError } from "./shared/errors/AppError.js";
 // Importa el middleware de manejo de errores
 import { errorHandler } from "./shared/middlewares/error.middleware.js";
-// Importa el middleware de validación
-import { validate } from "./shared/middlewares/validate.middleware.js";
 const app = express();
 // ======================================
 // Seguridad y análisis de solicitudes
@@ -27,6 +29,8 @@ app.use(cors());
 app.use(express.json({ limit: "1mb" }));
 // /api/health: permite comprobar que Express está respondiendo.
 app.use(express.urlencoded({ extended: true }));
+// Modulos
+app.use("/api/auth", authRoutes);
 // Health check - Endpoint para verificar el estado de la API
 app.get("/api/health", (_req, res) => {
     res.status(200).json({
@@ -35,23 +39,6 @@ app.get("/api/health", (_req, res) => {
         timestamp: new Date().toISOString(),
     });
 });
-// =====================
-// TEMPORAL
-// **************
-// Validar la estructura de los datos de prueba utilizando Zod
-const testSchema = z.object({
-    name: z.string().min(3),
-});
-// Endpoint para probar la validación de datos utilizando Zod
-app.post("/api/test-validation", validate(testSchema), (req, res) => {
-    res.status(200).json({
-        status: "ok",
-        message: "Validation passed",
-        data: req.body,
-    });
-});
-// **************
-// =====================
 // 404 handler - Middleware para manejar rutas no encontradas
 app.use((req, _res, next) => {
     next(new NotFoundError(`Route ${req.method} ${req.originalUrl} not found`));
