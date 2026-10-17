@@ -6,9 +6,9 @@ import { validate } from "../../shared/middlewares/validate.middleware.js";
 import { loginSchema } from "./auth.schema.js";
 import { login } from "./auth.controller.js";
 
-const router = Router();
+const authRoutes = Router();
 
 // Ruta para el login
-router.post("/login", validate(loginSchema), login);
+authRoutes.post("/login", validate(loginSchema), login);
 
-export default router;
+export default authRoutes;

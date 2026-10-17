@@ -9,6 +9,12 @@ import cors from "cors";
 import helmet from "helmet";
 
 // ===========
+// MODULOS
+// ===========
+// Auth
+import authRoutes from "./modules/auth/auth.routes.js";
+
+// ===========
 // MIDDLEWARES
 // ===========
 // Importa la clase NotFoundError desde el archivo de errores personalizado
@@ -18,6 +24,8 @@ import { errorHandler } from "./shared/middlewares/error.middleware.js";
 
 // Importa el middleware de validación
 import { validate } from "./shared/middlewares/validate.middleware.js";
+
+
 
 const app = express();
 
@@ -33,6 +41,9 @@ app.use(cors());
 app.use(express.json({ limit: "1mb" }));
 // /api/health: permite comprobar que Express está respondiendo.
 app.use(express.urlencoded({ extended: true }));
+
+// Modulos
+app.use("/api/auth", authRoutes);
 
 // Health check - Endpoint para verificar el estado de la API
 app.get("/api/health", (_req, res) => {
