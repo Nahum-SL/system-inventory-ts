@@ -29,4 +29,14 @@ pnpm migrate:make name_migration
 pnpm seed:make name_seed
 ```
 
+## Flujo de trabajo
+``` bash
 
+pnpm migrate:make
+pnpm migrate:status
+pnpm migrate:latest
+
+```
+genera una migración.
+identifica migraciones pendientes y completadas.
+ejecuta las migraciones pendientes.
