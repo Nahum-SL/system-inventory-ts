@@ -1,31 +1,23 @@
 {
-  // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
     "module": "nodenext",
-    "target": "esnext",
-    "types": [],
+    "target": "es2023",
+    "types": ["node"],
+
+    "rootDir": "src",
+    "outDir": "dist",
 
     "sourceMap": true,
-    "declaration": true,
-    "declarationMap": true,
-
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
+    "declaration": false,
 
     "strict": true,
-    "jsx": "react-jsx",
+    "noUncheckedIndexedAccess": true,
     "verbatimModuleSyntax": true,
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
-    "skipLibCheck": true,
+    "skipLibCheck": true
   },
-    
-  "scripts": {
-    "dev": "tsx watch src/server.ts",
-    "build": "tsc",
-    "start": "node dist/server.js",
-    "typecheck": "tsc --noEmit"
-  }
-  
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }
