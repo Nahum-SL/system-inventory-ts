@@ -12,14 +12,14 @@ import { createUserSchema } from "./users.schema.js";
 // controladores
 import { createUser, getUserById, listUsers } from "./users.controller.js";
 
-const router = Router();
+const userRoutes = Router();
 
 // Autentica y authoriza si el usuario es admin
-router.use(authenticate, authorize("admin"));
+userRoutes.use(authenticate, authorize("admin"));
 
 // Rutas endpoint
-router.get("/", listUsers);
-router.get("/:id", getUserById);
-router.post("/", validate(createUserSchema), createUser);
+userRoutes.get("/", listUsers);
+userRoutes.get("/:id", getUserById);
+userRoutes.post("/", validate(createUserSchema), createUser);
 
-export default router;
+export default userRoutes;
