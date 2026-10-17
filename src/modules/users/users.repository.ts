@@ -1,9 +1,12 @@
 import db from "../../database/knex.js";
 
 // Types
-
-import type { UserCredentials,CreateUserData, PublicUser } from "./users.types.ts";
-import type { UserRole } from "./users.types.ts";
+import type {
+  UserRole,
+  CreateUserData,
+  PublicUser,
+  UserCredentials,
+} from "./users.types.ts";
 /**
  * Repositorio para acceder a los datos de los usuarios en la base de datos.
  *  */
@@ -11,12 +14,11 @@ export class UsersRepository {
   /**
    * Funcion asyncrona que busca las credenciales del usuario por Nombre de usuario
    * @param username
-   * @returns 
+   * @returns
    */
   async findCredentialsByUsername(
     username: string,
   ): Promise<UserCredentials | null> {
-
     // Filas que se mostraran segun obtenga al usuario
     const row = await db("usuarios as u")
       .innerJoin("personas as p", "p.id", "u.persona_id")
@@ -47,10 +49,10 @@ export class UsersRepository {
   }
 
   /**
-   * Busqueda en general para Usuarios, devolviendo los datos de la persona 
+   * Busqueda en general para Usuarios, devolviendo los datos de la persona
    * menos su password (hasheada), de forma ascendente /
    * lista las cuentas y sus datos personales.
-   */  
+   */
   async findAll(): Promise<PublicUser[]> {
     const rows = await db("usuarios as u")
       .innerJoin("personas as p", "p.id", "u.persona_id")
@@ -78,10 +80,9 @@ export class UsersRepository {
 
   /**
    * Consulta una cuenta sin exponer la contraseña
-   * @param id 
+   * @param id
    */
   async findPublicById(id: number): Promise<PublicUser | null> {
-    
     // Instancia los datos en la variable row (Filas)
     const row = await db("usuarios as u")
       .innerJoin("personas as p", "p.id", "u.persona_id")
@@ -113,8 +114,8 @@ export class UsersRepository {
 
   /**
    * Permite detectar nombres de usuario duplicados.
-   * @param username 
-   * @returns 
+   * @param username
+   * @returns
    */
   async usernameExists(username: string): Promise<boolean> {
     const row = await db("usuarios").select("id").where({ username }).first();
@@ -124,8 +125,8 @@ export class UsersRepository {
 
   /**
    * crea una cuenta y devuelve únicamente sus datos públicos.
-   * @param data 
-   * @returns 
+   * @param data
+   * @returns
    */
   async create(data: CreateUserData): Promise<PublicUser> {
     // Consulta SQL - INSERTAR

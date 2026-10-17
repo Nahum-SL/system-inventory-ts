@@ -3,7 +3,7 @@ import type { RequestHandler } from "express";
 // Clases para el Manejo de Errores
 import { ForbiddenError, UnauthorizedError } from "../errors/AppError.js";
 // Type del modulo Users -> ("admin" / "usuario") 
-import type { UserRole } from "../../modules/users/users.repository.js";
+import type { UserRole } from "../../modules/users/users.types.js";
 
 /**
  * Funcion que verifica el rol del usuario, validando que este autenticado antes
