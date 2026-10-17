@@ -1,6 +1,7 @@
 /**
  * La clase AppError extiende la clase Error de JavaScript
- * y agrega propiedades adicionales para manejar errores de manera más estructurada en la aplicación.
+ * y agrega propiedades adicionales para manejar errores de manera más
+ * estructurada en la aplicación.
  */
 export class AppError extends Error {
     statusCode;
@@ -14,7 +15,8 @@ export class AppError extends Error {
     }
 }
 /**
- * Las clases de error específicas extienden la clase AppError y representan diferentes tipos de errores HTTP.
+ * Las clases de error específicas extienden la clase AppError y representan
+ * diferentes tipos de errores HTTP.
  * Cada clase tiene un mensaje predeterminado y un código de estado HTTP asociado.
 */
 export class BadRequestError extends AppError {
