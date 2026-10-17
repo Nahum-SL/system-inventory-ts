@@ -24,3 +24,6 @@ export function authorize(...allowedRoles: UserRole[]): RequestHandler {
     next();
   };
 }
+
+// 401 Unauthorized: el usuario no está autenticado o su token no es válido.
+// 403 Forbidden: el usuario está autenticado, pero su rol no tiene permiso para realizar la operación.
