@@ -1,13 +1,9 @@
 import db from "../../database/knex.js";
 
 // Types
-import type {
-  UserCredentials,
-  CreateUserData,
-  PublicUser,
-  UserRole,
-} from "./users.types.js";
 
+import type { UserCredentials,CreateUserData, PublicUser } from "./users.types.ts";
+import type { UserRole } from "./users.types.ts";
 /**
  * Repositorio para acceder a los datos de los usuarios en la base de datos.
  *  */
