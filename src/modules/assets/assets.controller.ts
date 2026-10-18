@@ -1,0 +1,106 @@
+import type { RequestHandler } from "express";
+// Servicio GET - POST
+import { assetsService } from "./assets.service.js";
+
+// Types
+import type { AssetStatus, AssetFilters } from "./assets.types.js";
+
+/**
+ * Lista todos los activos
+ * @param req 
+ * @param res 
+ * @param next 
+ * @returns 
+ */
+export const listAssets: RequestHandler = async (req, res, next) => {
+  try {
+    const filters: AssetFilters = {};
+
+    if (typeof req.query.q === "string") {
+      filters.q = req.query.q;
+    }
+
+    if (
+      req.query.estado === "activo" ||
+      req.query.estado === "inactivo" ||
+      req.query.estado === "mantenimiento"
+    ) {
+      filters.estado = req.query.estado as AssetStatus;
+    }
+
+    if (req.query.areaId !== undefined) {
+      const areaId = Number(req.query.areaId);
+
+      if (!Number.isSafeInteger(areaId) || areaId <= 0) {
+        res.status(400).json({
+          status: "error",
+          message: "El ID del área no es válido",
+        });
+        return;
+      }
+
+      filters.areaId = areaId;
+    }
+
+    const assets = await assetsService.list(filters);
+
+    res.status(200).json({
+      status: "success",
+      results: assets.length,
+      data: assets,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+/**
+ * Realiza una busqueda por ID en Activos
+ * @param req 
+ * @param res 
+ * @param next 
+ * @returns 
+ */
+export const getAssetById: RequestHandler = async (req, res, next) => {
+  try {
+    const id = Number(req.params.id);
+
+    if (!Number.isSafeInteger(id) || id <= 0) {
+      res.status(400).json({
+        status: "error",
+        message: "El ID del activo no es válido",
+      });
+      return;
+    }
+
+    const asset = await assetsService.getById(id);
+
+    res.status(200).json({
+      status: "success",
+      data: asset,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Crea un nuevo registro en Activos
+ * @param req 
+ * @param res 
+ * @param next 
+ */
+export const createAsset: RequestHandler = async (req, res, next) => {
+  try {
+    const asset = await assetsService.create(req.body);
+
+    res.status(201).json({
+      status: "success",
+      message: "Activo registrado correctamente",
+      data: asset,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
