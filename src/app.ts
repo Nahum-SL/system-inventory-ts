@@ -14,6 +14,8 @@ import helmet from "helmet";
 import authRoutes from "./modules/auth/auth.routes.js";
 // Users
 import userRoutes from "./modules/users/users.routes.js";
+// Activos
+import assetsRoutes from "./modules/assets/assets.routes.js";
 // ===========
 // MIDDLEWARES
 // ===========
@@ -40,6 +42,7 @@ app.use(express.urlencoded({ extended: true }));
 // Modulos
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/assets", assetsRoutes);
 
 // Health check - Endpoint para verificar el estado de la API
 app.get("/api/health", (_req, res) => {
