@@ -6,7 +6,7 @@ import type {
   Assignment,
   CreateAssignmentData,
   ReturnAssignmentData,
-} from "./assigments.types.js";
+} from "./assignments.types.js";
 
 /**
  * Repositorio de la tabla Asignaciones, sera intermediario entre la

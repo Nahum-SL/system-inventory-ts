@@ -7,12 +7,12 @@ import { ConflictError, NotFoundError } from "../../shared/errors/AppError.js";
 // Activos
 import { assetsRepository } from "../assets/assets.repository.js";
 // Asignaciones 
-import { assignmentsRepository } from "./assigments.repository.js";
+import { assignmentsRepository } from "./assignments.repository.js";
 // ======================
 // Schema - Asignaciones
-import type { CreateAssignmentInput, ReturnAssignmentInput } from "./assigments.shema.js";
+import type { CreateAssignmentInput, ReturnAssignmentInput } from "./assignments.shema.js";
 // types
-import type{Assignment} from "./assigments.types.js";
+import type{Assignment} from "./assignments.types.js";
 
 /**
  * Servicio que manejara la logica de la tabla de asignaciones
