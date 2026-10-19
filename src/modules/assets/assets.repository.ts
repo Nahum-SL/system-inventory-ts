@@ -136,9 +136,9 @@ export class AssetsRepository {
 
   /**
    * Realiza una busqueda, validando que si el codigo existe para otro activo
-   * @param codigoInventario 
-   * @param id 
-   * @returns 
+   * @param codigoInventario
+   * @param id
+   * @returns
    */
   async codeExistsForAnotherAsset(
     codigoInventario: string,
@@ -243,6 +243,20 @@ export class AssetsRepository {
       .first();
 
     return row ? this.mapRow(row) : null;
+  }
+
+  /**
+   * Elimnacion suave
+   * @param id 
+   * @returns 
+   */
+  async softDelete(id: number): Promise<boolean> {
+    const updated = await db("activos").where({ id, eliminado: false }).update({
+      eliminado: true,
+      fecha_eliminacion: db.fn.now(),
+    });
+
+    return updated > 0;
   }
 }
 

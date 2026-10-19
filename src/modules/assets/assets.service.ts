@@ -1,14 +1,11 @@
 // Manejo de errores
 import { ConflictError, NotFoundError } from "../../shared/errors/AppError.js";
 // Assets Types
-import type {
-  Asset,
-  AssetFilters,
-} from "./assets.types.js";
+import type { Asset, AssetFilters } from "./assets.types.js";
 // Assets Repositorio
 import { assetsRepository } from "./assets.repository.js";
 // Valida que todos los campos sean validos
-import type { CreateAssetInput } from "./assets.schema.js";
+import type { CreateAssetInput, UpdateAssetInput } from "./assets.schema.js";
 
 /**
  * Tendra la responsabilidad de ejecutar el GET - CREATE de la parte de Activos
@@ -16,10 +13,10 @@ import type { CreateAssetInput } from "./assets.schema.js";
 export class AssetsService {
   /**
    * Lista todos los activos, usando el assetsRepository para el manejo de la logica
-   * @param filters 
-   * @returns 
+   * @param filters
+   * @returns
    */
-    async list(filters: AssetFilters = {}): Promise<Asset[]> {
+  async list(filters: AssetFilters = {}): Promise<Asset[]> {
     if (filters.areaId !== undefined) {
       const areaExists = await assetsRepository.areaExists(filters.areaId);
 
@@ -30,12 +27,12 @@ export class AssetsService {
 
     return assetsRepository.findAll(filters);
   }
-  
+
   /**
-   * Realiza una busqueda por ID de los activos, usando el assetsRepository 
+   * Realiza una busqueda por ID de los activos, usando el assetsRepository
    * para el manejo de la logica
-   * @param id 
-   * @returns 
+   * @param id
+   * @returns
    */
   async getById(id: number): Promise<Asset> {
     const asset = await assetsRepository.findById(id);
@@ -48,11 +45,11 @@ export class AssetsService {
   }
 
   /**
-   * Crea nuevos activos, usando el assetsRepository 
+   * Crea nuevos activos, usando el assetsRepository
    * para el manejo de la logica
-   * @param id 
-   * @returns 
-   */  
+   * @param id
+   * @returns
+   */
   async create(input: CreateAssetInput): Promise<Asset> {
     const [brandExists, categoryExists, areaExists] = await Promise.all([
       assetsRepository.brandExists(input.marcaId),
@@ -81,6 +78,67 @@ export class AssetsService {
     }
 
     return assetsRepository.create(input);
+  }
+
+  /**
+   * Actualiza un Activo
+   * @param id 
+   * @param input 
+   * @returns 
+   */
+  async update(id: number, input: UpdateAssetInput): Promise<Asset> {
+    await this.getById(id);
+
+    const [brandExists, categoryExists, areaExists] = await Promise.all([
+      assetsRepository.brandExists(input.marcaId),
+      assetsRepository.categoryExists(input.categoriaId),
+      assetsRepository.areaExists(input.areaId),
+    ]);
+
+    if (!brandExists) {
+      throw new NotFoundError("La marca indicada no existe");
+    }
+
+    if (!categoryExists) {
+      throw new NotFoundError("La categoría indicada no existe");
+    }
+
+    if (!areaExists) {
+      throw new NotFoundError("El área indicada no existe");
+    }
+
+    const codeExists = await assetsRepository.codeExistsForAnotherAsset(
+      input.codigoInventario,
+      id,
+    );
+
+    if (codeExists) {
+      throw new ConflictError(
+        "El código de inventario ya pertenece a otro activo",
+      );
+    }
+
+    const updated = await assetsRepository.update(id, input);
+
+    if (!updated) {
+      throw new NotFoundError("No se pudo actualizar el activo");
+    }
+
+    return updated;
+  }
+
+  /**
+   * Elmina un registro de Activo
+   * @param id 
+   */
+  async delete(id: number): Promise<void> {
+    await this.getById(id);
+
+    const deleted = await assetsRepository.softDelete(id);
+
+    if (!deleted) {
+      throw new NotFoundError("No se pudo dar de baja el activo");
+    }
   }
 }
 
