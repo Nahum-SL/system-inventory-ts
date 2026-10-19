@@ -12,7 +12,6 @@ import type {
  * logica de negocio (servicios, controladores, casos de uso)de la app y
  * la fuente de datos (SQL, API)
  */
-
 export class MaintenanceRepository {
   /**
    * Registra un mantenimiento dentro de una transacción y comprueba que el activo exista y no esté eliminado.
