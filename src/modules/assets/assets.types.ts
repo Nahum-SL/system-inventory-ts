@@ -19,6 +19,8 @@ export interface Asset {
   descripcion: string | null;
   estado: AssetStatus;
   fechaRegistro: string;
+  eliminado: boolean;
+  fechaEliminacion: string | null;
 }
 
 export interface CreateAssetData {
