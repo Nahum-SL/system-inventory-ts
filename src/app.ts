@@ -18,6 +18,8 @@ import userRoutes from "./modules/users/users.routes.js";
 import assetsRoutes from "./modules/assets/assets.routes.js";
 // Moviemientos
 import movementsRoutes from "./modules/movements/movements.route.js";
+// Mantenimiento
+import maintenanceRoutes from "./modules/maintenance/maintenance.routes.js";
 // ===========
 // MIDDLEWARES
 // ===========
@@ -46,6 +48,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/assets", assetsRoutes);
 app.use("/api/movements", movementsRoutes);
+app.use("/api/maintenance", maintenanceRoutes);
 
 // Health check - Endpoint para verificar el estado de la API
 app.get("/api/health", (_req, res) => {
