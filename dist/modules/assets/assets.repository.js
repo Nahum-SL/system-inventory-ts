@@ -111,6 +111,20 @@ export class AssetsRepository {
         return Boolean(row);
     }
     /**
+     * Realiza una busqueda, validando que si el codigo existe para otro activo
+     * @param codigoInventario
+     * @param id
+     * @returns
+     */
+    async codeExistsForAnotherAsset(codigoInventario, id) {
+        const row = await db("activos")
+            .select("id")
+            .where({ codigo_inventario: codigoInventario })
+            .whereNot("id", id)
+            .first();
+        return Boolean(row);
+    }
+    /**
      * Valida que el campo de marca , exista en la tabla de Activos
      * retornando un True / False
      * @param id
@@ -189,6 +203,18 @@ export class AssetsRepository {
             .where("a.codigo_inventario", codigoInventario)
             .first();
         return row ? this.mapRow(row) : null;
+    }
+    /**
+     * Elimnacion suave
+     * @param id
+     * @returns
+     */
+    async softDelete(id) {
+        const updated = await db("activos").where({ id, eliminado: false }).update({
+            eliminado: true,
+            fecha_eliminacion: db.fn.now(),
+        });
+        return updated > 0;
     }
 }
 export const assetsRepository = new AssetsRepository();

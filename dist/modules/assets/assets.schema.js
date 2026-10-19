@@ -32,4 +32,5 @@ export const createAssetSchema = z.object({
         .enum(["activo", "inactivo", "mantenimiento"])
         .default("activo"),
 });
+export const updateAssetSchema = createAssetSchema;
 //# sourceMappingURL=assets.schema.js.map

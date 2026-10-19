@@ -60,6 +60,49 @@ export class AssetsService {
         }
         return assetsRepository.create(input);
     }
+    /**
+     * Actualiza un Activo
+     * @param id
+     * @param input
+     * @returns
+     */
+    async update(id, input) {
+        await this.getById(id);
+        const [brandExists, categoryExists, areaExists] = await Promise.all([
+            assetsRepository.brandExists(input.marcaId),
+            assetsRepository.categoryExists(input.categoriaId),
+            assetsRepository.areaExists(input.areaId),
+        ]);
+        if (!brandExists) {
+            throw new NotFoundError("La marca indicada no existe");
+        }
+        if (!categoryExists) {
+            throw new NotFoundError("La categoría indicada no existe");
+        }
+        if (!areaExists) {
+            throw new NotFoundError("El área indicada no existe");
+        }
+        const codeExists = await assetsRepository.codeExistsForAnotherAsset(input.codigoInventario, id);
+        if (codeExists) {
+            throw new ConflictError("El código de inventario ya pertenece a otro activo");
+        }
+        const updated = await assetsRepository.update(id, input);
+        if (!updated) {
+            throw new NotFoundError("No se pudo actualizar el activo");
+        }
+        return updated;
+    }
+    /**
+     * Elmina un registro de Activo
+     * @param id
+     */
+    async delete(id) {
+        await this.getById(id);
+        const deleted = await assetsRepository.softDelete(id);
+        if (!deleted) {
+            throw new NotFoundError("No se pudo dar de baja el activo");
+        }
+    }
 }
 export const assetsService = new AssetsService();
 //# sourceMappingURL=assets.service.js.map
