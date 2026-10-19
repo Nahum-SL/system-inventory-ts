@@ -18,6 +18,7 @@ export class AssetsRepository {
       .innerJoin("marcas as m", "m.id", "a.marca_id")
       .innerJoin("categorias as c", "c.id", "a.categoria_id")
       .innerJoin("areas as ar", "ar.id", "a.area_id")
+      .where("a.eliminado", false)
       .select({
         id: "a.id",
         marcaId: "a.marca_id",
@@ -31,14 +32,16 @@ export class AssetsRepository {
         descripcion: "a.descripcion",
         estado: "a.estado",
         fechaRegistro: "a.fecharegistro",
+        eliminado: "a.eliminado",
+        fechaEliminacion: "a.fecha_eliminacion",
       });
   }
 
   /**
    * Mapea y normaliza Date (Fecha) para devolverlo como cadena
    * Para luego retornar todo los datos de la tabla Activos
-   * @param row 
-   * @returns 
+   * @param row
+   * @returns
    */
   private mapRow(row: Record<string, any>): Asset {
     const normalizeDate = (value: unknown): string => {
@@ -62,13 +65,16 @@ export class AssetsRepository {
       descripcion: row.descripcion == null ? null : String(row.descripcion),
       estado: row.estado as AssetStatus,
       fechaRegistro: String(row.fechaRegistro),
+      eliminado: Boolean(row.eliminado),
+      fechaEliminacion:
+        row.fechaEliminacion == null ? null : String(row.fechaEliminacion),
     };
   }
 
   /**
    * Lista a todos los Activos, en forma descendente
-   * @param filters 
-   * @returns 
+   * @param filters
+   * @returns
    */
   async findAll(filters: AssetFilters = {}): Promise<Asset[]> {
     const query = this.baseQuery().orderBy("a.id", "desc");
@@ -102,8 +108,8 @@ export class AssetsRepository {
 
   /**
    * Realiza una busqueda de los activos por ID del Registro activos
-   * @param id 
-   * @returns 
+   * @param id
+   * @returns
    */
   async findById(id: number): Promise<Asset | null> {
     const row = await this.baseQuery().where("a.id", id).first();
@@ -116,8 +122,8 @@ export class AssetsRepository {
   /**
    * Valida que el codigoInventario / QR, exista en la tabla de Activos
    * retornando un True / False
-   * @param codigoInventario 
-   * @returns 
+   * @param codigoInventario
+   * @returns
    */
   async codeExists(codigoInventario: string): Promise<boolean> {
     const row = await db("activos")
@@ -131,8 +137,8 @@ export class AssetsRepository {
   /**
    * Valida que el campo de marca , exista en la tabla de Activos
    * retornando un True / False
-   * @param id 
-   * @returns 
+   * @param id
+   * @returns
    */
   async brandExists(id: number): Promise<boolean> {
     const row = await db("marcas").select("id").where({ id }).first();
@@ -142,8 +148,8 @@ export class AssetsRepository {
   /**
    * Valida que la categoria, exista en la tabla de Activos
    * retornando un True / False
-   * @param id 
-   * @returns 
+   * @param id
+   * @returns
    */
   async categoryExists(id: number): Promise<boolean> {
     const row = await db("categorias").select("id").where({ id }).first();
@@ -173,7 +179,6 @@ export class AssetsRepository {
       estado: data.estado,
     });
 
-
     // Usando el metodo findByCode() valida que el codigo QR exista y sea valido
     const created = await this.findByCode(data.codigoInventario);
 
@@ -184,7 +189,33 @@ export class AssetsRepository {
     return created;
   }
 
-    /**
+  /**
+   * Metodo que actualizara el estado del Activom recibiendo como parametros
+   * @param id 
+   * @param data 
+   * @returns 
+   */
+  async update(id: number, data: CreateAssetData): Promise<Asset | null> {
+    const updated = await db("activos")
+      .where({ id, eliminado: false })
+      .update({
+        marca_id: data.marcaId,
+        categoria_id: data.categoriaId,
+        area_id: data.areaId,
+        codigo_inventario: data.codigoInventario,
+        fechaingreso: data.fechaIngreso,
+        descripcion: data.descripcion ?? null,
+        estado: data.estado,
+      });
+
+    if (!updated) {
+      return null;
+    }
+
+    return this.findById(id);
+  }
+
+  /**
    * Realiza una busqueda por codigo QR
    */
   private async findByCode(codigoInventario: string): Promise<Asset | null> {
