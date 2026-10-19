@@ -36,4 +36,32 @@ export const createMovement = async (req, res, next) => {
         next(error);
     }
 };
+/**
+ * Recibe la peticion HTTP, invoca el servicio getHistory() del servicio
+ * @param req
+ * @param res
+ * @param next
+ * @returns
+ */
+export const getMovementHistory = async (req, res, next) => {
+    try {
+        const activoId = Number(req.params.id);
+        if (!Number.isSafeInteger(activoId) || activoId <= 0) {
+            res.status(400).json({
+                status: "error",
+                message: "El ID del activo no es válido",
+            });
+            return;
+        }
+        const history = await movementsService.getHistory(activoId);
+        res.status(200).json({
+            status: "success",
+            results: history.length,
+            data: history,
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+};
 //# sourceMappingURL=movements.controller.js.map

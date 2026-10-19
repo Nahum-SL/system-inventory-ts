@@ -8,6 +8,25 @@ import { movementsRepository } from "./movements.repository.js";
  * Clase que contendra la logica CRUD
  */
 export class MovementsService {
+    /**
+     * Obtiene el historial del movimiento recibiendo el siguiente parametro
+     * @param activoId
+     * @returns
+     */
+    async getHistory(activoId) {
+        const history = await movementsRepository.findHistoryByAssetId(activoId);
+        if (history === null) {
+            throw new NotFoundError("El activo no existe");
+        }
+        return history;
+    }
+    /**
+     * Crea un nuevo movimiento, recibiendo los siguiente parametros
+     * @param activoId
+     * @param usuarioId
+     * @param input
+     * @returns
+     */
     async create(activoId, usuarioId, input) {
         const asset = await assetsRepository.findById(activoId);
         if (!asset) {
