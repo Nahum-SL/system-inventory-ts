@@ -9,6 +9,7 @@ export class AssetsRepository {
             .innerJoin("marcas as m", "m.id", "a.marca_id")
             .innerJoin("categorias as c", "c.id", "a.categoria_id")
             .innerJoin("areas as ar", "ar.id", "a.area_id")
+            .where("a.eliminado", false)
             .select({
             id: "a.id",
             marcaId: "a.marca_id",
@@ -22,6 +23,8 @@ export class AssetsRepository {
             descripcion: "a.descripcion",
             estado: "a.estado",
             fechaRegistro: "a.fecharegistro",
+            eliminado: "a.eliminado",
+            fechaEliminacion: "a.fecha_eliminacion",
         });
     }
     /**
@@ -50,6 +53,8 @@ export class AssetsRepository {
             descripcion: row.descripcion == null ? null : String(row.descripcion),
             estado: row.estado,
             fechaRegistro: String(row.fechaRegistro),
+            eliminado: Boolean(row.eliminado),
+            fechaEliminacion: row.fechaEliminacion == null ? null : String(row.fechaEliminacion),
         };
     }
     /**
@@ -154,8 +159,31 @@ export class AssetsRepository {
         return created;
     }
     /**
-   * Realiza una busqueda por codigo QR
-   */
+     * Metodo que actualizara el estado del Activom recibiendo como parametros
+     * @param id
+     * @param data
+     * @returns
+     */
+    async update(id, data) {
+        const updated = await db("activos")
+            .where({ id, eliminado: false })
+            .update({
+            marca_id: data.marcaId,
+            categoria_id: data.categoriaId,
+            area_id: data.areaId,
+            codigo_inventario: data.codigoInventario,
+            fechaingreso: data.fechaIngreso,
+            descripcion: data.descripcion ?? null,
+            estado: data.estado,
+        });
+        if (!updated) {
+            return null;
+        }
+        return this.findById(id);
+    }
+    /**
+     * Realiza una busqueda por codigo QR
+     */
     async findByCode(codigoInventario) {
         const row = await this.baseQuery()
             .where("a.codigo_inventario", codigoInventario)

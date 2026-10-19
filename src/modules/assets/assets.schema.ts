@@ -45,3 +45,6 @@ export const createAssetSchema = z.object({
 });
 
 export type CreateAssetInput = z.infer<typeof createAssetSchema>;
+
+export const updateAssetSchema = createAssetSchema;
+export type UpdateAssetInput = z.infer<typeof updateAssetSchema>;
