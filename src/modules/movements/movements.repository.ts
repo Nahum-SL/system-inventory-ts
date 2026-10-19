@@ -1,10 +1,12 @@
 import db from "../../database/knex.js";
+
+import { ConflictError } from "../../shared/errors/AppError.js";
 // types
 import type { CreateMovementData, Movement } from "./movements.types.js";
 
 /**
- * Repositorio de la tabla Movimientos, sera intermediario entre la 
- * logica de negocio (servicios, controladores, casos de uso)de la app y 
+ * Repositorio de la tabla Movimientos, sera intermediario entre la
+ * logica de negocio (servicios, controladores, casos de uso)de la app y
  * la fuente de datos (SQL, API)
  */
 export class MovementsRepository {
@@ -28,8 +30,9 @@ export class MovementsRepository {
       const areaOrigenId = Number(asset.area_id);
       const areaDestinoId = data.areaDestinoId;
 
+      // Devolverá 409 Conflict, coherente con la situación
       if (areaOrigenId === areaDestinoId) {
-        throw new Error("El activo ya se encuentra en esa área");
+        throw new ConflictError("El activo ya se encuentra en esa área");
       }
 
       const [movementId] = await trx("movimientos").insert({
