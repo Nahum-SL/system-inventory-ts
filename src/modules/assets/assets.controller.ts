@@ -7,10 +7,10 @@ import type { AssetStatus, AssetFilters } from "./assets.types.js";
 
 /**
  * Lista todos los activos
- * @param req 
- * @param res 
- * @param next 
- * @returns 
+ * @param req
+ * @param res
+ * @param next
+ * @returns
  */
 export const listAssets: RequestHandler = async (req, res, next) => {
   try {
@@ -54,13 +54,12 @@ export const listAssets: RequestHandler = async (req, res, next) => {
   }
 };
 
-
 /**
  * Realiza una busqueda por ID en Activos
- * @param req 
- * @param res 
- * @param next 
- * @returns 
+ * @param req
+ * @param res
+ * @param next
+ * @returns
  */
 export const getAssetById: RequestHandler = async (req, res, next) => {
   try {
@@ -87,9 +86,9 @@ export const getAssetById: RequestHandler = async (req, res, next) => {
 
 /**
  * Crea un nuevo registro en Activos
- * @param req 
- * @param res 
- * @param next 
+ * @param req
+ * @param res
+ * @param next
  */
 export const createAsset: RequestHandler = async (req, res, next) => {
   try {
@@ -99,6 +98,67 @@ export const createAsset: RequestHandler = async (req, res, next) => {
       status: "success",
       message: "Activo registrado correctamente",
       data: asset,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Recibe la peticion HTTP, invoca el servicio update() y devuelve la respuesta
+ * @param req 
+ * @param res 
+ * @param next 
+ * @returns 
+ */
+export const updateAsset: RequestHandler = async (req, res, next) => {
+  try {
+    const id = Number(req.params.id);
+
+    if (!Number.isSafeInteger(id) || id <= 0) {
+      res.status(400).json({
+        status: "error",
+        message: "El ID del activo no es válido",
+      });
+      return;
+    }
+
+    const asset = await assetsService.update(id, req.body);
+
+    res.status(200).json({
+      status: "success",
+      message: "Activo actualizado correctamente",
+      data: asset,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Recibe la peticion HTTP, invoca el servicio delete() y devuelve la respuesta
+ * @param req 
+ * @param res 
+ * @param next 
+ * @returns 
+ */
+export const deleteAsset: RequestHandler = async (req, res, next) => {
+  try {
+    const id = Number(req.params.id);
+
+    if (!Number.isSafeInteger(id) || id <= 0) {
+      res.status(400).json({
+        status: "error",
+        message: "El ID del activo no es válido",
+      });
+      return;
+    }
+
+    await assetsService.delete(id);
+
+    res.status(200).json({
+      status: "success",
+      message: "Activo dado de baja correctamente",
     });
   } catch (error) {
     next(error);
