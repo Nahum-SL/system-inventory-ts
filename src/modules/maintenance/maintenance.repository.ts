@@ -15,9 +15,9 @@ import type {
 
 export class MaintenanceRepository {
   /**
-   * Creara un nuevo mantenimiento siempre y cuando no tenga el campo de eliminado en true(Osea este eliminado)
-   * @param data 
-   * @returns 
+   * Registra un mantenimiento dentro de una transacción y comprueba que el activo exista y no esté eliminado.
+   * @param data
+   * @returns
    */
   async create(data: CreateMaintenanceData): Promise<Maintenance | null> {
     return db.transaction(async (trx) => {
@@ -68,9 +68,11 @@ export class MaintenanceRepository {
   }
 
   /**
-   * Busca por historial del Activo, recibiendo como parametro el activo_id
-   * @param activoId 
-   * @returns 
+   * Rrecupera el historial ordenado por fecha, del más reciente al más antiguo.
+   * Devuelve null si el activo no existey un arreglo vacío si existe, 
+   * pero todavía no tiene mantenimientos.
+   * @param activoId
+   * @returns
    */
   async findHistoryByAssetId(activoId: number): Promise<Maintenance[] | null> {
     const asset = await db("activos")
@@ -104,8 +106,8 @@ export class MaintenanceRepository {
 
   /**
    * Mapea los datos de la tabla
-   * @param row 
-   * @returns 
+   * @param row
+   * @returns
    */
   private mapRow(row: Record<string, unknown>): Maintenance {
     const formatDate = (value: unknown): string => {
