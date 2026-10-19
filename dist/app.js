@@ -14,6 +14,8 @@ import authRoutes from "./modules/auth/auth.routes.js";
 import userRoutes from "./modules/users/users.routes.js";
 // Activos
 import assetsRoutes from "./modules/assets/assets.routes.js";
+// Moviemientos
+import movementsRoutes from "./modules/movements/movements.route.js";
 // ===========
 // MIDDLEWARES
 // ===========
@@ -33,10 +35,11 @@ app.use(cors());
 app.use(express.json({ limit: "1mb" }));
 // /api/health: permite comprobar que Express está respondiendo.
 app.use(express.urlencoded({ extended: true }));
-// Modulos
+// Endpoint Modulos
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/assets", assetsRoutes);
+app.use("/api/movements", movementsRoutes);
 // Health check - Endpoint para verificar el estado de la API
 app.get("/api/health", (_req, res) => {
     res.status(200).json({

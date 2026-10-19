@@ -10,6 +10,62 @@ import type { CreateMovementData, Movement } from "./movements.types.js";
  * la fuente de datos (SQL, API)
  */
 export class MovementsRepository {
+  /**
+   * Realiza una busqueda por activo_id
+   * devuelve null si el activo no existe y una lista vacía si existe
+   * @param activoId 
+   * @returns 
+   */
+  async findHistoryByAssetId(activoId: number): Promise<Movement[] | null> {
+    // Consultamos el activo sin filtrar por eliminado,
+    // para conservar acceso a su historial histórico.
+    const asset = await db("activos")
+      .select("id")
+      .where({ id: activoId })
+      .first();
+
+    if (!asset) {
+      return null;
+    }
+
+    const rows = await db("movimientos as mv")
+      .innerJoin("activos as a", "a.id", "mv.activo_id")
+      .leftJoin("areas as origen", "origen.id", "mv.area_origen_id")
+      .innerJoin("areas as destino", "destino.id", "mv.area_destino_id")
+      .innerJoin("usuarios as u", "u.id", "mv.usuario_id")
+      .select({
+        id: "mv.id",
+        activoId: "mv.activo_id",
+        codigoInventario: "a.codigo_inventario",
+        areaOrigenId: "mv.area_origen_id",
+        areaOrigenNombre: "origen.nombre",
+        areaDestinoId: "mv.area_destino_id",
+        areaDestinoNombre: "destino.nombre",
+        usuarioId: "mv.usuario_id",
+        username: "u.username",
+        fechaMovimiento: "mv.fecha_movimiento",
+        motivo: "mv.motivo",
+      })
+      .where("mv.activo_id", activoId)
+      .orderBy("mv.fecha_movimiento", "desc")
+      .orderBy("mv.id", "desc");
+
+    return rows.map((row) => ({
+      id: Number(row.id),
+      activoId: Number(row.activoId),
+      codigoInventario: String(row.codigoInventario),
+      areaOrigenId: row.areaOrigenId == null ? null : Number(row.areaOrigenId),
+      areaOrigenNombre:
+        row.areaOrigenNombre == null ? null : String(row.areaOrigenNombre),
+      areaDestinoId: Number(row.areaDestinoId),
+      areaDestinoNombre: String(row.areaDestinoNombre),
+      usuarioId: Number(row.usuarioId),
+      username: String(row.username),
+      fechaMovimiento: String(row.fechaMovimiento),
+      motivo: row.motivo == null ? null : String(row.motivo),
+    }));
+  }
+
   async create(data: CreateMovementData): Promise<Movement | null> {
     return db.transaction(async (trx) => {
       // Bloqueamos el registro durante el traslado para evitar
