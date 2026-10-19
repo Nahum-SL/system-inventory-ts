@@ -6,7 +6,7 @@ import { validate } from "../../shared/middlewares/validate.middleware.js";
 // Schema
 import { createMovementSchema } from "./movements.schema.js";
 // Controlador
-import { createMovement } from "./movements.controller.js";
+import { createMovement, getMovementHistory } from "./movements.controller.js";
 
 const movementsRoutes = Router();
 
@@ -19,5 +19,7 @@ movementsRoutes.post(
   validate(createMovementSchema),
   createMovement,
 );
+
+movementsRoutes.get("/assets/:id", getMovementHistory);
 
 export default movementsRoutes;
