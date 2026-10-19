@@ -135,6 +135,25 @@ export class AssetsRepository {
   }
 
   /**
+   * Realiza una busqueda, validando que si el codigo existe para otro activo
+   * @param codigoInventario 
+   * @param id 
+   * @returns 
+   */
+  async codeExistsForAnotherAsset(
+    codigoInventario: string,
+    id: number,
+  ): Promise<boolean> {
+    const row = await db("activos")
+      .select("id")
+      .where({ codigo_inventario: codigoInventario })
+      .whereNot("id", id)
+      .first();
+
+    return Boolean(row);
+  }
+
+  /**
    * Valida que el campo de marca , exista en la tabla de Activos
    * retornando un True / False
    * @param id
@@ -191,9 +210,9 @@ export class AssetsRepository {
 
   /**
    * Metodo que actualizara el estado del Activom recibiendo como parametros
-   * @param id 
-   * @param data 
-   * @returns 
+   * @param id
+   * @param data
+   * @returns
    */
   async update(id: number, data: CreateAssetData): Promise<Asset | null> {
     const updated = await db("activos")
