@@ -8,16 +8,16 @@ import { createMovementSchema } from "./movements.schema.js";
 // Controlador
 import { createMovement } from "./movements.controller.js";
 
-const router = Router();
+const movementsRoutes = Router();
 
-router.use(authenticate);
+movementsRoutes.use(authenticate);
 
 // Url
-router.post(
+movementsRoutes.post(
   "/assets/:id",
   authorize("admin"),
   validate(createMovementSchema),
   createMovement,
 );
 
-export default router;
+export default movementsRoutes;
