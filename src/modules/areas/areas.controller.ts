@@ -1,7 +1,5 @@
 // Servicio
 import { areasService } from "./areas.service.js";
-// MIDDLEWARE - Manejo de errores
-import { BadRequestError } from "../../shared/errors/AppError.js";
 // Utils
 import { asyncHandler } from "../../shared/utils/asyncHandler.js";
 import { parseId } from "../../shared/utils/parseId.js";
