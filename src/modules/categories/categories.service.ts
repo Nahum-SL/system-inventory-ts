@@ -9,7 +9,7 @@ import type {
   CreateCategoryInput,
   UpdateCategoryInput,
 } from "./categories.schema.js";
-import { isDuplicateEntryError } from "../../shared/utils/isDuplicatedEntryError.js";
+import { isDuplicateEntryError } from "../../shared/utils/isDuplicateEntryError.js";
 
 /**
  * Servicio de la lógica de negocio del módulo de categorías.
