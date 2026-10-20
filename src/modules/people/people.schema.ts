@@ -23,16 +23,14 @@ export const createPersonSchema = z.object({
     .trim()
     .regex(/^\d{9}$/, {
       message: "El teléfono debe contener 9 dígitos",
-    })
-    .optional(),
+    }),
 
   email: z
     .preprocess(
       (val) => (typeof val === "string" ? val.trim() : val),
       z.email().max(150),
-    )
-    .optional()
-    .or(z.literal("")),
+    ).or(z.literal("")),
+
 });
 
 export type CreatePersonInput = z.infer<typeof createPersonSchema>;
