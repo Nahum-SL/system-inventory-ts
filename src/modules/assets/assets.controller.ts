@@ -1,166 +1,58 @@
-import type { RequestHandler } from "express";
-// Servicio GET - POST
+// UTILS
+import { asyncHandler } from "../../shared/utils/asyncHandler.js";
+import { parseId } from "../../shared/utils/parseId.js";
+// SERVICIO
 import { assetsService } from "./assets.service.js";
-
 // Types
-import type { AssetStatus, AssetFilters } from "./assets.types.js";
+import type { AssetFilters } from "./assets.types.js";
 
-/**
- * Lista todos los activos
- * @param req
- * @param res
- * @param next
- * @returns
- */
-export const listAssets: RequestHandler = async (req, res, next) => {
-  try {
-    const filters: AssetFilters = {};
+/** Lista activos. El query llega validado por `validate(listAssetsQuerySchema, "query")`. */
+export const listAssets = asyncHandler(async (req, res) => {
+  const assets = await assetsService.list(req.query as AssetFilters);
 
-    if (typeof req.query.q === "string") {
-      filters.q = req.query.q;
-    }
+  res.status(200).json({
+    status: "success",
+    results: assets.length,
+    data: assets,
+  });
+});
 
-    if (
-      req.query.estado === "activo" ||
-      req.query.estado === "inactivo" ||
-      req.query.estado === "mantenimiento"
-    ) {
-      filters.estado = req.query.estado as AssetStatus;
-    }
+export const getAssetById = asyncHandler(async (req, res) => {
+  const asset = await assetsService.getById(
+    parseId(req.params.id, "del activo"),
+  );
 
-    if (req.query.areaId !== undefined) {
-      const areaId = Number(req.query.areaId);
+  res.status(200).json({ status: "success", data: asset });
+});
 
-      if (!Number.isSafeInteger(areaId) || areaId <= 0) {
-        res.status(400).json({
-          status: "error",
-          message: "El ID del área no es válido",
-        });
-        return;
-      }
+export const createAsset = asyncHandler(async (req, res) => {
+  const asset = await assetsService.create(req.body);
 
-      filters.areaId = areaId;
-    }
+  res.status(201).json({
+    status: "success",
+    message: "Activo registrado correctamente",
+    data: asset,
+  });
+});
 
-    const assets = await assetsService.list(filters);
+export const updateAsset = asyncHandler(async (req, res) => {
+  const asset = await assetsService.update(
+    parseId(req.params.id, "del activo"),
+    req.body,
+  );
 
-    res.status(200).json({
-      status: "success",
-      results: assets.length,
-      data: assets,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+  res.status(200).json({
+    status: "success",
+    message: "Activo actualizado correctamente",
+    data: asset,
+  });
+});
 
-/**
- * Realiza una busqueda por ID en Activos
- * @param req
- * @param res
- * @param next
- * @returns
- */
-export const getAssetById: RequestHandler = async (req, res, next) => {
-  try {
-    const id = Number(req.params.id);
+export const deleteAsset = asyncHandler(async (req, res) => {
+  await assetsService.delete(parseId(req.params.id, "del activo"));
 
-    if (!Number.isSafeInteger(id) || id <= 0) {
-      res.status(400).json({
-        status: "error",
-        message: "El ID del activo no es válido",
-      });
-      return;
-    }
-
-    const asset = await assetsService.getById(id);
-
-    res.status(200).json({
-      status: "success",
-      data: asset,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-/**
- * Crea un nuevo registro en Activos
- * @param req
- * @param res
- * @param next
- */
-export const createAsset: RequestHandler = async (req, res, next) => {
-  try {
-    const asset = await assetsService.create(req.body);
-
-    res.status(201).json({
-      status: "success",
-      message: "Activo registrado correctamente",
-      data: asset,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-/**
- * Recibe la peticion HTTP, invoca el servicio update() y devuelve la respuesta
- * @param req 
- * @param res 
- * @param next 
- * @returns 
- */
-export const updateAsset: RequestHandler = async (req, res, next) => {
-  try {
-    const id = Number(req.params.id);
-
-    if (!Number.isSafeInteger(id) || id <= 0) {
-      res.status(400).json({
-        status: "error",
-        message: "El ID del activo no es válido",
-      });
-      return;
-    }
-
-    const asset = await assetsService.update(id, req.body);
-
-    res.status(200).json({
-      status: "success",
-      message: "Activo actualizado correctamente",
-      data: asset,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-/**
- * Recibe la peticion HTTP, invoca el servicio delete() y devuelve la respuesta
- * @param req 
- * @param res 
- * @param next 
- * @returns 
- */
-export const deleteAsset: RequestHandler = async (req, res, next) => {
-  try {
-    const id = Number(req.params.id);
-
-    if (!Number.isSafeInteger(id) || id <= 0) {
-      res.status(400).json({
-        status: "error",
-        message: "El ID del activo no es válido",
-      });
-      return;
-    }
-
-    await assetsService.delete(id);
-
-    res.status(200).json({
-      status: "success",
-      message: "Activo dado de baja correctamente",
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+  res.status(200).json({
+    status: "success",
+    message: "Activo dado de baja correctamente",
+  });
+});
