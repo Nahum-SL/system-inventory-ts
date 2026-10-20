@@ -108,7 +108,10 @@ export async function up(knex) {
         table.string("codigo_inventario", 150).notNullable().unique();
         table.date("fechaingreso").notNullable();
         table.string("descripcion", 250).notNullable();
-        table.enu("estado", ["activo", "inactivo", "mantenimiento"]).notNullable();
+        table
+            .enu("estado", ["operativo", "mantenimiento", "fuera_de_servicio"])
+            .notNullable()
+            .defaultTo("operativo");
         table.timestamp("fecharegistro").notNullable().defaultTo(knex.fn.now());
     });
     // 8. Asignaciones
@@ -205,6 +208,7 @@ export async function up(knex) {
             .onDelete("RESTRICT");
         table.enu("tipo", ["preventivo", "correctivo"]).notNullable();
         table.date("fecha").notNullable();
+        table.date("fecha_fin").nullable();
         table.string("descripcion", 250).notNullable();
         table.text("observaciones").nullable();
         table.decimal("costo", 10, 2).notNullable().defaultTo(0);

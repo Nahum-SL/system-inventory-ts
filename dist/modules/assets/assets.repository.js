@@ -50,7 +50,7 @@ export class AssetsRepository {
             areaNombre: String(row.areaNombre),
             codigoInventario: String(row.codigoInventario),
             fechaIngreso: normalizeDate(row.fechaIngreso),
-            descripcion: row.descripcion == null ? null : String(row.descripcion),
+            descripcion: String(row.descripcion),
             estado: row.estado,
             fechaRegistro: String(row.fechaRegistro),
             eliminado: Boolean(row.eliminado),
@@ -173,29 +173,6 @@ export class AssetsRepository {
         return created;
     }
     /**
-     * Metodo que actualizara el estado del Activom recibiendo como parametros
-     * @param id
-     * @param data
-     * @returns
-     */
-    async update(id, data) {
-        const updated = await db("activos")
-            .where({ id, eliminado: false })
-            .update({
-            marca_id: data.marcaId,
-            categoria_id: data.categoriaId,
-            area_id: data.areaId,
-            codigo_inventario: data.codigoInventario,
-            fechaingreso: data.fechaIngreso,
-            descripcion: data.descripcion ?? null,
-            estado: data.estado,
-        });
-        if (!updated) {
-            return null;
-        }
-        return this.findById(id);
-    }
-    /**
      * Realiza una busqueda por codigo QR
      */
     async findByCode(codigoInventario) {
@@ -203,6 +180,21 @@ export class AssetsRepository {
             .where("a.codigo_inventario", codigoInventario)
             .first();
         return row ? this.mapRow(row) : null;
+    }
+    async update(id, data) {
+        const updateData = {};
+        if (data.marcaId !== undefined)
+            updateData.marca_id = data.marcaId;
+        if (data.categoriaId !== undefined)
+            updateData.categoria_id = data.categoriaId;
+        if (data.fechaIngreso !== undefined)
+            updateData.fechaingreso = data.fechaIngreso;
+        if (data.descripcion !== undefined)
+            updateData.descripcion = data.descripcion;
+        if (Object.keys(updateData).length > 0) {
+            await db("activos").where({ id, eliminado: false }).update(updateData);
+        }
+        return this.findById(id);
     }
     /**
      * Elimnacion suave
