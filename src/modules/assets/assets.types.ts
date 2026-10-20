@@ -16,7 +16,7 @@ export interface Asset {
   areaNombre: string;
   codigoInventario: string;
   fechaIngreso: string;
-  descripcion: string | null;
+  descripcion: string;
   estado: AssetStatus;
   fechaRegistro: string;
   eliminado: boolean;
@@ -29,6 +29,13 @@ export interface CreateAssetData {
   areaId: number;
   codigoInventario: string;
   fechaIngreso: string;
-  descripcion?: string;
+  descripcion: string;
   estado: AssetStatus;
+}
+
+export interface UpdateAssetData {
+  marcaId?: number;
+  categoriaId?: number;
+  fechaIngreso?: string;
+  descripcion?: string;
 }
