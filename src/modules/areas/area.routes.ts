@@ -13,28 +13,28 @@ import {
   updateArea,
 } from "./areas.controller.js";
 
-const areaRoutes = Router();
+const areasRoutes = Router();
 
 // Todas las operaciones requieren autenticación.
-areaRoutes.use(authenticate);
+areasRoutes.use(authenticate);
 
 // Lectura: cualquier usuario autenticado.
-areaRoutes.get("/", listAreas);
-areaRoutes.get("/:id", getAreaById);
+areasRoutes.get("/", listAreas);
+areasRoutes.get("/:id", getAreaById);
 
 // Escritura: solo administradores.
-areaRoutes.post(
+areasRoutes.post(
   "/",
   authorize("admin"),
   validate(createAreaSchema),
   createArea,
 );
 
-areaRoutes.patch(
+areasRoutes.patch(
   "/:id",
   authorize("admin"),
   validate(updateAreaSchema),
   updateArea,
 );
 
-export default areaRoutes;
+export default areasRoutes;
