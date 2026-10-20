@@ -6,7 +6,7 @@ import { validate } from "../../shared/middlewares/validate.middleware.js";
 // CONTROLLER - MANTENIMIENTO
 import {
   createMaintenance,
-  getMaintenanceHistory,
+  closeMaintenance,
 } from "./maintenance.controller.js";
 // Schema
 import { createMaintenanceSchema } from "./maintenance.shema.js";
@@ -15,10 +15,10 @@ const maintenanceRoutes = Router();
 
 maintenanceRoutes.use(authenticate);
 
-maintenanceRoutes.get("/assets/:id", getMaintenanceHistory);
+maintenanceRoutes.patch("/maintenance/:id/close", closeMaintenance);
 
 maintenanceRoutes.post(
-  "/assets/:id",
+  "/assets/:id/maintenance",
   authorize("admin"),
   validate(createMaintenanceSchema),
   createMaintenance,
