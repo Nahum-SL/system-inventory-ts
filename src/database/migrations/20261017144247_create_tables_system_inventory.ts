@@ -6,7 +6,7 @@ export async function up(knex: Knex): Promise<void> {
     table.engine("InnoDB");
     table.charset("utf8mb4");
     table.collate("utf8mb4_unicode_ci");
-    
+
     table.increments("id").primary();
     table.string("apellidos", 150).notNullable();
     table.string("nombres", 150).notNullable();
@@ -22,7 +22,7 @@ export async function up(knex: Knex): Promise<void> {
     table.engine("InnoDB");
     table.charset("utf8mb4");
     table.collate("utf8mb4_unicode_ci");
-    
+
     table.increments("id").primary();
     table.string("nombre", 150).notNullable().unique();
     table.timestamp("fecharegistro").notNullable().defaultTo(knex.fn.now());
@@ -33,7 +33,7 @@ export async function up(knex: Knex): Promise<void> {
     table.engine("InnoDB");
     table.charset("utf8mb4");
     table.collate("utf8mb4_unicode_ci");
-    
+
     table.increments("id").primary();
     table.string("nombre", 150).notNullable().unique();
     table.timestamp("fecharegistro").notNullable().defaultTo(knex.fn.now());
@@ -44,7 +44,7 @@ export async function up(knex: Knex): Promise<void> {
     table.engine("InnoDB");
     table.charset("utf8mb4");
     table.collate("utf8mb4_unicode_ci");
-    
+
     table.increments("id").primary();
     table.string("nombre", 150).notNullable().unique();
     table.timestamp("fecharegistro").notNullable().defaultTo(knex.fn.now());
@@ -55,7 +55,7 @@ export async function up(knex: Knex): Promise<void> {
     table.engine("InnoDB");
     table.charset("utf8mb4");
     table.collate("utf8mb4_unicode_ci");
-    
+
     table.increments("id").primary();
     table
       .integer("area_id")
@@ -76,7 +76,6 @@ export async function up(knex: Knex): Promise<void> {
     table.engine("InnoDB");
     table.charset("utf8mb4");
     table.collate("utf8mb4_unicode_ci");
-    
 
     table.increments("id").primary();
     table
@@ -98,7 +97,7 @@ export async function up(knex: Knex): Promise<void> {
     table.engine("InnoDB");
     table.charset("utf8mb4");
     table.collate("utf8mb4_unicode_ci");
-    
+
     table.increments("id").primary();
 
     table
@@ -131,7 +130,10 @@ export async function up(knex: Knex): Promise<void> {
     table.string("codigo_inventario", 150).notNullable().unique();
     table.date("fechaingreso").notNullable();
     table.string("descripcion", 250).notNullable();
-    table.enu("estado", ["activo", "inactivo", "mantenimiento"]).notNullable();
+    table
+      .enu("estado", ["operativo", "mantenimiento", "fuera_de_servicio"])
+      .notNullable()
+      .defaultTo("operativo");
     table.timestamp("fecharegistro").notNullable().defaultTo(knex.fn.now());
   });
 
@@ -140,7 +142,7 @@ export async function up(knex: Knex): Promise<void> {
     table.engine("InnoDB");
     table.charset("utf8mb4");
     table.collate("utf8mb4_unicode_ci");
-    
+
     table.increments("id").primary();
 
     table
@@ -183,7 +185,7 @@ export async function up(knex: Knex): Promise<void> {
     table.engine("InnoDB");
     table.charset("utf8mb4");
     table.collate("utf8mb4_unicode_ci");
-    
+
     table.increments("id").primary();
 
     table
@@ -231,7 +233,7 @@ export async function up(knex: Knex): Promise<void> {
     table.engine("InnoDB");
     table.charset("utf8mb4");
     table.collate("utf8mb4_unicode_ci");
-    
+
     table.increments("id").primary();
 
     table
