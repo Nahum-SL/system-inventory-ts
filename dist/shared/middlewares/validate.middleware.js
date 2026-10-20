@@ -1,31 +1,33 @@
-// Importa la clase BadRequestError desde el archivo de errores personalizado
-import { BadRequestError } from "../errors/AppError.js";
+import { ValidationError } from "../errors/AppError.js";
 /**
- * Middleware de validación que utiliza un esquema de Zod para validar
- * partes específicas de la solicitud (body, params o query).
-*/
+ * Valida una parte de la solicitud (body, params o query) con un esquema de Zod.
+ *
+ * - Si falla, pasa un {@link ValidationError} con el detalle por campo.
+ * - Si pasa, reemplaza esa parte de la solicitud por los datos ya
+ *   parseados (recortados, normalizados y sin claves desconocidas).
+ *
+ * @param schema - Esquema de Zod contra el que se valida.
+ * @param part - Parte de la solicitud a validar. Por defecto `body`.
+ */
 export function validate(schema, part = "body") {
     return (req, _res, next) => {
-        // Valida la parte especificada de la solicitud utilizando el esquema de Zod
         const result = schema.safeParse(req[part]);
-        // Si la validación falla, crea un BadRequestError con los detalles de los errores y pasa el error al siguiente middleware
         if (!result.success) {
-            const details = result.error.issues.map((issue) => ({
+            next(new ValidationError(result.error.issues.map((issue) => ({
                 field: issue.path.join("."),
                 message: issue.message,
-            }));
-            // Pasa un BadRequestError con los detalles de la validación fallida al siguiente middleware
-            next(new BadRequestError(JSON.stringify({
-                message: "Validacion fallida",
-                details,
-            })));
+            }))));
             return;
         }
-        // Si la validación es exitosa, reemplaza la parte de la solicitud con los datos validados 
-        // y pasa al siguiente middleware
+        // defineProperty en vez de `req[part] = ...`: en Express 5, `req.query`
+        // es un getter de solo lectura y la asignación directa lanzaría un error.
+        Object.defineProperty(req, part, {
+            value: result.data,
+            writable: true,
+            configurable: true,
+            enumerable: true,
+        });
         next();
     };
 }
-// schema.safeParse() -> valida los datos sin lanzar una excepción.
-// next() -> permite continuar al siguiente middleware o controlador.
 //# sourceMappingURL=validate.middleware.js.map

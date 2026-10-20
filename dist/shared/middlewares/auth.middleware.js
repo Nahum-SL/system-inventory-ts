@@ -9,7 +9,7 @@ import { UnauthorizedError } from "../errors/AppError.js";
  * Formato Bearer Token,
  * La firma sea válida y el token no haya expirado,
  * El ID, nombre y rol de usuario tengan el formato esperado
-*/
+ */
 export const authenticate = (req, _res, next) => {
     const authorization = req.headers.authorization;
     // Si el bearer no se encuentra
@@ -26,7 +26,9 @@ export const authenticate = (req, _res, next) => {
     }
     try {
         // se almacena el token y verifica con el JWT_SECRET validado
-        const payload = jwt.verify(token, env.JWT_SECRET);
+        const payload = jwt.verify(token, env.JWT_SECRET, {
+            algorithms: ["HS256"],
+        });
         if (typeof payload === "string" ||
             typeof payload.sub !== "string" ||
             !/^[1-9]\d*$/.test(payload.sub) ||

@@ -6,19 +6,30 @@
 export class AppError extends Error {
     statusCode;
     isOperational;
-    constructor(message, statusCode = 500, isOperational = true) {
+    details;
+    constructor(message, statusCode = 500, isOperational = true, details) {
         super(message);
         this.name = new.target.name;
         this.statusCode = statusCode;
         this.isOperational = isOperational;
+        this.details = details;
         Error.captureStackTrace?.(this, new.target);
+    }
+}
+/**
+ * Error 400 para validaciones fallidas. Lleva el detalle por campo
+ * en `details`, que el error handler expone como propiedad aparte.
+ */
+export class ValidationError extends AppError {
+    constructor(details, message = "Validación fallida") {
+        super(message, 400, true, details);
     }
 }
 /**
  * Las clases de error específicas extienden la clase AppError y representan
  * diferentes tipos de errores HTTP.
  * Cada clase tiene un mensaje predeterminado y un código de estado HTTP asociado.
-*/
+ */
 export class BadRequestError extends AppError {
     constructor(message = "Bad request") {
         super(message, 400);
@@ -27,7 +38,7 @@ export class BadRequestError extends AppError {
 /**
  * Las clases de error específicas extienden la clase AppError y representan diferentes tipos de errores HTTP.
  * Cada clase tiene un mensaje predeterminado y un código de estado HTTP asociado.
-*/
+ */
 export class UnauthorizedError extends AppError {
     constructor(message = "Unauthorized") {
         super(message, 401);
