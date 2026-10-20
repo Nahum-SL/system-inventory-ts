@@ -1,33 +1,43 @@
-// Este middleware de manejo de errores captura los errores que ocurren en la aplicación 
-// y envía una respuesta adecuada al cliente.
 import type { ErrorRequestHandler } from "express";
-// Importa la clase AppError desde el archivo de errores personalizado
 import { AppError } from "../errors/AppError.js";
 
 /**
- * Middleware de manejo de errores para capturar y responder a los errores en la aplicación.
+ * Middleware global de manejo de errores.
+ *
+ * - Errores operacionales ({@link AppError}): responden con su código,
+ *   mensaje y, si existe, `details` como propiedad aparte.
+ * - JSON malformado en el body: responde 400.
+ * - Cualquier otro error: se registra en el servidor y el cliente recibe
+ *   un mensaje genérico, sin filtrar información interna.
  */
 export const errorHandler: ErrorRequestHandler = (err, _req, res, next) => {
-  // Si los encabezados de la respuesta ya se han enviado, pasa el error al siguiente middleware
   if (res.headersSent) {
     next(err);
     return;
   }
 
-  // Si el error es una instancia de AppError, envía una respuesta con el código de estado y mensaje del error
-  if (err instanceof AppError) {
+  if (err instanceof AppError && err.isOperational) {
     res.status(err.statusCode).json({
       status: "error",
       message: err.message,
+      ...(err.details ? { details: err.details } : {}),
     });
     return;
   }
 
-  // Unexpected errors: keep details in server logs only.
+  // express.json() lanza un SyntaxError con este type cuando el body no es JSON válido.
+  if (err?.type === "entity.parse.failed") {
+    res.status(400).json({
+      status: "error",
+      message: "El cuerpo de la petición no es un JSON válido",
+    });
+    return;
+  }
+
   console.error("Unexpected error:", err);
 
   res.status(500).json({
     status: "error",
-    message: "Internal server error",
+    message: "Error interno del servidor",
   });
 };
