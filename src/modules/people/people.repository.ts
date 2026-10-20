@@ -3,6 +3,7 @@ import db from "../../database/knex.js";
 //types
 import type {
   CreatePersonData,
+  UpdatePersonData,
   Person,
   PersonFilters,
 } from "./people.types.js";
@@ -28,9 +29,9 @@ export class PeopleRepository {
    * tipos distintos a los del dominio (p. ej. `id` como string/bigint o
    * `fechaRegistro` como `Date`).
    *
-   * telefono y email se convierten explícitamente a string. 
+   * telefono y email se convierten explícitamente a string.
    * La base de datos debe garantizar que ambas columnas sean NOT NULL.
-   * 
+   *
    * @param row - Fila tal como la devuelve Knex, con los alias camelCase aplicados.
    * @returns Entidad de dominio con tipos garantizados.
    */
@@ -196,6 +197,42 @@ export class PeopleRepository {
     }
 
     return person;
+  }
+
+  async update(id: number, data: UpdatePersonData): Promise<Person | null> {
+    const updateData: Record<string, unknown> = {};
+
+    if (data.apellidos !== undefined) {
+      updateData.apellidos = data.apellidos;
+    }
+
+    if (data.nombres !== undefined) {
+      updateData.nombres = data.nombres;
+    }
+
+    if (data.tipodoc !== undefined) {
+      updateData.tipodoc = data.tipodoc;
+    }
+
+    if (data.numerodoc !== undefined) {
+      updateData.numerodoc = data.numerodoc;
+    }
+
+    if (data.telefono !== undefined) {
+      updateData.telefono = data.telefono;
+    }
+
+    if (data.email !== undefined) {
+      updateData.email = data.email;
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return this.findById(id);
+    }
+
+    await db("personas").where({ id }).update(updateData);
+
+    return this.findById(id);
   }
 }
 
