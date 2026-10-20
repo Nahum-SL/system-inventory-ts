@@ -15,11 +15,6 @@ export interface UpdateCategoryData {
   nombre?: string;
 }
 
-/**
- * Fila tal como la devuelve la base de datos.
- * Según el driver, `fechaRegistro` puede llegar como `Date` o como `string`,
- * y `id` como `number` o `string` (por ejemplo con columnas bigint).
- */
 export interface CategoryRow {
   id: number;
   nombre: string;
