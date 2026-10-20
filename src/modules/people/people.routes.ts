@@ -2,6 +2,7 @@ import { Router } from "express";
 // CONTROLLER
 import {
   createPerson,
+  updatePerson,
   getPersonById,
   listPeople,
 } from "./people.controller.js";
@@ -28,11 +29,11 @@ peopleRoutes.post(
   createPerson,
 );
 // Actualiza personas: solo administradores
-peopleRoutes.post(
+peopleRoutes.patch(
   "/:id",
   authorize("admin"),
   validate(updatePersonSchema),
-  createPerson,
+  updatePerson,
 );
 
 export default peopleRoutes;
