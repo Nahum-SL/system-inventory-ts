@@ -1,4 +1,11 @@
 export type AssetStatus = "operativo" | "mantenimiento" | "fuera_de_servicio";
+
+export type ManualAssetStatus = "operativo" | "fuera_de_servicio";
+
+export type ChangeStatusResult =
+  | { status: "ok" }
+  | { status: "not_found" }
+  | { status: "in_maintenance" };
 export interface AssetFilters {
   q?: string;
   estado?: AssetStatus;
