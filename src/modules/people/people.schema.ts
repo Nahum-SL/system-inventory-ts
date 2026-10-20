@@ -29,8 +29,19 @@ export const createPersonSchema = z.object({
     .preprocess(
       (val) => (typeof val === "string" ? val.trim() : val),
       z.email().max(150),
-    ).or(z.literal("")),
-
+    )
+    .or(z.literal("")),
 });
 
+/**
+ * Valida los campos enviados para actualizar una persona.
+ * Todos son opcionales, pero se debe enviar al menos uno.
+ */
+export const updatePersonSchema = createPersonSchema
+  .partial()
+  .refine((data) => Object.keys(data).length > 0, {
+    message: "Debes enviar al menos un campo para actualizar",
+  });
+
 export type CreatePersonInput = z.infer<typeof createPersonSchema>;
+export type UpdatePersonInput = z.infer<typeof updatePersonSchema>;

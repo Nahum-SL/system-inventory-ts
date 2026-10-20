@@ -20,6 +20,8 @@ import movementsRoutes from "./modules/movements/movements.route.js";
 import maintenanceRoutes from "./modules/maintenance/maintenance.routes.js";
 // Asignaciones
 import assignmentRoutes from "./modules/assigments/assignments.routes.js";
+// Personas
+import peopleRoutes from "./modules/people/people.routes.js";
 // ===========
 // MIDDLEWARES
 // ===========
@@ -46,6 +48,7 @@ app.use("/api/assets", assetsRoutes);
 app.use("/api/movements", movementsRoutes);
 app.use("/api/maintenance", maintenanceRoutes);
 app.use("/api/assignments", assignmentRoutes);
+app.use("/api/people", peopleRoutes);
 // Health check - Endpoint para verificar el estado de la API
 app.get("/api/health", (_req, res) => {
     res.status(200).json({
