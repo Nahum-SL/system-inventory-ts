@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const ESTADOS = ["activo", "inactivo", "mantenimiento"] as const;
+const ESTADOS = ["operativo", "mantenimiento", "fuera_de_servicio"] as const;
 
 const idField = (nombre: string) =>
   z
@@ -28,7 +28,7 @@ export const createAssetSchema = z.object({
     .trim()
     .min(1, "La descripción es obligatoria")
     .max(250, "La descripción no puede superar los 250 caracteres"),
-  estado: z.enum(ESTADOS).default("activo"),
+  estado: z.enum(ESTADOS).default("operativo"),
 });
 
 /**
