@@ -4,7 +4,11 @@ import { authenticate } from "../../shared/middlewares/auth.middleware.js";
 import { authorize } from "../../shared/middlewares/authorize.middleware.js";
 import { validate } from "../../shared/middlewares/validate.middleware.js";
 // SCHEMA - Valida que se cumpla el Contrato
-import { createAssetSchema, updateAssetSchema } from "./assets.schema.js";
+import {
+  createAssetSchema,
+  updateAssetSchema,
+  updateAssetStatusSchema,
+} from "./assets.schema.js";
 // CONTROLLER
 import {
   createAsset,
@@ -12,6 +16,7 @@ import {
   listAssets,
   deleteAsset,
   updateAsset,
+  updateAssetStatus,
 } from "./assets.controller.js";
 
 const assetsRoutes = Router();
@@ -34,6 +39,13 @@ assetsRoutes.patch(
   authorize("admin"),
   validate(updateAssetSchema),
   updateAsset,
+);
+
+assetsRoutes.patch(
+  "/:id/status",
+  authorize("admin"),
+  validate(updateAssetStatusSchema),
+  updateAssetStatus,
 );
 
 assetsRoutes.delete("/:id", authorize("admin"), deleteAsset);
