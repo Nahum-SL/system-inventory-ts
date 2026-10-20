@@ -56,3 +56,17 @@ export const deleteAsset = asyncHandler(async (req, res) => {
     message: "Activo dado de baja correctamente",
   });
 });
+
+/** Cambia el estado manual del activo. El body llega validado. */
+export const updateAssetStatus = asyncHandler(async (req, res) => {
+  const asset = await assetsService.changeStatus(
+    parseId(req.params.id, "del activo"),
+    req.body,
+  );
+
+  res.status(200).json({
+    status: "success",
+    message: "Estado del activo actualizado correctamente",
+    data: asset,
+  });
+});

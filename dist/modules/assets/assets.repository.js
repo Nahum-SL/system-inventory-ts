@@ -208,6 +208,34 @@ export class AssetsRepository {
         });
         return updated > 0;
     }
+    /**
+     * Cambia el estado manual de un activo (`operativo` ↔ `fuera_de_servicio`).
+     *
+     * Bloquea la fila con `FOR UPDATE` para no competir con la apertura o cierre
+     * de un mantenimiento sobre el mismo activo.
+     *
+     * @returns
+     * - `not_found`: no existe o está dado de baja.
+     * - `in_maintenance`: está en mantenimiento; su estado no se cambia a mano.
+     * - `ok`: el activo queda en el estado pedido (también si ya lo tenía).
+     */
+    async changeStatus(id, estado) {
+        return db.transaction(async (trx) => {
+            const asset = await trx("activos")
+                .select("id", "estado")
+                .where({ id, eliminado: false })
+                .forUpdate()
+                .first();
+            if (!asset)
+                return { status: "not_found" };
+            if (asset.estado === "mantenimiento")
+                return { status: "in_maintenance" };
+            if (asset.estado !== estado) {
+                await trx("activos").where({ id }).update({ estado });
+            }
+            return { status: "ok" };
+        });
+    }
 }
 export const assetsRepository = new AssetsRepository();
 //# sourceMappingURL=assets.repository.js.map
