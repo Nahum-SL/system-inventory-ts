@@ -48,6 +48,17 @@ export const updateAssetSchema = createAssetSchema
     path: ["body"],
   });
 
+/**
+ * Estados que se pueden fijar a mano. `mantenimiento` queda fuera porque
+ * solo cambia al abrir o cerrar un mantenimiento.
+ */
+export const updateAssetStatusSchema = z.object({
+  estado: z.enum(["operativo", "fuera_de_servicio"], {
+    error: "El estado debe ser 'operativo' o 'fuera_de_servicio'",
+  }),
+});
+
+
 /** Filtros de listado (query string). */
 export const listAssetsQuerySchema = z.object({
   q: z.string().trim().optional(),
@@ -57,3 +68,5 @@ export const listAssetsQuerySchema = z.object({
 
 export type CreateAssetInput = z.infer<typeof createAssetSchema>;
 export type UpdateAssetInput = z.infer<typeof updateAssetSchema>;
+
+export type UpdateAssetStatusInput = z.infer<typeof updateAssetStatusSchema>;
