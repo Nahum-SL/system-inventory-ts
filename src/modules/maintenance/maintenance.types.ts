@@ -24,6 +24,7 @@ export interface Maintenance {
   codigoInventario: string;
   tipo: MaintenanceType;
   fecha: string;
+  fechaFin: string | null;
   descripcion: string;
   observaciones: string | null;
   costo: number;
