@@ -10,6 +10,7 @@ import type { UserRole } from "../../modules/users/users.types.js";
  * de poder seguir, si no cuenta con ningun rol (admin, usuario) lo retorna
  */
 export function authorize(...allowedRoles: UserRole[]): RequestHandler {
+
   return (req, _res, next) => {
     if (!req.auth) {
       next(new UnauthorizedError("Debes autenticarte primero"));
