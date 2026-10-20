@@ -16,7 +16,6 @@ export const createCategorySchema = z.object({
 
 /**
  * Valida los campos enviados para actualizar una categoría.
- * Todos son opcionales, pero se debe enviar al menos uno.
  */
 export const updateCategorySchema = createCategorySchema
   .partial()
