@@ -26,6 +26,8 @@ import assignmentRoutes from "./modules/assigments/assignments.routes.js";
 import peopleRoutes from "./modules/people/people.routes.js";
 // Areas
 import areasRoutes from "./modules/areas/area.routes.js";
+// Marcas
+import brandsRoutes from "./modules/brands/brands.routes.js";
 // ===========
 // MIDDLEWARES
 // ===========
@@ -58,6 +60,7 @@ app.use("/api/maintenance", maintenanceRoutes);
 app.use("/api/assignments", assignmentRoutes);
 app.use("/api/people", peopleRoutes);
 app.use("/api/areas", areasRoutes);
+app.use("/api/brands", brandsRoutes);
 
 // Health check - Endpoint para verificar el estado de la API
 app.get("/api/health", (_req, res) => {
