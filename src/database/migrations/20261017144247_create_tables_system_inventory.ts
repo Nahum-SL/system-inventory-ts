@@ -247,6 +247,7 @@ export async function up(knex: Knex): Promise<void> {
 
     table.enu("tipo", ["preventivo", "correctivo"]).notNullable();
     table.date("fecha").notNullable();
+    table.date("fecha_fin").nullable();
     table.string("descripcion", 250).notNullable();
     table.text("observaciones").nullable();
     table.decimal("costo", 10, 2).notNullable().defaultTo(0);
