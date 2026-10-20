@@ -6,7 +6,7 @@ import {
   listPeople,
 } from "./people.controller.js";
 // SCHEMA
-import { createPersonSchema } from "./people.schema.js";
+import { createPersonSchema, updatePersonSchema } from "./people.schema.js";
 // MIDDLEWARES
 import { authenticate } from "../../shared/middlewares/auth.middleware.js";
 import { authorize } from "../../shared/middlewares/authorize.middleware.js";
@@ -25,6 +25,13 @@ peopleRoutes.post(
   "/",
   authorize("admin"),
   validate(createPersonSchema),
+  createPerson,
+);
+// Actualiza personas: solo administradores
+peopleRoutes.post(
+  "/:id",
+  authorize("admin"),
+  validate(updatePersonSchema),
   createPerson,
 );
 
