@@ -20,8 +20,8 @@ export interface CreatePersonData {
   nombres: string;
   tipodoc: string;
   numerodoc: string;
-  telefono?: string;
-  email?: string;
+  telefono: string;
+  email: string;
 }
 
 /**

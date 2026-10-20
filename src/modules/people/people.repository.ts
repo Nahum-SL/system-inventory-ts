@@ -28,9 +28,9 @@ export class PeopleRepository {
    * tipos distintos a los del dominio (p. ej. `id` como string/bigint o
    * `fechaRegistro` como `Date`).
    *
-   * `telefono` y `email` se normalizan a `null` cuando llegan como
-   * `null` o `undefined`.
-   *
+   * telefono y email se convierten explícitamente a string. 
+   * La base de datos debe garantizar que ambas columnas sean NOT NULL.
+   * 
    * @param row - Fila tal como la devuelve Knex, con los alias camelCase aplicados.
    * @returns Entidad de dominio con tipos garantizados.
    */
@@ -185,8 +185,8 @@ export class PeopleRepository {
       nombres: data.nombres,
       tipodoc: data.tipodoc,
       numerodoc: data.numerodoc,
-      telefono: data.telefono || null,
-      email: data.email || null,
+      telefono: data.telefono,
+      email: data.email,
     });
 
     const person = await this.findById(Number(insertedId));

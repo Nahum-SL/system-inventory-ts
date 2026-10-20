@@ -1,6 +1,9 @@
 export async function up(knex) {
     // 1. Personas
     await knex.schema.createTable("personas", (table) => {
+        table.engine("InnoDB");
+        table.charset("utf8mb4");
+        table.collate("utf8mb4_unicode_ci");
         table.increments("id").primary();
         table.string("apellidos", 150).notNullable();
         table.string("nombres", 150).notNullable();
@@ -12,24 +15,36 @@ export async function up(knex) {
     });
     // 2. Areas
     await knex.schema.createTable("areas", (table) => {
+        table.engine("InnoDB");
+        table.charset("utf8mb4");
+        table.collate("utf8mb4_unicode_ci");
         table.increments("id").primary();
         table.string("nombre", 150).notNullable().unique();
         table.timestamp("fecharegistro").notNullable().defaultTo(knex.fn.now());
     });
     // 3. Marcas
     await knex.schema.createTable("marcas", (table) => {
+        table.engine("InnoDB");
+        table.charset("utf8mb4");
+        table.collate("utf8mb4_unicode_ci");
         table.increments("id").primary();
         table.string("nombre", 150).notNullable().unique();
         table.timestamp("fecharegistro").notNullable().defaultTo(knex.fn.now());
     });
     // 4. Categorias
     await knex.schema.createTable("categorias", (table) => {
+        table.engine("InnoDB");
+        table.charset("utf8mb4");
+        table.collate("utf8mb4_unicode_ci");
         table.increments("id").primary();
         table.string("nombre", 150).notNullable().unique();
         table.timestamp("fecharegistro").notNullable().defaultTo(knex.fn.now());
     });
     // 5. Cargos
     await knex.schema.createTable("cargos", (table) => {
+        table.engine("InnoDB");
+        table.charset("utf8mb4");
+        table.collate("utf8mb4_unicode_ci");
         table.increments("id").primary();
         table
             .integer("area_id")
@@ -44,6 +59,9 @@ export async function up(knex) {
     });
     // 6. Usuarios
     await knex.schema.createTable("usuarios", (table) => {
+        table.engine("InnoDB");
+        table.charset("utf8mb4");
+        table.collate("utf8mb4_unicode_ci");
         table.increments("id").primary();
         table
             .integer("persona_id")
@@ -59,6 +77,9 @@ export async function up(knex) {
     });
     // 7. Activos
     await knex.schema.createTable("activos", (table) => {
+        table.engine("InnoDB");
+        table.charset("utf8mb4");
+        table.collate("utf8mb4_unicode_ci");
         table.increments("id").primary();
         table
             .integer("marca_id")
@@ -92,6 +113,9 @@ export async function up(knex) {
     });
     // 8. Asignaciones
     await knex.schema.createTable("asignaciones", (table) => {
+        table.engine("InnoDB");
+        table.charset("utf8mb4");
+        table.collate("utf8mb4_unicode_ci");
         table.increments("id").primary();
         table
             .integer("activo_id")
@@ -126,6 +150,9 @@ export async function up(knex) {
     });
     // 9. Movimientos
     await knex.schema.createTable("movimientos", (table) => {
+        table.engine("InnoDB");
+        table.charset("utf8mb4");
+        table.collate("utf8mb4_unicode_ci");
         table.increments("id").primary();
         table
             .integer("activo_id")
@@ -164,6 +191,9 @@ export async function up(knex) {
     });
     // 10. Mantenimientos
     await knex.schema.createTable("mantenimientos", (table) => {
+        table.engine("InnoDB");
+        table.charset("utf8mb4");
+        table.collate("utf8mb4_unicode_ci");
         table.increments("id").primary();
         table
             .integer("activo_id")
