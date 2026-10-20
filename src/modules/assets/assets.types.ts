@@ -1,5 +1,4 @@
-export type AssetStatus = "activo" | "inactivo" | "mantenimiento";
-
+export type AssetStatus = "operativo" | "mantenimiento" | "fuera_de_servicio";
 export interface AssetFilters {
   q?: string;
   estado?: AssetStatus;
