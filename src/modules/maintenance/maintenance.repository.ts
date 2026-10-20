@@ -1,10 +1,15 @@
 import db from "../../database/knex.js";
 
+import { Knex } from "knex";
+
 // types
 import type {
-  CreateMaintenanceData,
   Maintenance,
+  CreateMaintenanceData,
+  CloseMaintenanceData,
   MaintenanceType,
+  CloseMaintenanceResult,
+  CreateMaintenanceResult,
 } from "./maintenance.types.js";
 
 /**
@@ -13,24 +18,41 @@ import type {
  * la fuente de datos (SQL, API)
  */
 export class MaintenanceRepository {
-  /**
-   * Registra un mantenimiento dentro de una transacción y comprueba que el activo exista y no esté eliminado.
-   * @param data
-   * @returns
-   */
-  async create(data: CreateMaintenanceData): Promise<Maintenance | null> {
+  private selectMaintenance(conn: Knex | Knex.Transaction) {
+    return conn("mantenimientos as m")
+      .innerJoin("activos as a", "a.id", "m.activo_id")
+      .select({
+        id: "m.id",
+        activoId: "m.activo_id",
+        codigoInventario: "a.codigo_inventario",
+        tipo: "m.tipo",
+        fecha: "m.fecha",
+        fechaFin: "m.fecha_fin",
+        descripcion: "m.descripcion",
+        observaciones: "m.observaciones",
+        costo: "m.costo",
+        fechaRegistro: "m.fecharegistro",
+      });
+  }
+
+  async create(data: CreateMaintenanceData): Promise<CreateMaintenanceResult> {
     return db.transaction(async (trx) => {
       const asset = await trx("activos")
-        .select("id")
-        .where({
-          id: data.activoId,
-          eliminado: false,
-        })
+        .select("id", "estado")
+        .where({ id: data.activoId, eliminado: false })
         .forUpdate()
         .first();
 
-      if (!asset) {
-        return null;
+      if (!asset) return { status: "asset_not_found" };
+
+      const open = await trx("mantenimientos")
+        .select("id")
+        .where({ activo_id: data.activoId })
+        .whereNull("fecha_fin")
+        .first();
+
+      if (open || asset.estado === "mantenimiento") {
+        return { status: "already_open" };
       }
 
       const [insertedId] = await trx("mantenimientos").insert({
@@ -42,33 +64,71 @@ export class MaintenanceRepository {
         costo: data.costo,
       });
 
-      const row = await trx("mantenimientos as m")
-        .innerJoin("activos as a", "a.id", "m.activo_id")
-        .select({
-          id: "m.id",
-          activoId: "m.activo_id",
-          codigoInventario: "a.codigo_inventario",
-          tipo: "m.tipo",
-          fecha: "m.fecha",
-          descripcion: "m.descripcion",
-          observaciones: "m.observaciones",
-          costo: "m.costo",
-          fechaRegistro: "m.fecharegistro",
-        })
+      await trx("activos")
+        .where({ id: data.activoId })
+        .update({ estado: "mantenimiento" });
+
+      const row = await this.selectMaintenance(trx)
         .where("m.id", insertedId)
         .first();
-
-      if (!row) {
+      if (!row)
         throw new Error("No se pudo recuperar el mantenimiento registrado");
+
+      return { status: "ok", maintenance: this.mapRow(row) };
+    });
+  }
+
+  async close(
+    id: number,
+    data: CloseMaintenanceData,
+  ): Promise<CloseMaintenanceResult> {
+    return db.transaction(async (trx) => {
+      // Mismo orden de bloqueo que create: primero el activo, luego el mantenimiento.
+      const base = await trx("mantenimientos")
+        .select("activo_id")
+        .where({ id })
+        .first();
+      if (!base) return { status: "not_found" };
+
+      await trx("activos")
+        .select("id")
+        .where({ id: base.activo_id })
+        .forUpdate()
+        .first();
+
+      const current = await trx("mantenimientos").where({ id }).first();
+      if (!current) return { status: "not_found" };
+      if (current.fecha_fin !== null) return { status: "already_closed" };
+
+      if (data.fechaFin < String(current.fecha).slice(0, 10)) {
+        return { status: "invalid_dates" };
       }
 
-      return this.mapRow(row);
+      await trx("mantenimientos")
+        .where({ id })
+        .update({
+          fecha_fin: data.fechaFin,
+          ...(data.observaciones !== undefined
+            ? { observaciones: data.observaciones }
+            : {}),
+          ...(data.costo !== undefined ? { costo: data.costo } : {}),
+        });
+
+      await trx("activos")
+        .where({ id: base.activo_id })
+        .update({ estado: data.resultado });
+
+      const row = await this.selectMaintenance(trx).where("m.id", id).first();
+      if (!row)
+        throw new Error("No se pudo recuperar el mantenimiento cerrado");
+
+      return { status: "ok", maintenance: this.mapRow(row) };
     });
   }
 
   /**
    * Rrecupera el historial ordenado por fecha, del más reciente al más antiguo.
-   * Devuelve null si el activo no existey un arreglo vacío si existe, 
+   * Devuelve null si el activo no existey un arreglo vacío si existe,
    * pero todavía no tiene mantenimientos.
    * @param activoId
    * @returns
