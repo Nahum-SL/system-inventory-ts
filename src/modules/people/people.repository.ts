@@ -10,30 +10,29 @@ import type {
 /**
  * Repositorio de acceso a datos de la tabla `personas`.
  *
- * Encapsula todas las consultas SQL (vía Knex) y expone resultados ya
- * normalizados al modelo de dominio {@link Person}. No contiene reglas de
- * negocio ni validaciones: eso corresponde a la capa de servicio.
+ * Encapsula las consultas SQL (vía Knex) y devuelve resultados normalizados
+ * al modelo de dominio {@link Person}. No contiene reglas de negocio ni
+ * validaciones de entrada: eso corresponde a la capa de servicio.
  *
- * Convenciones de la tabla:
+ * Convenciones de la tabla (InnoDB):
  * - Las columnas están en minúsculas (`fecharegistro`); el dominio usa
- *   camelCase (`fechaRegistro`). La conversión se hace en cada SELECT mediante alias.
- * - `telefono` y `email` son opcionales y se persisten como `NULL` cuando no hay valor.
+ *   camelCase (`fechaRegistro`). La conversión se hace con alias en cada SELECT.
+ * - `numerodoc` y `email` tienen restricción `UNIQUE`.
+ * - `fecharegistro` es `NOT NULL` con default `CURRENT_TIMESTAMP`.
  */
 export class PeopleRepository {
   /**
    * Convierte una fila cruda de la base de datos en una entidad {@link Person}.
    *
-   * Existe porque el driver puede devolver tipos distintos a los del dominio
-   * (por ejemplo `id` como `bigint`/string o fechas como `Date`), por lo que se
-   * coerciona explícitamente cada campo.
+   * Se coerciona cada campo explícitamente porque el driver puede devolver
+   * tipos distintos a los del dominio (p. ej. `id` como string/bigint o
+   * `fechaRegistro` como `Date`).
    *
-   * Los campos opcionales (`telefono`, `email`) se normalizan a `null`
-   * cuando llegan como `null` o `undefined`.
+   * `telefono` y `email` se normalizan a `null` cuando llegan como
+   * `null` o `undefined`.
    *
-   * @param row - Fila tal como la devuelve Knex, ya con los alias camelCase aplicados.
+   * @param row - Fila tal como la devuelve Knex, con los alias camelCase aplicados.
    * @returns Entidad de dominio con tipos garantizados.
-   * @param row
-   * @returns
    */
   private mapRow(row: Record<string, unknown>): Person {
     return {
@@ -42,17 +41,17 @@ export class PeopleRepository {
       nombres: String(row.nombres),
       tipodoc: String(row.tipodoc),
       numerodoc: String(row.numerodoc),
-      telefono: row.telefono == null ? null : String(row.telefono),
-      email: row.email == null ? null : String(row.email),
+      telefono: String(row.telefono),
+      email: String(row.email),
       fechaRegistro: String(row.fechaRegistro),
     };
   }
 
   /**
-   * Lista personas, con búsqueda opcional, ordenadas por apellidos (ASC).
+   * Lista personas ordenadas por apellidos (ASC), con búsqueda opcional.
    *
-   * Cuando se informa `filters.q`, se aplica un `LIKE '%term%'` combinado con
-   * `OR` sobre `nombres`, `apellidos`, `numerodoc` y `email`. El término se
+   * Si se informa `filters.q`, se aplica `LIKE '%term%'` combinado con `OR`
+   * sobre `nombres`, `apellidos`, `numerodoc` y `email`. El término se
    * recorta con `trim()` antes de usarse.
    *
    * Notas:
@@ -60,6 +59,7 @@ export class PeopleRepository {
    * - Los comodines `%` y `_` incluidos en `q` no se escapan, por lo que el
    *   usuario puede alterar el patrón de búsqueda.
    * - No pagina: devuelve todas las coincidencias.
+   * - El `LIKE` con comodín inicial no puede aprovechar índices.
    *
    * @param filters - Filtros opcionales. Sin filtros devuelve todas las personas.
    * @returns Lista de personas; vacía si no hay coincidencias.
@@ -118,16 +118,17 @@ export class PeopleRepository {
   }
 
   /**
-   * Indica si ya existe una persona registrada con el número de documento dado.
+   * Indica si ya existe una persona con el número de documento dado.
    *
-   * Usa coincidencia exacta sobre `numerodoc` y solo consulta `id`
-   * (no hidrata la entidad), por lo que es una verificación barata.
-   * No considera `tipodoc`: dos tipos de documento distintos con el mismo
-   * número se reportarán como duplicado.
+   * Coincidencia exacta sobre `numerodoc` (columna `UNIQUE`), consultando solo
+   * `id` para evitar hidratar la entidad. No considera `tipodoc`: dos tipos de
+   * documento con el mismo número se reportan como duplicado, igual que lo hace
+   * la restricción de la BD.
    *
-   * Pensado para validar unicidad antes de {@link PeopleRepository.create}.
-   * No sustituye una restricción `UNIQUE` en base de datos: entre la
-   * verificación y el insert puede haber una condición de carrera.
+   * Es una verificación previa pensada para dar un mensaje de error claro antes
+   * de {@link PeopleRepository.create}. La garantía real de unicidad la da la
+   * restricción `UNIQUE`: entre esta consulta y el insert puede haber una
+   * condición de carrera, que se manifestará como `ER_DUP_ENTRY`.
    *
    * @param numerodoc - Número de documento a verificar.
    * @returns `true` si existe al menos una persona con ese documento.
@@ -139,19 +140,17 @@ export class PeopleRepository {
   }
 
   /**
-   * Indica si ya existe una persona registrada con el email dado,
-   * ignorando mayúsculas y minúsculas.
+   * Indica si ya existe una persona con el email dado, ignorando mayúsculas.
    *
-   * La comparación se hace con `LOWER(email) = LOWER(?)` para garantizar
-   * resultados consistentes sin depender del collation. Como contrapartida,
-   * al aplicar una función sobre la columna el motor no puede usar un índice
-   * normal sobre `email`; con tablas grandes conviene un índice funcional o un
-   * collation `_ci`.
+   * Compara con `LOWER(email) = LOWER(?)` para no depender del collation.
+   * Contrapartida: al aplicar una función sobre la columna, el motor no usa el
+   * índice `UNIQUE` de `email`. En tablas grandes conviene un collation `_ci`
+   * (y comparar directamente) o un índice funcional.
    *
-   * Al igual que {@link PeopleRepository.documentExists}, es una verificación previa
-   * y no reemplaza una restricción `UNIQUE`.
+   * Igual que {@link PeopleRepository.documentExists}, es una verificación
+   * previa; la unicidad definitiva la garantiza la restricción `UNIQUE`.
    *
-   * @param email - Email a verificar. Se espera no vacío (los vacíos se guardan como `NULL`).
+   * @param email - Email a verificar. Se espera no vacío.
    * @returns `true` si existe al menos una persona con ese email.
    */
   async emailExists(email: string): Promise<boolean> {
@@ -166,23 +165,19 @@ export class PeopleRepository {
   /**
    * Inserta una nueva persona y devuelve la entidad persistida.
    *
-   * `telefono` y `email` se normalizan a `NULL` cuando llegan vacíos
-   * (`""`, `undefined`), evitando almacenar strings vacíos.
-   * `fechaRegistro` no se envía: se asume que la genera la base de datos
-   * (default/`CURRENT_TIMESTAMP`).
-   *
-   * Tras el insert se vuelve a consultar por id para devolver la fila tal
-   * como quedó en la tabla (incluida la fecha generada por la BD).
-   * Esto implica dos consultas y que el insert y el select no son atómicos
-   * salvo que se ejecute dentro de una transacción.
+   * `fechaRegistro` no se envía: la genera la BD (`DEFAULT CURRENT_TIMESTAMP`).
+   * Tras el insert se consulta por id para devolver la fila tal como quedó
+   * guardada. Son dos consultas no atómicas salvo que se ejecuten dentro de
+   * una transacción.
    *
    * Depende de que el driver devuelva el `insertId` como primer elemento
    * (comportamiento de MySQL/MariaDB; en PostgreSQL habría que usar `.returning()`).
    *
    * @param data - Datos de la persona a crear.
-   * @returns La persona creada, con su `id` y `fechaRegistro` asignados.
+   * @returns La persona creada, con `id` y `fechaRegistro` asignados.
    * @throws {Error} Si la fila insertada no puede recuperarse inmediatamente después.
-   * @throws Errores del driver (p. ej. violación de `UNIQUE`/`NOT NULL`) se propagan sin envolver.
+   * @throws Errores del driver (p. ej. `ER_DUP_ENTRY` por `numerodoc` o `email`
+   *   duplicados, o `ER_BAD_NULL_ERROR`) se propagan sin envolver.
    */
   async create(data: CreatePersonData): Promise<Person> {
     const [insertedId] = await db("personas").insert({
