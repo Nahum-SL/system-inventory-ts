@@ -142,20 +142,8 @@ export class MaintenanceRepository {
     if (!asset) {
       return null;
     }
-
-    const rows = await db("mantenimientos as m")
-      .innerJoin("activos as a", "a.id", "m.activo_id")
-      .select({
-        id: "m.id",
-        activoId: "m.activo_id",
-        codigoInventario: "a.codigo_inventario",
-        tipo: "m.tipo",
-        fecha: "m.fecha",
-        descripcion: "m.descripcion",
-        observaciones: "m.observaciones",
-        costo: "m.costo",
-        fechaRegistro: "m.fecharegistro",
-      })
+    
+    const rows = await this.selectMaintenance(db)      
       .where("m.activo_id", activoId)
       .orderBy("m.fecha", "desc")
       .orderBy("m.id", "desc");
@@ -183,9 +171,10 @@ export class MaintenanceRepository {
       codigoInventario: String(row.codigoInventario),
       tipo: row.tipo as MaintenanceType,
       fecha: formatDate(row.fecha),
+      fechaFin: row.fechaFin == null ? null : formatDate(row.fechaFin),
       descripcion: String(row.descripcion),
       observaciones:
-        row.observaciones == null ? null : String(row.observaciones),
+      row.observaciones == null ? null : String(row.observaciones),
       costo: Number(row.costo),
       fechaRegistro: String(row.fechaRegistro),
     };

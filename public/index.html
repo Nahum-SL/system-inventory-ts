@@ -1,0 +1,1032 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>E-Yonda | Gestión de inventario</title>
+    <style>
+      :root {
+        font-family:
+          Inter,
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          Segoe UI,
+          sans-serif;
+        color: #17233c;
+        background: #f5f7fb;
+        --surface: #fff;
+        --muted: #71809b;
+        --line: #e7ecf4;
+        --accent: #5558e8;
+        --bg: #f5f7fb;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: inherit;
+      }
+      button,
+      input,
+      select {
+        font: inherit;
+      }
+      button {
+        cursor: pointer;
+      }
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      body.dark {
+        --surface: #1a2336;
+        --bg: #101827;
+        --line: #303c51;
+        --muted: #a4afc3;
+        color: #f0f3fb;
+      }
+      .shell {
+        display: grid;
+        grid-template-columns: 244px minmax(0, 1fr);
+        min-height: 100vh;
+      }
+      .sidebar {
+        background: #131c34;
+        color: #d9e1f4;
+        padding: 28px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 34px;
+      }
+      .brand {
+        font-size: 23px;
+        font-weight: 850;
+        letter-spacing: -1px;
+        padding: 0 14px;
+      }
+      .brand span {
+        color: #8b91ff;
+      }
+      .nav {
+        display: grid;
+        gap: 7px;
+      }
+      .nav button {
+        border: 0;
+        background: transparent;
+        color: #aebbd5;
+        text-align: left;
+        padding: 13px 16px;
+        border-radius: 12px;
+        font-weight: 650;
+      }
+      .nav button.active,
+      .nav button:hover {
+        background: #293453;
+        color: #fff;
+      }
+      .sidefoot {
+        margin-top: auto;
+        color: #92a1bd;
+        font-size: 12px;
+        padding: 15px;
+      }
+      .main {
+        padding: 30px 38px;
+        max-width: 1650px;
+        width: 100%;
+        margin: auto;
+      }
+      .top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 35px;
+      }
+      .crumb {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      h1 {
+        font-size: 29px;
+        margin: 7px 0 5px;
+        letter-spacing: -1px;
+      }
+      h2 {
+        font-size: 18px;
+        margin: 0;
+      }
+      .muted {
+        color: var(--muted);
+      }
+      .topright {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .avatar {
+        background: #e8e9ff;
+        color: #4b4fca;
+        padding: 10px 13px;
+        border-radius: 12px;
+        font-weight: 800;
+      }
+      .btn {
+        border: 0;
+        background: var(--accent);
+        color: white;
+        padding: 11px 16px;
+        border-radius: 11px;
+        font-weight: 700;
+      }
+      .btn.secondary {
+        background: var(--surface);
+        color: inherit;
+        border: 1px solid var(--line);
+      }
+      .btn.small {
+        padding: 8px 11px;
+        font-size: 13px;
+      }
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 17px;
+        margin: 22px 0;
+      }
+      .card,
+      .panel {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 17px;
+        box-shadow: 0 8px 30px #182a4d08;
+      }
+      .card {
+        padding: 22px;
+      }
+      .card .label {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .metric {
+        font-size: 32px;
+        font-weight: 850;
+        letter-spacing: -1px;
+        margin: 12px 0;
+      }
+      .metric-icon {
+        float: right;
+        background: #eeefff;
+        color: #5558e8;
+        padding: 9px;
+        border-radius: 11px;
+      }
+      .panel {
+        padding: 22px;
+        margin-top: 20px;
+      }
+      .panelhead,
+      .toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .toolbar {
+        margin: 20px 0;
+      }
+      .field {
+        padding: 11px 13px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--surface);
+        color: inherit;
+        min-width: 170px;
+      }
+      .search {
+        width: min(330px, 100%);
+      }
+      .tablewrap {
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+        white-space: nowrap;
+      }
+      th {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--muted);
+        font-weight: 750;
+      }
+      th,
+      td {
+        padding: 16px 12px;
+        border-bottom: 1px solid var(--line);
+      }
+      td {
+        font-size: 13px;
+      }
+      tr:last-child td {
+        border-bottom: 0;
+      }
+      .tag {
+        display: inline-block;
+        border-radius: 20px;
+        padding: 6px 10px;
+        font-weight: 750;
+        font-size: 11px;
+      }
+      .operativo {
+        background: #dcfce9;
+        color: #16754b;
+      }
+      .mantenimiento {
+        background: #fff1d6;
+        color: #a76710;
+      }
+      .fuera_de_servicio {
+        background: #fee3e6;
+        color: #bd3b4e;
+      }
+      .empty {
+        text-align: center;
+        color: var(--muted);
+        padding: 40px;
+      }
+      .error {
+        color: #db4356;
+        font-size: 13px;
+      }
+      .success {
+        color: #168453;
+        font-size: 13px;
+      }
+      .login {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: radial-gradient(circle at 70% 20%, #414a92, #10182f 70%);
+        padding: 20px;
+      }
+      .loginbox {
+        background: white;
+        color: #18233a;
+        width: min(430px, 100%);
+        padding: 36px;
+        border-radius: 22px;
+        box-shadow: 0 30px 80px #0004;
+      }
+      .loginbox h1 {
+        margin: 14px 0 6px;
+      }
+      .form {
+        display: grid;
+        gap: 13px;
+      }
+      .form label {
+        font-size: 13px;
+        font-weight: 700;
+      }
+      .form input,
+      .form select {
+        width: 100%;
+        margin-top: 7px;
+      }
+      .form .btn {
+        margin-top: 8px;
+      }
+      .hidden {
+        display: none !important;
+      }
+      .pagination {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 12px;
+        padding-top: 18px;
+      }
+      .modalbg {
+        position: fixed;
+        inset: 0;
+        background: #0a1224aa;
+        display: grid;
+        place-items: center;
+        padding: 18px;
+        z-index: 10;
+      }
+      .modal {
+        background: var(--surface);
+        padding: 28px;
+        border-radius: 18px;
+        width: min(520px, 100%);
+        max-height: 90vh;
+        overflow: auto;
+      }
+      .grid2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      .toast {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        padding: 13px 19px;
+        background: #1d2944;
+        color: #fff;
+        border-radius: 12px;
+        box-shadow: 0 15px 30px #0003;
+        z-index: 30;
+      }
+      .statusbar {
+        font-size: 12px;
+        margin-top: 10px;
+      }
+      .dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #27b77e;
+        margin-right: 6px;
+      }
+      @media (max-width: 1000px) {
+        .cards {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .shell {
+          grid-template-columns: 190px 1fr;
+        }
+        .main {
+          padding: 25px 18px;
+        }
+      }
+      @media (max-width: 680px) {
+        .shell {
+          display: block;
+        }
+        .sidebar {
+          padding: 15px;
+          gap: 12px;
+        }
+        .brand {
+          font-size: 20px;
+        }
+        .nav {
+          display: flex;
+          overflow-x: auto;
+        }
+        .nav button {
+          white-space: nowrap;
+          padding: 9px 12px;
+        }
+        .sidefoot {
+          display: none;
+        }
+        .main {
+          padding: 20px 14px;
+        }
+        .cards {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 9px;
+        }
+        .card {
+          padding: 15px;
+        }
+        .metric {
+          font-size: 25px;
+        }
+        .top {
+          align-items: flex-start;
+        }
+        .topright {
+          flex-wrap: wrap;
+          justify-content: flex-end;
+        }
+        .grid2 {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <section id="loginScreen" class="login">
+      <div class="loginbox">
+        <div class="brand" style="padding: 0; color: #202c4b">
+          E<span>-</span>Yonda<span>.</span>
+        </div>
+        <h1>Bienvenido de nuevo</h1>
+        <p class="muted">Ingresa con tu cuenta del sistema de inventario.</p>
+        <form id="loginForm" class="form">
+          <label
+            >Usuario<input
+              class="field"
+              name="username"
+              autocomplete="username"
+              required
+              maxlength="150"
+              placeholder="Tu usuario" /></label
+          ><label
+            >Contraseña<input
+              class="field"
+              type="password"
+              name="password"
+              autocomplete="current-password"
+              required
+              placeholder="••••••••"
+          /></label>
+          <p id="loginError" class="error" role="alert"></p>
+          <button class="btn" type="submit">Iniciar sesión →</button>
+        </form>
+        <p class="muted" style="font-size: 12px; margin-top: 25px">
+          Conectado a la API de E-Yonda
+        </p>
+      </div>
+    </section>
+    <div id="app" class="shell hidden">
+      <aside class="sidebar">
+        <div class="brand">E<span>-</span>Yonda<span>.</span></div>
+        <nav class="nav" id="nav">
+          <button data-view="dashboard" class="active">◫ &nbsp; Resumen</button
+          ><button data-view="assets">▦ &nbsp; Activos</button
+          ><button data-view="areas">▤ &nbsp; Áreas</button
+          ><button data-view="brands">◈ &nbsp; Marcas</button
+          ><button data-view="categories">◧ &nbsp; Categorías</button
+          ><button data-view="people">♙ &nbsp; Personas</button>
+        </nav>
+        <div class="sidefoot">
+          GESTIÓN DE INVENTARIO<br />Panel administrativo · v1.0
+        </div>
+      </aside>
+      <main class="main">
+        <header class="top">
+          <div>
+            <div class="crumb">
+              E-Yonda / <span id="breadcrumb">Resumen</span>
+            </div>
+            <h1 id="pageTitle">Panel general</h1>
+            <div class="muted" id="subtitle">
+              Control y seguimiento de tus activos
+            </div>
+          </div>
+          <div class="topright">
+            <button
+              id="themeBtn"
+              class="btn secondary small"
+              title="Cambiar tema"
+            >
+              ☾
+            </button>
+            <div class="avatar" id="avatar">EY</div>
+            <button id="logoutBtn" class="btn secondary small">Salir</button>
+          </div>
+        </header>
+        <div id="dashboard">
+          <div class="panelhead">
+            <h2>Vista general</h2>
+            <button class="btn secondary small" id="refreshBtn">
+              ↻ Actualizar
+            </button>
+          </div>
+          <div class="cards">
+            <div class="card">
+              <div class="metric-icon">▦</div>
+              <div class="label">Total de activos</div>
+              <div class="metric" id="total">—</div>
+              <div class="muted">Registrados</div>
+            </div>
+            <div class="card">
+              <div class="metric-icon">✓</div>
+              <div class="label">Operativos</div>
+              <div class="metric" id="operativos">—</div>
+              <div class="muted">En funcionamiento</div>
+            </div>
+            <div class="card">
+              <div class="metric-icon">⚒</div>
+              <div class="label">En mantenimiento</div>
+              <div class="metric" id="mantenimientos">—</div>
+              <div class="muted">Requieren seguimiento</div>
+            </div>
+            <div class="card">
+              <div class="metric-icon">!</div>
+              <div class="label">Fuera de servicio</div>
+              <div class="metric" id="fuera">—</div>
+              <div class="muted">No disponibles</div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panelhead">
+              <h2>Últimos activos</h2>
+              <button class="btn secondary small" id="viewAll">
+                Ver todos →
+              </button>
+            </div>
+            <div class="tablewrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Código</th>
+                    <th>Descripción</th>
+                    <th>Área</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody id="recentRows"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <section id="listing" class="hidden">
+          <div class="panel">
+            <div class="panelhead">
+              <h2 id="listTitle">Activos</h2>
+              <button id="newAsset" class="btn small hidden">
+                + Nuevo activo
+              </button>
+            </div>
+            <div class="toolbar">
+              <input
+                id="search"
+                class="field search"
+                placeholder="Buscar por código, descripción..."
+              /><select id="statusFilter" class="field">
+                <option value="">Todos los estados</option>
+                <option value="operativo">Operativo</option>
+                <option value="mantenimiento">Mantenimiento</option>
+                <option value="fuera_de_servicio">
+                  Fuera de servicio
+                </option></select
+              ><button id="reload" class="btn secondary small">
+                ↻ Recargar
+              </button>
+            </div>
+            <div class="tablewrap">
+              <table>
+                <thead id="tableHead"></thead>
+                <tbody id="tableBody"></tbody>
+              </table>
+            </div>
+            <div class="pagination">
+              <span class="muted" id="pageInfo"></span
+              ><button class="btn secondary small" id="prev">← Anterior</button
+              ><button class="btn secondary small" id="next">
+                Siguiente →
+              </button>
+            </div>
+          </div>
+        </section>
+        <p id="apiStatus" class="statusbar muted">
+          <span class="dot"></span>API conectada
+        </p>
+      </main>
+    </div>
+    <div id="modalOverlay" class="modalbg hidden">
+      <div class="modal">
+        <div class="panelhead">
+          <h2>Registrar nuevo activo</h2>
+          <button class="btn secondary small" id="closeModal">✕</button>
+        </div>
+        <p class="muted">
+          Completa los datos obligatorios para crear un activo.
+        </p>
+        <form id="assetForm" class="form">
+          <label
+            >Código de inventario<input
+              class="field"
+              name="codigoInventario"
+              required
+              maxlength="100" /></label
+          ><label
+            >Descripción<input class="field" name="descripcion" required
+          /></label>
+          <div class="grid2">
+            <label
+              >Marca<select
+                class="field"
+                name="marcaId"
+                id="brandSelect"
+                required
+              ></select></label
+            ><label
+              >Categoría<select
+                class="field"
+                name="categoriaId"
+                id="categorySelect"
+                required
+              ></select></label
+            ><label
+              >Área<select
+                class="field"
+                name="areaId"
+                id="areaSelect"
+                required
+              ></select></label
+            ><label
+              >Fecha de ingreso<input
+                class="field"
+                type="date"
+                name="fechaIngreso"
+                required
+            /></label>
+          </div>
+          <label
+            >Estado<select class="field" name="estado">
+              <option value="operativo">Operativo</option>
+              <option value="fuera_de_servicio">Fuera de servicio</option>
+              <option value="mantenimiento">Mantenimiento</option>
+            </select></label
+          >
+          <p id="assetError" class="error"></p>
+          <button class="btn" type="submit">Guardar activo</button>
+        </form>
+      </div>
+    </div>
+    <div id="toast" class="toast hidden" role="status"></div>
+    <script>
+      (() => {
+        "use strict";
+        const $ = (id) => document.getElementById(id),
+          API = "/api",
+          names = {
+            dashboard: "Resumen",
+            assets: "Activos",
+            areas: "Áreas",
+            brands: "Marcas",
+            categories: "Categorías",
+            people: "Personas",
+          };
+        const state = {
+          token: sessionStorage.getItem("ey_token"),
+          user: null,
+          view: "dashboard",
+          items: [],
+          assets: [],
+          page: 1,
+          limit: 10,
+          search: "",
+          status: "",
+        };
+        const safe = (v) =>
+          String(v ?? "—").replace(
+            /[&<>"']/g,
+            (c) =>
+              ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;",
+              })[c],
+          );
+        const date = (v) => (v ? String(v).slice(0, 10) : "—");
+        const statusLabel = (v) =>
+          ({
+            operativo: "Operativo",
+            mantenimiento: "Mantenimiento",
+            fuera_de_servicio: "Fuera de servicio",
+          })[v] ||
+          v ||
+          "—";
+        function toast(msg) {
+          $("toast").textContent = msg;
+          $("toast").classList.remove("hidden");
+          setTimeout(() => $("toast").classList.add("hidden"), 3500);
+        }
+        async function request(path, options = {}) {
+          const headers = {
+            "Content-Type": "application/json",
+            ...(state.token ? { Authorization: "Bearer " + state.token } : {}),
+          };
+          let response;
+          try {
+            response = await fetch(API + path, {
+              ...options,
+              headers: { ...headers, ...options.headers },
+            });
+          } catch {
+            throw Error("No se pudo conectar con el servidor");
+          }
+          let json = {};
+          try {
+            json = await response.json();
+          } catch {}
+          if (response.status === 401 && state.token) {
+            logout();
+            throw Error("La sesión ha expirado");
+          }
+          if (!response.ok)
+            throw Error(
+              json.message || json.error || "Error HTTP " + response.status,
+            );
+          return json.data ?? json;
+        }
+        function logout() {
+          state.token = null;
+          state.user = null;
+          sessionStorage.removeItem("ey_token");
+          $("app").classList.add("hidden");
+          $("loginScreen").classList.remove("hidden");
+        }
+        async function enter() {
+          const data = await request("/auth/me");
+          state.user = data.user ?? data;
+          $("avatar").textContent = String(
+            state.user.nombres || state.user.username || "EY",
+          )
+            .slice(0, 2)
+            .toUpperCase();
+          $("loginScreen").classList.add("hidden");
+          $("app").classList.remove("hidden");
+          await navigate("dashboard");
+        }
+        $("loginForm").addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const btn = e.target.querySelector("button");
+          btn.disabled = true;
+          $("loginError").textContent = "";
+          try {
+            const form = new FormData(e.target),
+              data = await request("/auth/login", {
+                method: "POST",
+                body: JSON.stringify({
+                  username: form.get("username"),
+                  password: form.get("password"),
+                }),
+              });
+            state.token = data.accessToken;
+            sessionStorage.setItem("ey_token", state.token);
+            await enter();
+          } catch (err) {
+            $("loginError").textContent = err.message;
+          } finally {
+            btn.disabled = false;
+          }
+        });
+        $("logoutBtn").onclick = logout;
+        async function fetchAssets() {
+          const result = await request("/assets");
+          state.assets = Array.isArray(result) ? result : (result.items ?? []);
+          return state.assets;
+        }
+        function metrics() {
+          const arr = state.assets;
+          for (const [id, filter] of [
+            ["total", () => true],
+            ["operativos", (x) => x.estado === "operativo"],
+            ["mantenimientos", (x) => x.estado === "mantenimiento"],
+            ["fuera", (x) => x.estado === "fuera_de_servicio"],
+          ])
+            $(id).textContent = arr
+              .filter(filter)
+              .length.toLocaleString("es-PE");
+          $("recentRows").innerHTML =
+            arr
+              .slice(0, 6)
+              .map(
+                (x) =>
+                  `<tr><td><b>${safe(x.codigoInventario)}</b></td><td>${safe(x.descripcion)}</td><td>${safe(x.areaNombre)}</td><td><span class="tag ${safe(x.estado)}">${safe(statusLabel(x.estado))}</span></td></tr>`,
+              )
+              .join("") ||
+            '<tr><td colspan="4" class="empty">No hay activos registrados.</td></tr>';
+        }
+        async function navigate(view) {
+          state.view = view;
+          state.page = 1;
+          state.search = "";
+          state.status = "";
+          $("search").value = "";
+          $("statusFilter").value = "";
+          $("dashboard").classList.toggle("hidden", view !== "dashboard");
+          $("listing").classList.toggle("hidden", view === "dashboard");
+          $("pageTitle").textContent =
+            view === "dashboard"
+              ? "Panel general"
+              : "Gestión de " + names[view].toLowerCase();
+          $("breadcrumb").textContent = names[view];
+          $("subtitle").textContent =
+            view === "dashboard"
+              ? "Control y seguimiento de tus activos"
+              : "Consulta los registros del sistema";
+          document
+            .querySelectorAll("#nav button")
+            .forEach((b) =>
+              b.classList.toggle("active", b.dataset.view === view),
+            );
+          $("statusFilter").classList.toggle("hidden", view !== "assets");
+          $("newAsset").classList.toggle(
+            "hidden",
+            view !== "assets" || state.user?.rol !== "admin",
+          );
+          try {
+            if (view === "dashboard") {
+              await fetchAssets();
+              metrics();
+            } else await loadList();
+            $("apiStatus").innerHTML =
+              '<span class="dot"></span>Datos actualizados';
+          } catch (err) {
+            $("apiStatus").textContent = "⚠ " + err.message;
+            toast(err.message);
+          }
+        }
+        async function loadList() {
+          const path = {
+            assets: "/assets",
+            areas: "/areas",
+            brands: "/brands",
+            categories: "/categories",
+            people: "/people",
+          }[state.view];
+          const data = await request(path);
+          state.items = Array.isArray(data) ? data : (data.items ?? []);
+          renderTable();
+        }
+        function renderTable() {
+          const asset = state.view === "assets";
+          const cols = asset
+            ? [
+                ["codigoInventario", "Código"],
+                ["descripcion", "Descripción"],
+                ["marcaNombre", "Marca"],
+                ["categoriaNombre", "Categoría"],
+                ["areaNombre", "Área"],
+                ["estado", "Estado"],
+              ]
+            : state.view === "people"
+              ? [
+                  ["id", "ID"],
+                  ["nombres", "Nombres"],
+                  ["apellidos", "Apellidos"],
+                ]
+              : [
+                  ["id", "ID"],
+                  ["nombre", "Nombre"],
+                ];
+          $("listTitle").textContent = names[state.view];
+          $("tableHead").innerHTML =
+            "<tr>" +
+            cols.map((c) => "<th>" + c[1] + "</th>").join("") +
+            "</tr>";
+          const term = state.search.toLocaleLowerCase();
+          const filtered = state.items.filter(
+            (x) =>
+              (!asset || !state.status || x.estado === state.status) &&
+              (!term ||
+                Object.values(x).some((v) =>
+                  String(v ?? "")
+                    .toLocaleLowerCase()
+                    .includes(term),
+                )),
+          );
+          const pages = Math.max(1, Math.ceil(filtered.length / state.limit));
+          state.page = Math.min(state.page, pages);
+          const rows = filtered.slice(
+            (state.page - 1) * state.limit,
+            state.page * state.limit,
+          );
+          $("tableBody").innerHTML =
+            rows
+              .map(
+                (x) =>
+                  "<tr>" +
+                  cols
+                    .map(
+                      ([key]) =>
+                        "<td>" +
+                        (key === "estado"
+                          ? `<span class="tag ${safe(x.estado)}">${safe(statusLabel(x.estado))}</span>`
+                          : safe(x[key])) +
+                        "</td>",
+                    )
+                    .join("") +
+                  "</tr>",
+              )
+              .join("") ||
+            `<tr><td colspan="${cols.length}" class="empty">No se encontraron registros.</td></tr>`;
+          $("pageInfo").textContent =
+            `${filtered.length} registros · Página ${state.page} de ${pages}`;
+          $("prev").disabled = state.page <= 1;
+          $("next").disabled = state.page >= pages;
+        }
+        $("nav").addEventListener("click", (e) => {
+          const b = e.target.closest("[data-view]");
+          if (b) navigate(b.dataset.view);
+        });
+        $("viewAll").onclick = () => navigate("assets");
+        $("refreshBtn").onclick = () => navigate("dashboard");
+        $("reload").onclick = loadList;
+        $("search").oninput = (e) => {
+          state.search = e.target.value;
+          state.page = 1;
+          renderTable();
+        };
+        $("statusFilter").onchange = (e) => {
+          state.status = e.target.value;
+          state.page = 1;
+          renderTable();
+        };
+        $("prev").onclick = () => {
+          state.page--;
+          renderTable();
+        };
+        $("next").onclick = () => {
+          state.page++;
+          renderTable();
+        };
+        $("themeBtn").onclick = () => {
+          document.body.classList.toggle("dark");
+          localStorage.setItem(
+            "ey_dark",
+            document.body.classList.contains("dark") ? "1" : "0",
+          );
+        };
+        if (localStorage.getItem("ey_dark") === "1")
+          document.body.classList.add("dark");
+        function options(rows) {
+          return (
+            '<option value="">Seleccionar...</option>' +
+            rows
+              .map(
+                (x) =>
+                  `<option value="${Number(x.id)}">${safe(x.nombre)}</option>`,
+              )
+              .join("")
+          );
+        }
+        $("newAsset").onclick = async () => {
+          if (state.user?.rol !== "admin") return;
+          $("assetError").textContent = "";
+          $("assetForm").reset();
+          $("assetForm").elements.fechaIngreso.value =
+            new Date().toLocaleDateString("en-CA");
+          $("modalOverlay").classList.remove("hidden");
+          try {
+            const [brands, categories, areas] = await Promise.all([
+              request("/brands"),
+              request("/categories"),
+              request("/areas"),
+            ]);
+            $("brandSelect").innerHTML = options(brands);
+            $("categorySelect").innerHTML = options(categories);
+            $("areaSelect").innerHTML = options(areas);
+          } catch (e) {
+            $("assetError").textContent = e.message;
+          }
+        };
+        $("closeModal").onclick = () =>
+          $("modalOverlay").classList.add("hidden");
+        $("modalOverlay").onclick = (e) => {
+          if (e.target === $("modalOverlay"))
+            $("modalOverlay").classList.add("hidden");
+        };
+        $("assetForm").onsubmit = async (e) => {
+          e.preventDefault();
+          const btn = e.target.querySelector("button[type=submit]");
+          btn.disabled = true;
+          $("assetError").textContent = "";
+          const f = new FormData(e.target);
+          const payload = {
+            codigoInventario: f.get("codigoInventario"),
+            descripcion: f.get("descripcion"),
+            marcaId: Number(f.get("marcaId")),
+            categoriaId: Number(f.get("categoriaId")),
+            areaId: Number(f.get("areaId")),
+            fechaIngreso: f.get("fechaIngreso"),
+            estado: f.get("estado"),
+          };
+          try {
+            await request("/assets", {
+              method: "POST",
+              body: JSON.stringify(payload),
+            });
+            $("modalOverlay").classList.add("hidden");
+            toast("Activo registrado correctamente");
+            await loadList();
+          } catch (err) {
+            $("assetError").textContent = err.message;
+          } finally {
+            btn.disabled = false;
+          }
+        };
+        if (state.token)
+          enter().catch((err) => {
+            logout();
+            $("loginError").textContent = err.message;
+          });
+      })();
+    </script>
+  </body>
+</html>
