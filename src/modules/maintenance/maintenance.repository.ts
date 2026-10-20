@@ -1,6 +1,6 @@
 import db from "../../database/knex.js";
 
-import { Knex } from "knex";
+import type { Knex } from "knex";
 
 // types
 import type {

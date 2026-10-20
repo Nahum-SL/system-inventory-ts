@@ -73,6 +73,22 @@ export class AssetsService {
         if (!area)
             throw new NotFoundError("El área indicada no existe");
     }
+    /**
+     * Marca un activo como `operativo` o `fuera_de_servicio`.
+     *
+     * @throws {NotFoundError} Si el activo no existe o fue dado de baja (404).
+     * @throws {ConflictError} Si está en mantenimiento (409).
+     */
+    async changeStatus(id, input) {
+        const result = await assetsRepository.changeStatus(id, input.estado);
+        if (result.status === "not_found") {
+            throw new NotFoundError("El activo no existe");
+        }
+        if (result.status === "in_maintenance") {
+            throw new ConflictError("El activo está en mantenimiento; cierra el mantenimiento para cambiar su estado");
+        }
+        return this.getById(id);
+    }
 }
 export const assetsService = new AssetsService();
 //# sourceMappingURL=assets.service.js.map
