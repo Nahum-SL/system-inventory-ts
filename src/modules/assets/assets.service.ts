@@ -1,39 +1,21 @@
 // Manejo de errores
 import { ConflictError, NotFoundError } from "../../shared/errors/AppError.js";
-// Assets Types
-import type { Asset, AssetFilters } from "./assets.types.js";
-// Assets Repositorio
+// Utils
+import { withConflictHandling } from "../../shared/utils/withConflictHandling.js";
+// REPOSITORIO
 import { assetsRepository } from "./assets.repository.js";
-// Valida que todos los campos sean validos
+// types
+import type { Asset, AssetFilters } from "./assets.types.js";
+// SCHEMA
 import type { CreateAssetInput, UpdateAssetInput } from "./assets.schema.js";
 
-/**
- * Tendra la responsabilidad de ejecutar el GET - CREATE de la parte de Activos
- */
 export class AssetsService {
-  /**
-   * Lista todos los activos, usando el assetsRepository para el manejo de la logica
-   * @param filters
-   * @returns
-   */
+  /** Lista activos con filtros opcionales (texto, estado, área). */
   async list(filters: AssetFilters = {}): Promise<Asset[]> {
-    if (filters.areaId !== undefined) {
-      const areaExists = await assetsRepository.areaExists(filters.areaId);
-
-      if (!areaExists) {
-        throw new NotFoundError("El área indicada no existe");
-      }
-    }
-
     return assetsRepository.findAll(filters);
   }
 
-  /**
-   * Realiza una busqueda por ID de los activos, usando el assetsRepository
-   * para el manejo de la logica
-   * @param id
-   * @returns
-   */
+  /** @throws {NotFoundError} Si el activo no existe (404). */
   async getById(id: number): Promise<Asset> {
     const asset = await assetsRepository.findById(id);
 
@@ -45,100 +27,75 @@ export class AssetsService {
   }
 
   /**
-   * Crea nuevos activos, usando el assetsRepository
-   * para el manejo de la logica
-   * @param id
-   * @returns
+   * Registra un activo verificando marca, categoría, área y unicidad del código.
+   * @throws {NotFoundError} Si marca, categoría o área no existen (404).
+   * @throws {ConflictError} Si el código ya está registrado (409).
    */
   async create(input: CreateAssetInput): Promise<Asset> {
-    const [brandExists, categoryExists, areaExists] = await Promise.all([
-      assetsRepository.brandExists(input.marcaId),
-      assetsRepository.categoryExists(input.categoriaId),
-      assetsRepository.areaExists(input.areaId),
-    ]);
+    await this.assertReferencesExist(input);
 
-    if (!brandExists) {
-      throw new NotFoundError("La marca indicada no existe");
-    }
-
-    if (!categoryExists) {
-      throw new NotFoundError("La categoría indicada no existe");
-    }
-
-    if (!areaExists) {
-      throw new NotFoundError("El área indicada no existe");
-    }
-
-    const codeExists = await assetsRepository.codeExists(
-      input.codigoInventario,
-    );
-
-    if (codeExists) {
+    if (await assetsRepository.codeExists(input.codigoInventario)) {
       throw new ConflictError("El código de inventario ya está registrado");
     }
 
-    return assetsRepository.create(input);
+    return withConflictHandling(
+      () => assetsRepository.create(input),
+      "El código de inventario ya está registrado",
+    );
   }
 
   /**
-   * Actualiza un Activo
-   * @param id 
-   * @param input 
-   * @returns 
+   * Actualiza los datos descriptivos del activo (marca, categoría, fecha de
+   * ingreso, descripción). No modifica código, área ni estado.
+   * @throws {NotFoundError} Si el activo, la marca o la categoría no existen (404).
    */
   async update(id: number, input: UpdateAssetInput): Promise<Asset> {
-    await this.getById(id);
+    const current = await this.getById(id);
 
-    const [brandExists, categoryExists, areaExists] = await Promise.all([
-      assetsRepository.brandExists(input.marcaId),
-      assetsRepository.categoryExists(input.categoriaId),
-      assetsRepository.areaExists(input.areaId),
-    ]);
-
-    if (!brandExists) {
-      throw new NotFoundError("La marca indicada no existe");
-    }
-
-    if (!categoryExists) {
-      throw new NotFoundError("La categoría indicada no existe");
-    }
-
-    if (!areaExists) {
-      throw new NotFoundError("El área indicada no existe");
-    }
-
-    const codeExists = await assetsRepository.codeExistsForAnotherAsset(
-      input.codigoInventario,
-      id,
-    );
-
-    if (codeExists) {
-      throw new ConflictError(
-        "El código de inventario ya pertenece a otro activo",
-      );
-    }
+    await this.assertReferencesExist({
+      ...(input.marcaId !== undefined && input.marcaId !== current.marcaId
+        ? { marcaId: input.marcaId }
+        : {}),
+      ...(input.categoriaId !== undefined &&
+      input.categoriaId !== current.categoriaId
+        ? { categoriaId: input.categoriaId }
+        : {}),
+    });
 
     const updated = await assetsRepository.update(id, input);
 
     if (!updated) {
-      throw new NotFoundError("No se pudo actualizar el activo");
+      throw new NotFoundError("El activo no existe");
     }
 
     return updated;
   }
 
-  /**
-   * Elmina un registro de Activo
-   * @param id 
-   */
+  /** Da de baja lógica un activo (conserva su historial). */
   async delete(id: number): Promise<void> {
     await this.getById(id);
 
-    const deleted = await assetsRepository.softDelete(id);
-
-    if (!deleted) {
-      throw new NotFoundError("No se pudo dar de baja el activo");
+    if (!(await assetsRepository.softDelete(id))) {
+      throw new NotFoundError("El activo no existe");
     }
+  }
+
+  /** Verifica solo las referencias que se le pasan. */
+  private async assertReferencesExist(refs: {
+    marcaId?: number;
+    categoriaId?: number;
+    areaId?: number;
+  }): Promise<void> {
+    const [brand, category, area] = await Promise.all([
+      refs.marcaId === undefined || assetsRepository.brandExists(refs.marcaId),
+      refs.categoriaId === undefined ||
+        assetsRepository.categoryExists(refs.categoriaId),
+      refs.areaId === undefined || assetsRepository.areaExists(refs.areaId),
+    ]);
+
+    if (!brand) throw new NotFoundError("La marca indicada no existe");
+    if (!category) throw new NotFoundError("La categoría indicada no existe");
+    if (!area) throw new NotFoundError("El área indicada no existe");
   }
 }
 

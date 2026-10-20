@@ -1,5 +1,5 @@
 // Servicio
-import { positionsService } from "./positions.servicios.js";
+import { positionsService } from "./positions.service.js";
 // Utils
 import { asyncHandler } from "../../shared/utils/asyncHandler.js";
 import { parseId } from "../../shared/utils/parseId.js";
