@@ -7,7 +7,7 @@ import { assetsRepository } from "./assets.repository.js";
 // types
 import type { Asset, AssetFilters } from "./assets.types.js";
 // SCHEMA
-import type { CreateAssetInput, UpdateAssetInput } from "./assets.schema.js";
+import type { CreateAssetInput, UpdateAssetInput, UpdateAssetStatusInput } from "./assets.schema.js";
 
 export class AssetsService {
   /** Lista activos con filtros opcionales (texto, estado, área). */
@@ -96,6 +96,31 @@ export class AssetsService {
     if (!brand) throw new NotFoundError("La marca indicada no existe");
     if (!category) throw new NotFoundError("La categoría indicada no existe");
     if (!area) throw new NotFoundError("El área indicada no existe");
+  }
+
+  /**
+   * Marca un activo como `operativo` o `fuera_de_servicio`.
+   *
+   * @throws {NotFoundError} Si el activo no existe o fue dado de baja (404).
+   * @throws {ConflictError} Si está en mantenimiento (409).
+   */
+  async changeStatus(
+    id: number,
+    input: UpdateAssetStatusInput,
+  ): Promise<Asset> {
+    const result = await assetsRepository.changeStatus(id, input.estado);
+
+    if (result.status === "not_found") {
+      throw new NotFoundError("El activo no existe");
+    }
+
+    if (result.status === "in_maintenance") {
+      throw new ConflictError(
+        "El activo está en mantenimiento; cierra el mantenimiento para cambiar su estado",
+      );
+    }
+
+    return this.getById(id);
   }
 }
 
