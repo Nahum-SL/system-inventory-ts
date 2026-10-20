@@ -7,8 +7,8 @@ export interface Person {
   nombres: string;
   tipodoc: string;
   numerodoc: string;
-  telefono: string | null;
-  email: string | null;
+  telefono: string;
+  email: string;
   fechaRegistro: string;
 }
 
