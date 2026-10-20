@@ -16,7 +16,6 @@
     "migrate:status": "pnpm knex migrate:status",
     "seed:make": "pnpm knex seed:make",
     "seed:run": "pnpm knex seed:run"
-    
   },
 
   "keywords": [],
@@ -37,6 +36,7 @@
     "dotenv": "^18.0.8",
     "e-yonda-ts": "link:",
     "express": "^5.3.0",
+    "express-rate-limit": "^8.7.1",
     "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.3",
     "knex": "^3.3.0",
