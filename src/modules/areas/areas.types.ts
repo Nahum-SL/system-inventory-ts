@@ -14,3 +14,9 @@ export interface CreateAreaData {
 export interface UpdateAreaData {
   nombre?: string;
 }
+
+export interface AreaRow {
+  id: number;
+  nombre: string;
+  fechaRegistro: string;
+}
