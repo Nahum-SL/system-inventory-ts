@@ -3,9 +3,9 @@ import { ConflictError, NotFoundError } from "../../shared/errors/AppError.js";
 // REPOSITORIO - PEOPLE
 import { peopleRepository } from "./people.repository.js";
 // SHEMA - PERSONA
-import type { CreatePersonInput } from "./people.schema.js";
+import type { CreatePersonInput, UpdatePersonInput } from "./people.schema.js";
 // Types
-import type { Person } from "./people.types.js";
+import type { Person, UpdatePersonData } from "./people.types.js";
 
 /**
  * Clase Persona que albergara la logica CR para los controladores
@@ -62,6 +62,60 @@ export class PeopleService {
       telefono: input.telefono,
       email,
     });
+  }
+
+  /**
+   * Actualiza una persona después de verificar el ID existente.
+   * Actualizando solo los campos modificados
+   * @param id 
+   * @param input 
+   * @returns 
+   */
+  async update(id: number, input: UpdatePersonInput): Promise<Person> {
+    // 1. Comprobar que la persona exista.
+    await this.getById(id);
+
+    // 2. Comprobar que el documento no pertenezca a otra persona.
+    if (
+      input.numerodoc !== undefined &&
+      (await peopleRepository.documentExists(input.numerodoc))
+    ) {
+      const existing = await peopleRepository.findById(id);
+
+      if (existing?.numerodoc !== input.numerodoc) {
+        throw new ConflictError(
+          "Ya existe una persona con ese número de documento",
+        );
+      }
+    }
+
+    // 3. Normalizar y comprobar el correo.
+    const email = input.email?.trim().toLowerCase();
+
+    if (email !== undefined && (await peopleRepository.emailExists(email))) {
+      const existing = await peopleRepository.findById(id);
+
+      if (existing?.email.toLowerCase() !== email) {
+        throw new ConflictError(
+          "Ya existe una persona con ese correo electrónico",
+        );
+      }
+    }
+
+    // 4. Preparar los campos que realmente se enviaron.
+    const data: UpdatePersonData = {
+      ...input,
+      ...(email !== undefined ? { email } : {}),
+    };
+
+    // 5. Actualizar y devolver el registro.
+    const updated = await peopleRepository.update(id, data);
+
+    if (!updated) {
+      throw new NotFoundError("La persona no existe");
+    }
+
+    return updated;
   }
 }
 
