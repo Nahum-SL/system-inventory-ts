@@ -25,6 +25,18 @@ export interface CreatePersonData {
 }
 
 /**
+ * Interfaz del modulo Persona, para actualizar un nuevo registro
+ */
+export interface UpdatePersonData {
+  apellidos?: string;
+  nombres?: string;
+  tipodoc?: string;
+  numerodoc?: string;
+  telefono?: string;
+  email?: string;
+}
+
+/**
  * Permite filtrar personas
  */
 export interface PersonFilters {
