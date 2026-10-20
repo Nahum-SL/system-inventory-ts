@@ -9,6 +9,7 @@ import type {
   CreateCategoryInput,
   UpdateCategoryInput,
 } from "./categories.schema.js";
+import { isDuplicateEntryError } from "../../shared/utils/isDuplicatedEntryError.js";
 
 /**
  * Servicio de la lógica de negocio del módulo de categorías.
@@ -74,7 +75,17 @@ export class CategoriesService {
       throw new ConflictError("Ya existe una categoría con ese nombre");
     }
 
-    return categoriesRepository.create({ nombre });
+    try {
+      return categoriesRepository.create({ nombre });
+    } catch (error) {
+      // Condición de carrera: otra petición insertó el mismo nombre
+      // entre findByName y el insert.
+      if (isDuplicateEntryError(error)) {
+        throw new ConflictError("Ya existe una categoría con ese nombre");
+      }
+
+      throw error;
+    }
   }
 
   /**
@@ -112,13 +123,21 @@ export class CategoriesService {
       throw new ConflictError("Ya existe una categoría con ese nombre");
     }
 
-    const updated = await categoriesRepository.update(id, { nombre });
+    try {
+      const updated = await categoriesRepository.update(id, { nombre });
 
-    if (!updated) {
-      throw new NotFoundError("La categoría no existe");
+      if (!updated) {
+        throw new NotFoundError("La categoría no existe");
+      }
+
+      return updated;
+    } catch (error) {
+      if (isDuplicateEntryError(error)) {
+        throw new ConflictError("Ya existe una categoría con ese nombre");
+      }
+
+      throw error;
     }
-
-    return updated;
   }
 }
 
