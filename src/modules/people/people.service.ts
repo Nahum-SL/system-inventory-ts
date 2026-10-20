@@ -67,41 +67,34 @@ export class PeopleService {
   /**
    * Actualiza una persona después de verificar el ID existente.
    * Actualizando solo los campos modificados
-   * @param id 
-   * @param input 
-   * @returns 
+   * @param id
+   * @param input
+   * @returns
    */
   async update(id: number, input: UpdatePersonInput): Promise<Person> {
-    // 1. Comprobar que la persona exista.
-    await this.getById(id);
+    const existing = await this.getById(id);
 
-    // 2. Comprobar que el documento no pertenezca a otra persona.
     if (
       input.numerodoc !== undefined &&
+      input.numerodoc !== existing.numerodoc &&
       (await peopleRepository.documentExists(input.numerodoc))
     ) {
-      const existing = await peopleRepository.findById(id);
-
-      if (existing?.numerodoc !== input.numerodoc) {
-        throw new ConflictError(
-          "Ya existe una persona con ese número de documento",
-        );
-      }
+      throw new ConflictError(
+        "Ya existe una persona con ese número de documento",
+      );
     }
 
-    // 3. Normalizar y comprobar el correo.
     const email = input.email?.trim().toLowerCase();
 
-    if (email !== undefined && (await peopleRepository.emailExists(email))) {
-      const existing = await peopleRepository.findById(id);
-
-      if (existing?.email.toLowerCase() !== email) {
-        throw new ConflictError(
-          "Ya existe una persona con ese correo electrónico",
-        );
-      }
+    if (
+      email !== undefined &&
+      email !== existing.email.toLowerCase() &&
+      (await peopleRepository.emailExists(email))
+    ) {
+      throw new ConflictError(
+        "Ya existe una persona con ese correo electrónico",
+      );
     }
-
     // 4. Preparar los campos que realmente se enviaron.
     const data: UpdatePersonData = {
       ...input,
