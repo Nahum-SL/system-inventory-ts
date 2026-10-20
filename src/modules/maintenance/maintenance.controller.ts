@@ -1,7 +1,7 @@
 // utils
 import { asyncHandler } from "../../shared/utils/asyncHandler.js";
 import { parseId } from "../../shared/utils/parseId.js";
-// Servicio
+// Servicioz
 import { maintenanceService } from "./maintenance.service.js";
 
 export const createMaintenance = asyncHandler(async (req, res) => {
@@ -28,4 +28,29 @@ export const closeMaintenance = asyncHandler(async (req, res) => {
     message: "Mantenimiento cerrado correctamente",
     data: maintenance,
   });
+});
+
+// Obtiene el historial de manrenimiento
+export const getMaintenanceHistory = asyncHandler(async (req, res, next) => {
+  try {
+    const activoId = Number(req.params.id);
+
+    if (!Number.isSafeInteger(activoId) || activoId <= 0) {
+      res.status(400).json({
+        status: "error",
+        message: "El ID del activo no es válido",
+      });
+      return;
+    }
+
+    const history = await maintenanceService.getHistory(activoId);
+
+    res.status(200).json({
+      status: "success",
+      results: history.length,
+      data: history,
+    });
+  } catch (error) {
+    next(error);
+  }
 });
