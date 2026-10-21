@@ -20,8 +20,6 @@ const envSchema = z.object({
   DB_USER: z.string().min(1).default("root"),
   DB_PASSWORD: z.string().default(""),
 
-  DB_NAME_TEST: z.string().min(1).default("system_inventory_test"),
-
   JWT_SECRET: z.string().min(32),
   JWT_EXPIRES_IN: z.coerce.number().int().positive().default(3600),
 });
