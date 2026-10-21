@@ -1,3 +1,7 @@
+export type CreateMovementResult =
+  | { status: "ok"; movement: Movement }
+  | { status: "asset_not_found" }
+  | { status: "same_area" };
 
 /**
  * Interfaz necesaria para la creacion de un nuevo registro en Movimiento
