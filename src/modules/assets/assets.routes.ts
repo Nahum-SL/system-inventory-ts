@@ -3,28 +3,29 @@ import { Router } from "express";
 import { authenticate } from "../../shared/middlewares/auth.middleware.js";
 import { authorize } from "../../shared/middlewares/authorize.middleware.js";
 import { validate } from "../../shared/middlewares/validate.middleware.js";
-// SCHEMA - Valida que se cumpla el Contrato
 import {
   createAssetSchema,
   updateAssetSchema,
   updateAssetStatusSchema,
+  decommissionAssetSchema,
+  listAssetsQuerySchema,
 } from "./assets.schema.js";
-// CONTROLLER
 import {
   createAsset,
   getAssetById,
   listAssets,
-  deleteAsset,
   updateAsset,
   updateAssetStatus,
+  decommissionAsset,
 } from "./assets.controller.js";
 
 const assetsRoutes = Router();
 
 assetsRoutes.use(authenticate);
 
-// RUTAS
-assetsRoutes.get("/", listAssets);
+assetsRoutes.get("/", validate(listAssetsQuerySchema, "query"), listAssets);
+// Ficha por código (paso 3): va ANTES de "/:id".
+// assetsRoutes.get("/code/:codigo", getAssetByCode);
 assetsRoutes.get("/:id", getAssetById);
 
 assetsRoutes.post(
@@ -33,21 +34,22 @@ assetsRoutes.post(
   validate(createAssetSchema),
   createAsset,
 );
-
 assetsRoutes.patch(
   "/:id",
   authorize("admin"),
   validate(updateAssetSchema),
   updateAsset,
 );
-
 assetsRoutes.patch(
   "/:id/status",
   authorize("admin"),
   validate(updateAssetStatusSchema),
   updateAssetStatus,
 );
-
-assetsRoutes.delete("/:id", authorize("admin"), deleteAsset);
-
+assetsRoutes.post(
+  "/:id/decommission",
+  authorize("admin"),
+  validate(decommissionAssetSchema),
+  decommissionAsset,
+);
 export default assetsRoutes;
