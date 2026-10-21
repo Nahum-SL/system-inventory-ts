@@ -136,7 +136,7 @@ export async function up(knex: Knex): Promise<void> {
       .notNullable()
       .defaultTo("operativo");
     table.boolean("eliminado").notNullable().defaultTo(false);
-    table.timestamp("fecha_eliminacion").nullable();
+    table.dateTime("fecha_eliminacion").nullable();
     table.string("motivo_eliminacion", 250).nullable();
     table.timestamp("fecharegistro").notNullable().defaultTo(knex.fn.now());
   });

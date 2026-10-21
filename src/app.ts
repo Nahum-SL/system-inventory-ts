@@ -21,7 +21,7 @@ import movementsRoutes from "./modules/movements/movements.route.js";
 // Mantenimiento
 import maintenanceRoutes from "./modules/maintenance/maintenance.routes.js";
 // Asignaciones
-import assignmentRoutes from "./modules/assignments/assignments.routes.js";
+import assignmentRoutes from "./modules/assigments/assignments.routes.js";
 // Personas
 import peopleRoutes from "./modules/people/people.routes.js";
 // Areas
