@@ -19,5 +19,4 @@ const authRoutes = Router();
 authRoutes.post("/login", loginLimiter, validate(loginSchema), login);
 authRoutes.get("/me", authenticate, getCurrentUser);
 
-
 export default authRoutes;

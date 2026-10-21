@@ -1,4 +1,31 @@
-import listEndpoints from "express-list-endpoints";
+import { collectRoutes } from "./shared/utils/printRoutes.js";
+
+// ===========
+// MODULOS
+// ===========
+// Auth
+import authRoutes from "./modules/auth/auth.routes.js";
+// Users
+import userRoutes from "./modules/users/users.routes.js";
+// Activos
+import assetsRoutes from "./modules/assets/assets.routes.js";
+// Moviemientos
+import movementsRoutes from "./modules/movements/movements.route.js";
+// Mantenimiento
+import maintenanceRoutes from "./modules/maintenance/maintenance.routes.js";
+// Asignaciones
+import assignmentRoutes from "./modules/assigments/assignments.routes.js";
+// Personas
+import peopleRoutes from "./modules/people/people.routes.js";
+// Areas
+import areasRoutes from "./modules/areas/area.routes.js";
+// Marcas
+import brandsRoutes from "./modules/brands/brands.routes.js";
+// Categorias
+import categoriesRoutes from "./modules/categories/categories.routes.js";
+// Cargos
+import positionsRoutes from "./modules/positions/positions.routes.js";
+
 import app from "./app.js";
 import { env } from "./config/env.js";
 import db from "./database/knex.js";
@@ -11,14 +38,21 @@ const server = app.listen(env.PORT, () => {
 
   // Solo en desarrollo: lista los endpoints disponibles
   if (env.NODE_ENV === "development") {
-    const endpoints = listEndpoints(app);
-
     console.log("\nEndpoints disponibles:");
-    console.table(
-      endpoints.flatMap((e) =>
-        e.methods.map((method) => ({ Método: method, Ruta: e.path })),
-      ),
-    );
+    console.table([
+      { Método: "GET", Ruta: "/api/health" },
+      ...collectRoutes(authRoutes, "/api/auth"),
+      ...collectRoutes(assetsRoutes, "/api/assets"),
+      ...collectRoutes(peopleRoutes, "/api/people"),
+      ...collectRoutes(areasRoutes, "/api/areas"),
+      ...collectRoutes(brandsRoutes, "/api/brands"),
+      ...collectRoutes(categoriesRoutes, "/api/categories"),
+      ...collectRoutes(positionsRoutes, "/api/positions"),
+
+      ...collectRoutes(movementsRoutes, "/api"),
+      ...collectRoutes(maintenanceRoutes, "/api"),
+      ...collectRoutes(assignmentRoutes, "/api"),
+    ]);
   }
 });
 

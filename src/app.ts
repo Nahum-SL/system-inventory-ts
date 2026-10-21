@@ -56,7 +56,7 @@ app.use(helmet());
 app.use(
   cors({
     // p. ej. "http://localhost:5173"; omite cors() si usas proxy de Vite
-    origin: env.CORS_ORIGIN, 
+    origin: env.CORS_ORIGIN,
   }),
 );
 app.use(express.json({ limit: "1mb" }));
