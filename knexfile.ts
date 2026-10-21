@@ -27,6 +27,7 @@ const config: { [key: string]: Knex.Config } = {
   test: {
     client: "mysql2",
     connection: {
+      charset: "utf8mb4",
       database: process.env.DB_NAME || "system_inventory_test",
       user: process.env.DB_USER || "root",
       password: process.env.DB_PASSWORD || "",
