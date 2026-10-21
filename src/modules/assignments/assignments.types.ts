@@ -24,5 +24,18 @@ export interface Assignment {
 
 export interface ReturnAssignmentData {
   assignmentId: number;
+  fechaFin: string;
   condicionDevolucion: string;
 }
+
+export type CreateAssignmentResult =
+  | { status: "ok"; assignment: Assignment }
+  | { status: "asset_not_found" }
+  | { status: "asset_not_operational"; estado: string }
+  | { status: "already_assigned" };
+
+export type ReturnAssignmentResult =
+  | { status: "ok"; assignment: Assignment }
+  | { status: "not_found" }
+  | { status: "already_returned" }
+  | { status: "invalid_dates" };
