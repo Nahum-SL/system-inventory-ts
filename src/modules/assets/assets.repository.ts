@@ -40,6 +40,7 @@ export class AssetsRepository {
         fechaRegistro: "a.fecharegistro",
         eliminado: "a.eliminado",
         fechaEliminacion: "a.fecha_eliminacion",
+        motivoEliminacion: "a.motivo_eliminacion"
       });
 
     if (!options.includeDeleted) query.where("a.eliminado", false);
