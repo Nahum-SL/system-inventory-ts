@@ -1,61 +1,32 @@
-import type { RequestHandler } from "express";
+import { asyncHandler } from "../../shared/utils/asyncHandler.js";
+import { parseId } from "../../shared/utils/parseId.js";
 import { usersService } from "./users.service.js";
 
-/**
- * Lista a los usuarios
- */
-export const listUsers: RequestHandler = async (_req, res, next) => {
-  try {
-    const users = await usersService.list();
+/** Lista las cuentas de usuario (solo admin). */
+export const listUsers = asyncHandler(async (_req, res) => {
+  const users = await usersService.list();
 
-    res.status(200).json({
-      status: "success",
-      data: users,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+  res
+    .status(200)
+    .json({ status: "success", results: users.length, data: users });
+});
 
-/**
- * Obtiene al usuario por ID
- */
-export const getUserById: RequestHandler = async (req, res, next) => {
-  try {
-    const id = Number(req.params.id);
+/** Obtiene una cuenta por id. Responde 400 si el id no es válido o 404 si no existe. */
+export const getUserById = asyncHandler(async (req, res) => {
+  const user = await usersService.getById(
+    parseId(req.params.id, "del usuario"),
+  );
 
-    if (!Number.isSafeInteger(id) || id <= 0) {
-      res.status(400).json({
-        status: "error",
-        message: "El ID del usuario no es válido",
-      });
-      return;
-    }
+  res.status(200).json({ status: "success", data: user });
+});
 
-    const user = await usersService.getById(id);
+/** Crea una cuenta. El body llega validado. Responde 201, 404 o 409. */
+export const createUser = asyncHandler(async (req, res) => {
+  const user = await usersService.create(req.body);
 
-    res.status(200).json({
-      status: "success",
-      data: user,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-/**
- * Crea un nuevo usuario
- */
-export const createUser: RequestHandler = async (req, res, next) => {
-  try {
-    const user = await usersService.create(req.body);
-
-    res.status(201).json({
-      status: "success",
-      message: "Usuario creado correctamente",
-      data: user,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+  res.status(201).json({
+    status: "success",
+    message: "Usuario creado correctamente",
+    data: user,
+  });
+});

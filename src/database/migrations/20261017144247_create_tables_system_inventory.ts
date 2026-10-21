@@ -82,6 +82,7 @@ export async function up(knex: Knex): Promise<void> {
       .integer("persona_id")
       .unsigned()
       .notNullable()
+      .unique()
       .references("id")
       .inTable("personas")
       .onUpdate("CASCADE")

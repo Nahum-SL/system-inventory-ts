@@ -1,66 +1,72 @@
 import bcrypt from "bcrypt";
 
-import db from "../../database/knex.js";
-
-// Manejo de Errores
 import { ConflictError, NotFoundError } from "../../shared/errors/AppError.js";
-
-// Clase
+import { isDuplicateEntryError } from "../../shared/utils/isDuplicateEntryError.js";
+import { peopleRepository } from "../people/people.repository.js";
 import { usersRepository } from "./users.repository.js";
-// Types
 import type { PublicUser } from "./users.types.js";
-// Schema - Campos validados
 import type { CreateUserInput } from "./users.schema.js";
 
-/**
- * Clase que contendra la logica de los metodos parael CRUD
- * de la tabla Usuarios, que sera utilizado en su controlador 
- */
-export class UsersService {
+const BCRYPT_COST = 12;
 
+/** Lógica de negocio de las cuentas de usuario. */
+export class UsersService {
+  /** Lista las cuentas sin exponer contraseñas. */
   async list(): Promise<PublicUser[]> {
     return usersRepository.findAll();
   }
 
+  /** @throws {NotFoundError} Si el usuario no existe (404). */
   async getById(id: number): Promise<PublicUser> {
     const user = await usersRepository.findPublicById(id);
 
-    if (!user) {
-      throw new NotFoundError("El usuario no existe");
-    }
+    if (!user) throw new NotFoundError("El usuario no existe");
 
     return user;
   }
 
+  /**
+   * Crea una cuenta para una persona existente.
+   * La contraseña se guarda con bcrypt; nunca se devuelve.
+   * @throws {NotFoundError} Si la persona no existe (404).
+   * @throws {ConflictError} Si la persona ya tiene cuenta o el usuario está en uso (409).
+   */
   async create(input: CreateUserInput): Promise<PublicUser> {
-    const personExists = await usersRepository.personExists(input.personaId);
-
-    if (!personExists) {
+    if (!(await peopleRepository.findById(input.personaId))) {
       throw new NotFoundError("La persona indicada no existe");
     }
 
-    const personAlreadyHasUser = await usersRepository.personHasUser(
-      input.personaId,
-    );
-
-    if (personAlreadyHasUser) {
+    if (await usersRepository.personHasUser(input.personaId)) {
       throw new ConflictError("Esta persona ya tiene una cuenta de usuario");
     }
 
-    const usernameExists = await usersRepository.usernameExists(input.username);
-
-    if (usernameExists) {
+    if (await usersRepository.usernameExists(input.username)) {
       throw new ConflictError("El nombre de usuario ya está registrado");
     }
 
-    const passwordHash = await bcrypt.hash(input.password, 12);
+    const passwordHash = await bcrypt.hash(input.password, BCRYPT_COST);
 
-    return usersRepository.create({
-      personaId: input.personaId,
-      username: input.username,
-      passwordHash,
-      rol: input.rol,
-    });
+    try {
+      return await usersRepository.create({
+        personaId: input.personaId,
+        username: input.username,
+        passwordHash,
+        rol: input.rol,
+      });
+    } catch (error) {
+      // Condición de carrera: otra petición ganó entre las verificaciones y el insert.
+      if (isDuplicateEntryError(error)) {
+        const sqlMessage = (error as { sqlMessage?: string }).sqlMessage ?? "";
+
+        throw new ConflictError(
+          sqlMessage.includes("persona_id")
+            ? "Esta persona ya tiene una cuenta de usuario"
+            : "El nombre de usuario ya está registrado",
+        );
+      }
+
+      throw error;
+    }
   }
 }
 
