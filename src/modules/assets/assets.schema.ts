@@ -66,7 +66,19 @@ export const listAssetsQuerySchema = z.object({
   areaId: z.coerce.number().int().positive().optional(),
 });
 
+/** Datos para dar de baja un activo. El motivo queda en el registro. */
+export const decommissionAssetSchema = z.object({
+  motivo: z
+    .string()
+    .trim()
+    .min(1, "El motivo de la baja es obligatorio")
+    .max(250, "El motivo no puede superar los 250 caracteres"),
+});
+
+export type DecommissionAssetInput = z.infer<typeof decommissionAssetSchema>;
+
+
+
 export type CreateAssetInput = z.infer<typeof createAssetSchema>;
 export type UpdateAssetInput = z.infer<typeof updateAssetSchema>;
-
 export type UpdateAssetStatusInput = z.infer<typeof updateAssetStatusSchema>;
