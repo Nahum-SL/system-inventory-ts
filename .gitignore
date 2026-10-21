@@ -4,3 +4,7 @@ dist/
 .env.test
 
 node_modules
+
+# FRONTEND
+frontend/node_modules
+frontend/dist
