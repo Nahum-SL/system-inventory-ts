@@ -10,6 +10,8 @@ const envSchema = z.object({
   PORT: z.coerce.number().int().positive().default(3000),
 
   CORS_ORIGIN: z.url().default("http://localhost:5173"),
+  
+  PUBLIC_APP_URL: z.url().default("http://localhost:5173"),
 
   DB_HOST: z.string().min(1).default("localhost"),
   DB_PORT: z.coerce.number().int().min(1).max(65535).default(3306),

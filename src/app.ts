@@ -55,7 +55,8 @@ app.use(helmet());
 // cors(): habilita CORS con su configuración predeterminada. Más adelante restringiremos los orígenes permitidos.
 app.use(
   cors({
-    origin: env.CORS_ORIGIN, // p. ej. "http://localhost:5173"; omite cors() si usas proxy de Vite
+    // p. ej. "http://localhost:5173"; omite cors() si usas proxy de Vite
+    origin: env.CORS_ORIGIN, 
   }),
 );
 app.use(express.json({ limit: "1mb" }));
