@@ -1,11 +1,17 @@
+import QRCode from "qrcode";
+import { env } from "../../config/env.js";
 // Manejo de errores
-import { ConflictError, NotFoundError } from "../../shared/errors/AppError.js";
+import {
+  ConflictError,
+  GoneError,
+  NotFoundError,
+} from "../../shared/errors/AppError.js";
 // Utils
 import { withConflictHandling } from "../../shared/utils/withConflictHandling.js";
 // REPOSITORIO
 import { assetsRepository } from "./assets.repository.js";
 // types
-import type { Asset, AssetFilters } from "./assets.types.js";
+import type { Asset, AssetCard, AssetFilters } from "./assets.types.js";
 // SCHEMA
 import type {
   CreateAssetInput,
@@ -152,6 +158,59 @@ export class AssetsService {
         "El activo está asignado; registra su devolución antes de darlo de baja",
       );
     }
+  }
+
+  /**
+   * Ficha del activo para el QR: datos, asignación actual, mantenimiento abierto
+   * y disponibilidad derivada.
+   *
+   * @throws {NotFoundError} Si no existe un activo con ese código (404).
+   * @throws {GoneError} Si fue dado de baja (410), con fecha y motivo en el mensaje.
+   */
+  async getCardByCode(codigo: string): Promise<AssetCard> {
+    const asset = await assetsRepository.findByCode(codigo);
+
+    if (!asset) throw new NotFoundError("No existe un activo con ese código");
+
+    if (asset.eliminado) {
+      const fecha = asset.fechaEliminacion?.slice(0, 10) ?? "fecha desconocida";
+      const motivo = asset.motivoEliminacion
+        ? `. Motivo: ${asset.motivoEliminacion}`
+        : "";
+
+      throw new GoneError(`Este activo fue dado de baja el ${fecha}${motivo}`);
+    }
+
+    const [asignacionActual, mantenimientoAbierto] = await Promise.all([
+      assetsRepository.findCurrentAssignment(asset.id),
+      assetsRepository.findOpenMaintenance(asset.id),
+    ]);
+
+    return {
+      ...asset,
+      disponibilidad: asignacionActual ? "asignado" : "disponible",
+      asignacionActual,
+      mantenimientoAbierto,
+    };
+  }
+
+  /**
+   * Genera el QR (SVG) de un activo. Codifica una URL a la ficha en el frontend:
+   * `${PUBLIC_APP_URL}/activos/<codigo>`. No se guarda; se genera al vuelo.
+   *
+   * @throws {NotFoundError} Si el activo no existe o fue dado de baja (404).
+   */
+  async getQrSvg(id: number): Promise<string> {
+    const asset = await this.getById(id);
+
+    const baseUrl = env.PUBLIC_APP_URL.replace(/\/+$/, "");
+    const url = `${baseUrl}/activos/${encodeURIComponent(asset.codigoInventario)}`;
+
+    return QRCode.toString(url, {
+      type: "svg",
+      errorCorrectionLevel: "M",
+      margin: 2,
+    });
   }
 }
 
