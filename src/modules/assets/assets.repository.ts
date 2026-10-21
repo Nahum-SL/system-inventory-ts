@@ -24,7 +24,6 @@ export class AssetsRepository {
       .innerJoin("marcas as m", "m.id", "a.marca_id")
       .innerJoin("categorias as c", "c.id", "a.categoria_id")
       .innerJoin("areas as ar", "ar.id", "a.area_id")
-      .where("a.eliminado", false)
       .select({
         id: "a.id",
         marcaId: "a.marca_id",
