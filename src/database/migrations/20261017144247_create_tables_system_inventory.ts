@@ -264,10 +264,10 @@ export async function up(knex: Knex): Promise<void> {
     table.timestamp("fecharegistro").notNullable().defaultTo(knex.fn.now());
   });
 
-  await knex.raw(`
+await knex.raw(`
   ALTER TABLE mantenimientos
-  ADD COLUMN abierta TINYINT GENERATED ALWAYS AS (IF(fecha_fin IS NULL, 1, NULL)) VIRTUAL,
-  ADD UNIQUE KEY uq_asignacion_abierta (activo_id, abierto)
+  ADD COLUMN abierto TINYINT GENERATED ALWAYS AS (IF(fecha_fin IS NULL, 1, NULL)) VIRTUAL,
+  ADD UNIQUE KEY uq_mantenimiento_abierto (activo_id, abierto)
 `);
 }
 
