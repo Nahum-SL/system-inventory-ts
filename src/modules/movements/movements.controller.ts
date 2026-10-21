@@ -1,82 +1,34 @@
-import type { RequestHandler } from "express";
-// Servicio
+import { UnauthorizedError } from "../../shared/errors/AppError.js";
+import { asyncHandler } from "../../shared/utils/asyncHandler.js";
+import { parseId } from "../../shared/utils/parseId.js";
 import { movementsService } from "./movements.service.js";
 
-/**
- * Recibe la peticion HTTP, invoca el servicio Create de movementsService
- * @param req 
- * @param res 
- * @param next 
- * @returns 
- */
-export const createMovement: RequestHandler = async (req, res, next) => {
-  try {
-    const activoId = Number(req.params.id);
-    const usuarioId = req.auth?.id;
+/** Traslada un activo. El usuario sale del token y el body llega validado. */
+export const createMovement = asyncHandler(async (req, res) => {
+  if (!req.auth) throw new UnauthorizedError("Debes autenticarte primero");
 
-    if (!Number.isSafeInteger(activoId) || activoId <= 0) {
-      res.status(400).json({
-        status: "error",
-        message: "El ID del activo no es válido",
-      });
-      return;
-    }
+  const movement = await movementsService.create(
+    parseId(req.params.id, "del activo"),
+    req.auth.id,
+    req.body,
+  );
 
-    if (!usuarioId) {
-      res.status(401).json({
-        status: "error",
-        message: "Debes autenticarte primero",
-      });
-      return;
-    }
+  res.status(201).json({
+    status: "success",
+    message: "Movimiento registrado correctamente",
+    data: movement,
+  });
+});
 
-    const movement = await movementsService.create(
-      activoId,
-      usuarioId,
-      req.body,
-    );
+/** Historial de traslados de un activo, incluso si fue dado de baja. */
+export const getMovementHistory = asyncHandler(async (req, res) => {
+  const history = await movementsService.getHistory(
+    parseId(req.params.id, "del activo"),
+  );
 
-    res.status(201).json({
-      status: "success",
-      message: "Movimiento registrado correctamente",
-      data: movement,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-/**
- * Recibe la peticion HTTP, invoca el servicio getHistory() del servicio
- * @param req 
- * @param res 
- * @param next 
- * @returns 
- */
-export const getMovementHistory: RequestHandler = async (
-  req,
-  res,
-  next,
-) => {
-  try {
-    const activoId = Number(req.params.id);
-
-    if (!Number.isSafeInteger(activoId) || activoId <= 0) {
-      res.status(400).json({
-        status: "error",
-        message: "El ID del activo no es válido",
-      });
-      return;
-    }
-
-    const history = await movementsService.getHistory(activoId);
-
-    res.status(200).json({
-      status: "success",
-      results: history.length,
-      data: history,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+  res.status(200).json({
+    status: "success",
+    results: history.length,
+    data: history,
+  });
+});
