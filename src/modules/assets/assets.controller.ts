@@ -70,3 +70,16 @@ export const updateAssetStatus = asyncHandler(async (req, res) => {
     data: asset,
   });
 });
+
+/** Da de baja un activo. El body (`motivo`) llega validado. */
+export const decommissionAsset = asyncHandler(async (req, res) => {
+  await assetsService.decommission(
+    parseId(req.params.id, "del activo"),
+    req.body,
+  );
+
+  res.status(200).json({
+    status: "success",
+    message: "Activo dado de baja correctamente",
+  });
+});
