@@ -11,11 +11,20 @@ const config: Knex.Config = {
     database: env.DB_NAME,
     user: env.DB_USER,
     password: env.DB_PASSWORD,
+    // DATE/DATETIME/TIMESTAMP llegan como strings "YYYY-MM-DD HH:mm:ss",
+    // sin conversión a Date (evita desfases de día por zona horaria).
+    dateStrings: true,
   },
-  // Permite reutilizar conexiones en vez de abrir una nueva para cada consulta
   pool: {
     min: 0,
     max: 10,
+    // Fija la zona de la sesión para que NOW() y los TIMESTAMP salgan en hora de Lima.
+    afterCreate: (
+      conn: { query: (sql: string, cb: (err: Error | null) => void) => void },
+      done: (err: Error | null, conn: unknown) => void,
+    ) => {
+      conn.query("SET time_zone = '-05:00'", (err) => done(err, conn));
+    },
   },
 };
 
