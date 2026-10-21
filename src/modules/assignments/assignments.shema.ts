@@ -1,24 +1,32 @@
 import { z } from "zod";
 
-/**
- * Valida y restringe que todos los campos se cumplan para Asignaciones 
- */
+const idField = (nombre: string) =>
+  z
+    .number({ error: `${nombre} es obligatorio y debe ser un número` })
+    .int(`${nombre} debe ser un entero`)
+    .positive(`${nombre} no es válido`);
+
+/** Datos para asignar un activo. Las condiciones admiten 250 caracteres (límite de la columna). */
 export const createAssignmentSchema = z.object({
-  personaId: z.number().int().positive(),
-
-  cargoId: z.number().int().positive(),
-
-  fechaInicio: z
+  personaId: idField("La persona"),
+  cargoId: idField("El cargo"),
+  fechaInicio: z.iso.date("La fecha debe tener formato YYYY-MM-DD"),
+  condicionEntrega: z
     .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, "La fecha debe tener formato YYYY-MM-DD"),
+    .trim()
+    .min(1, "La condición de entrega es obligatoria")
+    .max(250, "La condición no puede superar los 250 caracteres"),
+});
 
-  condicionEntrega: z.string().trim().min(1).max(1000),
+/** Datos para registrar la devolución. `fechaFin` no puede ser anterior al inicio. */
+export const returnAssignmentSchema = z.object({
+  fechaFin: z.iso.date("La fecha debe tener formato YYYY-MM-DD"),
+  condicionDevolucion: z
+    .string()
+    .trim()
+    .min(1, "La condición de devolución es obligatoria")
+    .max(250, "La condición no puede superar los 250 caracteres"),
 });
 
 export type CreateAssignmentInput = z.infer<typeof createAssignmentSchema>;
-
-export const returnAssignmentSchema = z.object({
-  condicionDevolucion: z.string().trim().min(1).max(1000),
-});
-
 export type ReturnAssignmentInput = z.infer<typeof returnAssignmentSchema>;
