@@ -1,77 +1,49 @@
-// MANEJO DE ERRORES
 import { ConflictError, NotFoundError } from "../../shared/errors/AppError.js";
-// REPOSITORIO - ACTIVOS
-import { assetsRepository } from "../assets/assets.repository.js";
-// REPOSITORIO - MOVIMIENTOS
+import { areasRepository } from "../areas/areas.repository.js";
 import { movementsRepository } from "./movements.repository.js";
-// SCHEMA
 import type { CreateMovementInput } from "./movements.schema.js";
-// TYPES
 import type { Movement } from "./movements.types.js";
 
-/**
- * Clase que contendra la logica CRUD
- */
+/** Lógica de negocio de los traslados de activos entre áreas. */
 export class MovementsService {
-  /**
-   * Obtiene el historial del movimiento recibiendo el siguiente parametro
-   * @param activoId 
-   * @returns 
-   */
+  /** @throws {NotFoundError} Si el activo no existe (404). */
   async getHistory(activoId: number): Promise<Movement[]> {
     const history = await movementsRepository.findHistoryByAssetId(activoId);
 
-    if (history === null) {
-      throw new NotFoundError("El activo no existe");
-    }
+    if (history === null) throw new NotFoundError("El activo no existe");
 
     return history;
   }
 
   /**
-   * Crea un nuevo movimiento, recibiendo los siguiente parametros
-   * @param activoId
-   * @param usuarioId
-   * @param input
-   * @returns
+   * Traslada un activo a otra área y registra quién lo hizo.
+   * @throws {NotFoundError} Si el activo (o dado de baja) o el área destino no existen (404).
+   * @throws {ConflictError} Si el activo ya está en esa área (409).
    */
   async create(
     activoId: number,
     usuarioId: number,
     input: CreateMovementInput,
   ): Promise<Movement> {
-    const asset = await assetsRepository.findById(activoId);
-
-    if (!asset) {
-      throw new NotFoundError("El activo no existe o está dado de baja");
-    }
-
-    const destinationExists = await assetsRepository.areaExists(
-      input.areaDestinoId,
-    );
-
-    if (!destinationExists) {
+    if (!(await areasRepository.findById(input.areaDestinoId))) {
       throw new NotFoundError("El área de destino no existe");
     }
 
-    if (asset.areaId === input.areaDestinoId) {
-      throw new ConflictError("El activo ya se encuentra en esa área");
-    }
-
-    const movement = await movementsRepository.create({
+    const result = await movementsRepository.create({
       activoId,
-      areaDestinoId: input.areaDestinoId,
       usuarioId,
+      areaDestinoId: input.areaDestinoId,
       motivo: input.motivo,
     });
 
-    if (!movement) {
-      throw new NotFoundError(
-        "No se pudo registrar el movimiento; comprueba que el activo siga disponible",
-      );
+    switch (result.status) {
+      case "asset_not_found":
+        throw new NotFoundError("El activo no existe o fue dado de baja");
+      case "same_area":
+        throw new ConflictError("El activo ya se encuentra en esa área");
+      case "ok":
+        return result.movement;
     }
-
-    return movement;
   }
 }
 
