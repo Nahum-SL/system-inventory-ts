@@ -97,3 +97,10 @@ export class TooManyRequestsError extends AppError {
     super(message, 429);
   }
 }
+
+/** 410: el recurso existió pero ya no está disponible (p. ej. activo dado de baja). */
+export class GoneError extends AppError {
+  constructor(message = "El recurso ya no está disponible") {
+    super(message, 410);
+  }
+}
