@@ -212,6 +212,9 @@ importers:
       '@types/express':
         specifier: ^5.0.6
         version: 5.0.6
+      '@types/express-list-endpoints':
+        specifier: ^7.1.0
+        version: 7.1.0
       '@types/jsonwebtoken':
         specifier: ^9.0.10
         version: 9.0.10
@@ -224,6 +227,9 @@ importers:
       '@types/supertest':
         specifier: ^7.2.1
         version: 7.2.1
+      express-list-endpoints:
+        specifier: ^7.1.1
+        version: 7.1.1
       nodemon:
         specifier: ^3.1.14
         version: 3.1.14
@@ -540,6 +546,10 @@ packages:
 
   '@types/estree@1.0.9':
     resolution: {integrity: sha512-GhdPgy1el4/ImP05X05Uw4cw2/M93BCUmnEvWZNStlCzEKME4Fkk+YpoA5OiHNQmoS7Cafb8Xa3Pya8m1Qrzeg==}
+
+  '@types/express-list-endpoints@7.1.0':
+    resolution: {integrity: sha512-odaxFluLo1cH9w/8xdLoWbYUCNVabujc4PeDxoRVido8H5wDzxiqG5g46sRmvuaa5ccpcv6gYS66S1yfr+jrxg==}
+    deprecated: This is a stub types definition. express-list-endpoints provides its own type definitions, so you do not need this installed.
 
   '@types/express-serve-static-core@5.1.3':
     resolution: {integrity: sha512-dPfW8NFiOF4wOHc7+N/QSxlY9cfSsenewGbAz8C8U/MULPd/YZ27LvJUIlzaXie7e6Ove9YunJGgC9tbHD2cKw==}
@@ -952,6 +962,10 @@ packages:
   expect-type@1.4.0:
     resolution: {integrity: sha512-KfYbmpRm0VbLjEvVa9yGwCi9GI34xvi7A/HXYWQO65CSD2u3MczUJSuwXKFIxlGsgBQizV9q5J9NHj4VG0n+pA==}
     engines: {node: '>=12.0.0'}
+
+  express-list-endpoints@7.1.1:
+    resolution: {integrity: sha512-SA6YHH1r6DrioJ4fFJNqiwu1FweGFqJZO9KBApMzwPosoSGPOX2AW0wiMepOXjojjEXDuP9whIvckomheErbJA==}
+    engines: {node: '>=18'}
 
   express-rate-limit@8.7.1:
     resolution: {integrity: sha512-2FXbqkygil3mZiXzEtM0IjE/UBmBNot0J1GEVrJT4JbrvwOSoEtqtO+wHbiMQELWe1eNvHoYRg2dkjOid+6JkA==}
@@ -1909,6 +1923,10 @@ snapshots:
 
   '@types/estree@1.0.9': {}
 
+  '@types/express-list-endpoints@7.1.0':
+    dependencies:
+      express-list-endpoints: 7.1.1
+
   '@types/express-serve-static-core@5.1.3':
     dependencies:
       '@types/node': 26.6.5
@@ -2263,6 +2281,8 @@ snapshots:
   etag@1.8.1: {}
 
   expect-type@1.4.0: {}
+
+  express-list-endpoints@7.1.1: {}
 
   express-rate-limit@8.7.1(express@5.3.0(supports-color@5.5.0))(supports-color@5.5.0):
     dependencies:
