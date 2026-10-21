@@ -30,6 +30,7 @@ pnpm seed:make name_seed
 ```
 
 ## Flujo de trabajo
+
 ``` bash
 
 pnpm migrate:make
@@ -37,6 +38,14 @@ pnpm migrate:status
 pnpm migrate:latest
 
 ```
+## Comando en bash para el JWT
+``` bash
+
+LC_ALL=C tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 64; echo
+
+```
+
+
 genera una migración.
 identifica migraciones pendientes y completadas.
 ejecuta las migraciones pendientes.
