@@ -6,7 +6,13 @@ export type ChangeStatusResult =
   | { status: "ok" }
   | { status: "not_found" }
   | { status: "in_maintenance" };
-export interface AssetFilters {
+
+export type DecommissionResult =
+  | { status: "ok" }
+  | { status: "not_found" }
+  | { status: "in_maintenance" }
+  | { status: "has_open_assignment" };
+  export interface AssetFilters {
   q?: string;
   estado?: AssetStatus;
   areaId?: number;
