@@ -1,12 +1,15 @@
 import { Router } from "express";
 // CONTROLLER - ASIGNMENTS / ASIGNACIONES
 import {
-    createAssignment,
-    getAssignmentHistory,
-    returnAssignment,
+  createAssignment,
+  getAssignmentHistory,
+  returnAssignment,
 } from "./assignments.controller.js";
 // SCHEMA - ASSIGNMENTS / ASIGNACIONES
-import { createAssignmentSchema, returnAssignmentSchema } from "./assignments.shema.js";
+import {
+  createAssignmentSchema,
+  returnAssignmentSchema,
+} from "./assignments.shema.js";
 // MIDDLEWARES
 import { authenticate } from "../../shared/middlewares/auth.middleware.js";
 import { authorize } from "../../shared/middlewares/authorize.middleware.js";
@@ -18,17 +21,19 @@ const assignmentRoutes = Router();
 assignmentRoutes.use(authenticate);
 
 // ENDPOINTS
-assignmentRoutes.get("/assets/:id", getAssignmentHistory);
+assignmentRoutes.use(authenticate);
+
+assignmentRoutes.get("/assets/:id/assignments", getAssignmentHistory);
 
 assignmentRoutes.post(
-  "/assets/:id",
+  "/assets/:id/assignments",
   authorize("admin"),
   validate(createAssignmentSchema),
   createAssignment,
 );
 
 assignmentRoutes.patch(
-  "/:id/return",
+  "/assignments/:id/return",
   authorize("admin"),
   validate(returnAssignmentSchema),
   returnAssignment,
