@@ -1,11 +1,14 @@
 import db from "../../database/knex.js";
+import type { knex } from "knex";
 // Manejo de errores
 import { ConflictError } from "../../shared/errors/AppError.js";
 // Types
 import type {
   Assignment,
   CreateAssignmentData,
+  CreateAssignmentResult,
   ReturnAssignmentData,
+  ReturnAssignmentResult,
 } from "./assignments.types.js";
 
 /**
@@ -67,38 +70,34 @@ export class AssignmentsRepository {
   }
 
   /**
-   * bloquea la fila del activo durante la transacción y comprueba si tiene una asignación abierta.
-   * @param data
-   * @returns
+   * Registra una asignación dentro de una transacción.
+   * Bloquea el activo con `FOR UPDATE` y exige que esté `operativo` y sin
+   * asignación abierta.
    */
-  async create(data: CreateAssignmentData): Promise<Assignment | null> {
-    return db.transaction(async (trx) => {
+  async create(data: CreateAssignmentData): Promise<CreateAssignmentResult> {
+    return db.transaction<CreateAssignmentResult>(async (trx) => {
       const asset = await trx("activos")
-        .select("id")
-        .where({
-          id: data.activoId,
-          eliminado: false,
-        })
+        .select("id", "estado")
+        .where({ id: data.activoId, eliminado: false })
         .forUpdate()
         .first();
 
-      if (!asset) {
-        return null;
+      if (!asset) return { status: "asset_not_found" };
+
+      if (asset.estado !== "operativo") {
+        return {
+          status: "asset_not_operational",
+          estado: String(asset.estado),
+        };
       }
 
-      const openAssignment = await trx("asignaciones")
+      const open = await trx("asignaciones")
         .select("id")
-        .where({
-          activo_id: data.activoId,
-        })
+        .where({ activo_id: data.activoId })
         .whereNull("fecha_fin")
         .first();
 
-      if (openAssignment) {
-        throw new ConflictError(
-          "El activo ya tiene una asignación pendiente de devolución",
-        );
-      }
+      if (open) return { status: "already_assigned" };
 
       const [insertedId] = await trx("asignaciones").insert({
         activo_id: data.activoId,
@@ -112,11 +111,9 @@ export class AssignmentsRepository {
         .where("asi.id", insertedId)
         .first();
 
-      if (!row) {
-        throw new Error("No se pudo recuperar la asignación creada");
-      }
+      if (!row) throw new Error("No se pudo recuperar la asignación creada");
 
-      return this.mapRow(row);
+      return { status: "ok", assignment: this.mapRow(row) };
     });
   }
 
@@ -144,30 +141,40 @@ export class AssignmentsRepository {
   }
 
   /**
-   * bloquea la asignación y evita que una devolución se registre dos veces.
-   * @param data
-   * @returns
+   * Cierra una asignación abierta con la fecha y condición de devolución.
+   * Mismo orden de bloqueo que mantenimiento y baja: primero el activo.
    */
   async returnAssignment(
     data: ReturnAssignmentData,
-  ): Promise<Assignment | null> {
-    return db.transaction(async (trx) => {
-      const assignment = await trx("asignaciones")
-        .select("id", "fecha_fin")
+  ): Promise<ReturnAssignmentResult> {
+    return db.transaction<ReturnAssignmentResult>(async (trx) => {
+      const base = await trx("asignaciones")
+        .select("activo_id")
         .where({ id: data.assignmentId })
+        .first();
+
+      if (!base) return { status: "not_found" };
+
+      await trx("activos")
+        .select("id")
+        .where({ id: base.activo_id })
         .forUpdate()
         .first();
 
-      if (!assignment) {
-        return null;
-      }
+      const current = await trx("asignaciones")
+        .select("fecha_inicio", "fecha_fin")
+        .where({ id: data.assignmentId })
+        .first();
 
-      if (assignment.fecha_fin != null) {
-        throw new ConflictError("Esta asignación ya fue devuelta");
+      if (!current) return { status: "not_found" };
+      if (current.fecha_fin !== null) return { status: "already_returned" };
+
+      if (data.fechaFin < String(current.fecha_inicio).slice(0, 10)) {
+        return { status: "invalid_dates" };
       }
 
       await trx("asignaciones").where({ id: data.assignmentId }).update({
-        fecha_fin: trx.fn.now(),
+        fecha_fin: data.fechaFin,
         condicion_devolucion: data.condicionDevolucion,
       });
 
@@ -175,11 +182,9 @@ export class AssignmentsRepository {
         .where("asi.id", data.assignmentId)
         .first();
 
-      if (!row) {
-        throw new Error("No se pudo recuperar la asignación devuelta");
-      }
+      if (!row) throw new Error("No se pudo recuperar la asignación devuelta");
 
-      return this.mapRow(row);
+      return { status: "ok", assignment: this.mapRow(row) };
     });
   }
 }
