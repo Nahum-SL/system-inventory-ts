@@ -83,3 +83,19 @@ export const decommissionAsset = asyncHandler(async (req, res) => {
     message: "Activo dado de baja correctamente",
   });
 });
+
+/** Ficha del activo por código (la que abre el QR). 404 si no existe, 410 si está dado de baja. */
+export const getAssetByCode = asyncHandler(async (req, res) => {
+  const card = await assetsService.getCardByCode(req.params.codigo as string);
+
+  res.status(200).json({ status: "success", data: card });
+});
+
+/** QR del activo en SVG. */
+export const getAssetQr = asyncHandler(async (req, res) => {
+  const svg = await assetsService.getQrSvg(
+    parseId(req.params.id, "del activo"),
+  );
+
+  res.status(200).type("image/svg+xml").send(svg);
+});
