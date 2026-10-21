@@ -131,9 +131,9 @@ export async function up(knex: Knex): Promise<void> {
     table.date("fechaingreso").notNullable();
     table.string("descripcion", 250).notNullable();
     table
-    .enu("estado", ["operativo", "mantenimiento", "fuera_de_servicio"])
-    .notNullable()
-    .defaultTo("operativo");
+      .enu("estado", ["operativo", "mantenimiento", "fuera_de_servicio"])
+      .notNullable()
+      .defaultTo("operativo");
     table.boolean("eliminado").notNullable().defaultTo(false);
     table.timestamp("fecha_eliminacion").nullable();
     table.string("motivo_eliminacion", 250).nullable();
@@ -262,6 +262,12 @@ export async function up(knex: Knex): Promise<void> {
     table.decimal("costo", 10, 2).notNullable().defaultTo(0);
     table.timestamp("fecharegistro").notNullable().defaultTo(knex.fn.now());
   });
+
+  await knex.raw(`
+  ALTER TABLE mantenimientos
+  ADD COLUMN abierta TINYINT GENERATED ALWAYS AS (IF(fecha_fin IS NULL, 1, NULL)) VIRTUAL,
+  ADD UNIQUE KEY uq_asignacion_abierta (activo_id, abierto)
+`);
 }
 
 export async function down(knex: Knex): Promise<void> {
