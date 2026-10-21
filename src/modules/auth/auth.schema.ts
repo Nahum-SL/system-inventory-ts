@@ -1,10 +1,10 @@
-
 import { z } from "zod";
 
 export const loginSchema = z.object({
   username: z
     .string()
     .trim()
+    .toLowerCase()
     .min(1, "El nombre de usuario es obligatorio")
     .max(150, "El nombre de usuario es demasiado largo"),
 

@@ -90,3 +90,10 @@ export class ConflictError extends AppError {
     super(message, 409);
   }
 }
+
+/** 429: demasiadas peticiones en un periodo corto. */
+export class TooManyRequestsError extends AppError {
+  constructor(message = "Demasiados intentos. Intenta más tarde.") {
+    super(message, 429);
+  }
+}
