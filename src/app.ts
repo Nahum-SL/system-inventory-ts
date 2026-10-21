@@ -53,7 +53,11 @@ app.set("trust proxy", 1);
 // helmet(): configura cabeceras HTTP de seguridad.
 app.use(helmet());
 // cors(): habilita CORS con su configuración predeterminada. Más adelante restringiremos los orígenes permitidos.
-app.use(cors()); // express.json(): permite procesar cuerpos JSON y limita su tamaño a 1 MB.
+app.use(
+  cors({
+    origin: env.CORS_ORIGIN, // p. ej. "http://localhost:5173"; omite cors() si usas proxy de Vite
+  }),
+);
 app.use(express.json({ limit: "1mb" }));
 // /api/health: permite comprobar que Express está respondiendo.
 app.use(express.urlencoded({ extended: true }));
