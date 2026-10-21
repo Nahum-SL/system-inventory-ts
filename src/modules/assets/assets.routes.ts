@@ -9,6 +9,7 @@ import {
   updateAssetStatusSchema,
   decommissionAssetSchema,
   listAssetsQuerySchema,
+  assetCodeParamSchema,
 } from "./assets.schema.js";
 import {
   createAsset,
@@ -17,6 +18,8 @@ import {
   updateAsset,
   updateAssetStatus,
   decommissionAsset,
+  getAssetByCode,
+  getAssetQr,
 } from "./assets.controller.js";
 
 const assetsRoutes = Router();
@@ -52,4 +55,15 @@ assetsRoutes.post(
   validate(decommissionAssetSchema),
   decommissionAsset,
 );
+
+// Endpoints para el QR
+assetsRoutes.get("/", validate(listAssetsQuerySchema, "query"), listAssets);
+assetsRoutes.get(
+  "/code/:codigo",
+  validate(assetCodeParamSchema, "params"),
+  getAssetByCode,
+);
+assetsRoutes.get("/:id/qr", getAssetQr);
+assetsRoutes.get("/:id", getAssetById);
+
 export default assetsRoutes;
