@@ -1,6 +1,10 @@
 import { z } from "zod";
 
+// CONSTANTES
 const ESTADOS = ["operativo", "mantenimiento", "fuera_de_servicio"] as const;
+// QR
+const CODIGO_REGEX = /^[A-Za-z0-9-]+$/;
+const CODIGO_MESSAGE = "El código solo puede tener letras, números y guiones";
 
 const idField = (nombre: string) =>
   z
@@ -21,7 +25,9 @@ export const createAssetSchema = z.object({
     .string()
     .trim()
     .min(1, "El código de inventario es obligatorio")
-    .max(100, "El código de inventario es demasiado largo"),
+    .max(100, "El código de inventario es demasiado largo")
+    .regex(CODIGO_REGEX, CODIGO_MESSAGE),
+
   fechaIngreso: z.iso.date("La fecha debe tener el formato YYYY-MM-DD"),
   descripcion: z
     .string()
@@ -58,7 +64,6 @@ export const updateAssetStatusSchema = z.object({
   }),
 });
 
-
 /** Filtros de listado (query string). */
 export const listAssetsQuerySchema = z.object({
   q: z.string().trim().optional(),
@@ -75,10 +80,13 @@ export const decommissionAssetSchema = z.object({
     .max(250, "El motivo no puede superar los 250 caracteres"),
 });
 
-export type DecommissionAssetInput = z.infer<typeof decommissionAssetSchema>;
-
+/** Parámetro de ruta para consultar por código. */
+export const assetCodeParamSchema = z.object({
+  codigo: z.string().trim().min(1).max(100).regex(CODIGO_REGEX, CODIGO_MESSAGE),
+});
 
 
 export type CreateAssetInput = z.infer<typeof createAssetSchema>;
 export type UpdateAssetInput = z.infer<typeof updateAssetSchema>;
 export type UpdateAssetStatusInput = z.infer<typeof updateAssetStatusSchema>;
+export type DecommissionAssetInput = z.infer<typeof decommissionAssetSchema>;

@@ -3,7 +3,9 @@ import db from "../../database/knex.js";
 // Types necesarios para la clase
 import type {
   Asset,
+  AssetCurrentAssignment,
   AssetFilters,
+  AssetOpenMaintenance,
   AssetStatus,
   ChangeStatusResult,
   CreateAssetData,
@@ -17,8 +19,8 @@ import type {
  * Para la tabla de Activos
  */
 export class AssetsRepository {
-  private baseQuery() {
-    return db("activos as a")
+  private baseQuery(options: { includeDeleted?: boolean } = {}) {
+    const query = db("activos as a")
       .innerJoin("marcas as m", "m.id", "a.marca_id")
       .innerJoin("categorias as c", "c.id", "a.categoria_id")
       .innerJoin("areas as ar", "ar.id", "a.area_id")
@@ -39,6 +41,10 @@ export class AssetsRepository {
         eliminado: "a.eliminado",
         fechaEliminacion: "a.fecha_eliminacion",
       });
+
+    if (!options.includeDeleted) query.where("a.eliminado", false);
+
+    return query;
   }
 
   /**
@@ -70,6 +76,8 @@ export class AssetsRepository {
       estado: row.estado as AssetStatus,
       fechaRegistro: String(row.fechaRegistro),
       eliminado: Boolean(row.eliminado),
+      motivoEliminacion:
+        row.motivoEliminacion == null ? null : String(row.motivoEliminacion),
       fechaEliminacion:
         row.fechaEliminacion == null ? null : String(row.fechaEliminacion),
     };
@@ -212,11 +220,9 @@ export class AssetsRepository {
     return created;
   }
 
-  /**
-   * Realiza una busqueda por codigo QR
-   */
+  /** Busca por código de inventario, INCLUIDOS los dados de baja (las etiquetas siguen pegadas). */
   async findByCode(codigoInventario: string): Promise<Asset | null> {
-    const row = await this.baseQuery()
+    const row = await this.baseQuery({ includeDeleted: true })
       .where("a.codigo_inventario", codigoInventario)
       .first();
 
@@ -239,6 +245,58 @@ export class AssetsRepository {
     }
 
     return this.findById(id);
+  }
+
+  /** Asignación abierta (`fecha_fin IS NULL`) del activo, o `null`. */
+  async findCurrentAssignment(
+    activoId: number,
+  ): Promise<AssetCurrentAssignment | null> {
+    const row = await db("asignaciones as asi")
+      .innerJoin("personas as p", "p.id", "asi.persona_id")
+      .innerJoin("cargos as c", "c.id", "asi.cargo_id")
+      .select({
+        id: "asi.id",
+        personaId: "asi.persona_id",
+        nombres: "p.nombres",
+        apellidos: "p.apellidos",
+        cargoId: "asi.cargo_id",
+        cargoNombre: "c.nombre",
+        fechaInicio: "asi.fecha_inicio",
+      })
+      .where("asi.activo_id", activoId)
+      .whereNull("asi.fecha_fin")
+      .first();
+
+    if (!row) return null;
+
+    return {
+      id: Number(row.id),
+      personaId: Number(row.personaId),
+      personaNombre: `${String(row.apellidos)} ${String(row.nombres)}`,
+      cargoId: Number(row.cargoId),
+      cargoNombre: String(row.cargoNombre),
+      fechaInicio: String(row.fechaInicio).slice(0, 10),
+    };
+  }
+
+  /** Mantenimiento abierto (`fecha_fin IS NULL`) del activo, o `null`. */
+  async findOpenMaintenance(
+    activoId: number,
+  ): Promise<AssetOpenMaintenance | null> {
+    const row = await db("mantenimientos")
+      .select("id", "tipo", "fecha", "descripcion")
+      .where({ activo_id: activoId })
+      .whereNull("fecha_fin")
+      .first();
+
+    if (!row) return null;
+
+    return {
+      id: Number(row.id),
+      tipo: row.tipo as AssetOpenMaintenance["tipo"],
+      fecha: String(row.fecha).slice(0, 10),
+      descripcion: String(row.descripcion),
+    };
   }
 
   /**

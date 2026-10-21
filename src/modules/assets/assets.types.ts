@@ -32,6 +32,7 @@ export interface Asset {
   estado: AssetStatus;
   fechaRegistro: string;
   eliminado: boolean;
+  motivoEliminacion: string | null;
   fechaEliminacion: string | null;
 }
 
@@ -50,4 +51,31 @@ export interface UpdateAssetData {
   categoriaId?: number;
   fechaIngreso?: string;
   descripcion?: string;
+}
+
+// Manejo con el QR
+export interface AssetCurrentAssignment {
+  id: number;
+  personaId: number;
+  personaNombre: string;
+  cargoId: number;
+  cargoNombre: string;
+  fechaInicio: string;
+}
+
+export interface AssetOpenMaintenance {
+  id: number;
+  tipo: "preventivo" | "correctivo";
+  fecha: string;
+  descripcion: string;
+}
+
+/** Derivada de `asignaciones`; no se guarda. */
+export type AssetAvailability = "disponible" | "asignado";
+
+/** Ficha que se muestra al escanear el QR. */
+export interface AssetCard extends Asset {
+  disponibilidad: AssetAvailability;
+  asignacionActual: AssetCurrentAssignment | null;
+  mantenimientoAbierto: AssetOpenMaintenance | null;
 }
