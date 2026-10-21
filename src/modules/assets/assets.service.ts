@@ -7,7 +7,12 @@ import { assetsRepository } from "./assets.repository.js";
 // types
 import type { Asset, AssetFilters } from "./assets.types.js";
 // SCHEMA
-import type { CreateAssetInput, UpdateAssetInput, UpdateAssetStatusInput } from "./assets.schema.js";
+import type {
+  CreateAssetInput,
+  DecommissionAssetInput,
+  UpdateAssetInput,
+  UpdateAssetStatusInput,
+} from "./assets.schema.js";
 
 export class AssetsService {
   /** Lista activos con filtros opcionales (texto, estado, área). */
@@ -121,6 +126,32 @@ export class AssetsService {
     }
 
     return this.getById(id);
+  }
+
+  /**
+   * Da de baja lógica un activo, conservando su historial.
+   *
+   * @throws {NotFoundError} Si no existe o ya estaba dado de baja (404).
+   * @throws {ConflictError} Si tiene un mantenimiento o una asignación abiertos (409).
+   */
+  async decommission(id: number, input: DecommissionAssetInput): Promise<void> {
+    const result = await assetsRepository.decommission(id, input.motivo);
+
+    if (result.status === "not_found") {
+      throw new NotFoundError("El activo no existe o ya fue dado de baja");
+    }
+
+    if (result.status === "in_maintenance") {
+      throw new ConflictError(
+        "El activo tiene un mantenimiento en curso; ciérralo antes de darlo de baja",
+      );
+    }
+
+    if (result.status === "has_open_assignment") {
+      throw new ConflictError(
+        "El activo está asignado; registra su devolución antes de darlo de baja",
+      );
+    }
   }
 }
 
