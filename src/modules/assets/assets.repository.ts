@@ -7,6 +7,7 @@ import type {
   AssetStatus,
   ChangeStatusResult,
   CreateAssetData,
+  DecommissionResult,
   ManualAssetStatus,
   UpdateAssetData,
 } from "./assets.types.js";
@@ -282,6 +283,57 @@ export class AssetsRepository {
       if (asset.estado !== estado) {
         await trx("activos").where({ id }).update({ estado });
       }
+
+      return { status: "ok" };
+    });
+  }
+
+  /**
+   * Da de baja lógica un activo dentro de una transacción.
+   *
+   * Bloquea la fila con `FOR UPDATE` (mismo orden que mantenimiento: primero
+   * el activo) y rechaza la baja si hay un mantenimiento o una asignación
+   * abiertos, para no dejar historial huérfano.
+   *
+   * @returns
+   * - `not_found`: no existe o ya estaba dado de baja.
+   * - `in_maintenance`: está en mantenimiento o tiene uno abierto.
+   * - `has_open_assignment`: está asignado a alguien (falta devolverlo).
+   * - `ok`: marcado como eliminado, con fecha y motivo.
+   */
+  async decommission(id: number, motivo: string): Promise<DecommissionResult> {
+    return db.transaction<DecommissionResult>(async (trx) => {
+      const asset = await trx("activos")
+        .select("id", "estado")
+        .where({ id, eliminado: false })
+        .forUpdate()
+        .first();
+
+      if (!asset) return { status: "not_found" };
+
+      const openMaintenance = await trx("mantenimientos")
+        .select("id")
+        .where({ activo_id: id })
+        .whereNull("fecha_fin")
+        .first();
+
+      if (openMaintenance || asset.estado === "mantenimiento") {
+        return { status: "in_maintenance" };
+      }
+
+      const openAssignment = await trx("asignaciones")
+        .select("id")
+        .where({ activo_id: id })
+        .whereNull("fecha_fin")
+        .first();
+
+      if (openAssignment) return { status: "has_open_assignment" };
+
+      await trx("activos").where({ id }).update({
+        eliminado: true,
+        fecha_eliminacion: trx.fn.now(),
+        motivo_eliminacion: motivo,
+      });
 
       return { status: "ok" };
     });
