@@ -1,0 +1,7 @@
+creacion del frontend con vite
+
+pnpm create vite frontend --template react-ts
+cd frontend
+pnpm install
+pnpm add @tanstack/react-query react-router
+pnpm add -D tailwindcss @tailwindcss/vite
