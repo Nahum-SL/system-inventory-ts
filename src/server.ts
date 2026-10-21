@@ -1,3 +1,4 @@
+import listEndpoints from "express-list-endpoints";
 import app from "./app.js";
 import { env } from "./config/env.js";
 import db from "./database/knex.js";
@@ -7,12 +8,18 @@ const server = app.listen(env.PORT, () => {
   console.log(`Server ejecutandose en http://localhost:${env.PORT}`);
   console.log(`Health check: http://localhost:${env.PORT}/api/health`);
   console.log(`Environment: ${env.NODE_ENV}`);
-});
 
-// Manejo de errores del servidor
-server.on("error", (error: NodeJS.ErrnoException) => {
-  console.error("Error al comenzar el server:", error.message);
-  process.exitCode = 1;
+  // Solo en desarrollo: lista los endpoints disponibles
+  if (env.NODE_ENV === "development") {
+    const endpoints = listEndpoints(app);
+
+    console.log("\nEndpoints disponibles:");
+    console.table(
+      endpoints.flatMap((e) =>
+        e.methods.map((method) => ({ Método: method, Ruta: e.path })),
+      ),
+    );
+  }
 });
 
 // Función para cerrar el servidor y la conexión a la base de datos de manera ordenada
@@ -37,6 +44,6 @@ function shutdown(signal: string): void {
   });
 }
 
-// Escucha las señales SIGINT y SIGTERM para cerrar el servidor y la conexión a la base de datos de manera ordenada 
+// Escucha las señales SIGINT y SIGTERM para cerrar el servidor y la conexión a la base de datos de manera ordenada
 process.once("SIGINT", () => shutdown("SIGINT"));
 process.once("SIGTERM", () => shutdown("SIGTERM"));
