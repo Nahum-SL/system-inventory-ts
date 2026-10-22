@@ -17,7 +17,7 @@ export default function AppLayout() {
               {user?.nombres} · {user?.rol}
             </span>
             <button
-              onClick={() => logout}
+              onClick={() => logout()}
               className="rounded-md border border-slate-300 px-3 py-1.5 hover:bg-slate-100"
             >
               Salir
