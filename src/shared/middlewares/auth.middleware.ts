@@ -1,44 +1,44 @@
 import type { RequestHandler } from "express";
-
 import jwt from "jsonwebtoken";
 
 // Configuracion validada de los .env
 import { env } from "../../config/env.js";
-
-// Clase para manejar errores de JS
+// Clase para manejar errores
 import { UnauthorizedError } from "../errors/AppError.js";
 
 /**
- * Constante que servira para comprobar que exista
- * Encabezado Authorization,
- * Formato Bearer Token,
- * La firma sea válida y el token no haya expirado,
- * El ID, nombre y rol de usuario tengan el formato esperado
+ * Autentica la petición con un JWT enviado en el header
+ * `Authorization: Bearer <token>`.
+ *
+ * Comprueba que:
+ * - exista el header con formato Bearer,
+ * - la firma sea válida (HS256) y el token no haya expirado,
+ * - `sub`, `username` y `rol` tengan el formato esperado.
+ *
+ * Si todo es correcto, deja `{ id, username, rol }` en `req.auth`.
+ *
+ * @throws {UnauthorizedError} (401) Si falta el token, es inválido o expiró.
  */
 export const authenticate: RequestHandler = (req, _res, next) => {
   const authorization = req.headers.authorization;
 
-  // Si el bearer no se encuentra
   if (!authorization?.startsWith("Bearer ")) {
     next(new UnauthorizedError("Token de autenticación requerido"));
     return;
   }
 
-  // Almacena el valor del Bearer en la variable token
   const token = authorization.slice("Bearer ".length).trim();
 
-  // Si el token no esta muestra el siguiente mensaje
   if (!token) {
     next(new UnauthorizedError("Token de autenticación requerido"));
     return;
   }
 
   try {
-    // se almacena el token y verifica con el JWT_SECRET validado
     const payload = jwt.verify(token, env.JWT_SECRET, {
       algorithms: ["HS256"],
     });
-    
+
     if (
       typeof payload === "string" ||
       typeof payload.sub !== "string" ||
@@ -50,7 +50,6 @@ export const authenticate: RequestHandler = (req, _res, next) => {
       return;
     }
 
-    // Si todo esta bien, retorna el id, nombre y rol del usuario
     req.auth = {
       id: Number(payload.sub),
       username: payload.username,
