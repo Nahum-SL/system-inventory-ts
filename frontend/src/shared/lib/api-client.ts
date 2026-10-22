@@ -1,5 +1,7 @@
 import type { ApiErrorBody } from "../types/api.types";
 
+import { tokenStorage } from "./token-storage";
+
 /** Se dispara ante un 401 (salvo en el login) para que la sesión se invalide. */
 export const UNAUTHORIZED_EVENT = "auth:unauthorized";
 
@@ -25,17 +27,15 @@ async function request(
   path: string,
   init: RequestInit = {},
 ): Promise<Response> {
+  const token = tokenStorage.get();
   const headers = new Headers(init.headers);
+
   if (init.body) headers.set("Content-Type", "application/json");
+  if (token) headers.set("Authorization", `Bearer ${token}`);
 
   let res: Response;
   try {
-    // same-origin: el navegador adjunta la cookie httpOnly; el JS nunca la ve.
-    res = await fetch(`/api${path}`, {
-      ...init,
-      headers,
-      credentials: "same-origin",
-    });
+    res = await fetch(`/api${path}`, { ...init, headers });
   } catch {
     throw new ApiError("No se pudo conectar con el servidor", 0);
   }
@@ -49,6 +49,7 @@ async function request(
     }
 
     if (res.status === 401 && path !== "/auth/login") {
+      tokenStorage.clear();
       window.dispatchEvent(new Event(UNAUTHORIZED_EVENT));
     }
 
