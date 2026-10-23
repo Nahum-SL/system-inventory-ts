@@ -1,5 +1,5 @@
 import { Navigate, Outlet, useLocation } from "react-router";
-import Spinner from "../../../components/Spinner";
+import Spinner from "../../../shared/components/Spinner";
 import { useSession } from "../hooks/useSessions";
 
 export default function ProtectedRoute() {

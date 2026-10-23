@@ -1,5 +1,5 @@
 import { Navigate, useLocation } from "react-router";
-import Spinner from "../../../components/Spinner";
+import Spinner from "../../../shared/components/Spinner";
 import LoginForm from "../components/LoginForm";
 import { useSession } from "../hooks/useSessions";
 

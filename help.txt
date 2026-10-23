@@ -5,3 +5,20 @@ cd frontend
 pnpm install
 pnpm add @tanstack/react-query react-router
 pnpm add -D tailwindcss @tailwindcss/vite
+
+
+Rutas
+
+JWT
+
+Migraciones
+
+Semillas
+
+Middleware
+
+Controladores
+
+Cookie
+
+Expresiones regulares
