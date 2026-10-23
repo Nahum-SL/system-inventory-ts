@@ -1,0 +1,120 @@
+Secciones de Pasos  ->  =====
+Contiene Scripts    ->  *****
+Conclusion          ->  #####
+
+====================================
+1. Usuario de MySQL solo para respaldar
+No uses el usuario de la app ni root. Este solo puede leer:
+
+CREATE USER 'inventario_backup'@'localhost' IDENTIFIED BY '<clave-larga>';
+GRANT SELECT, SHOW VIEW, TRIGGER ON system_inventory_prod.* TO 'inventario_backup'@'localhost';
+====================================
+
+====================================
+2. Archivo de credenciales
+D:\respaldos\.backup.cnf, para que la contraseña no aparezca en la línea de comandos:
+
+[client]
+user=inventario_backup
+password=<clave-larga>
+host=localhost
+====================================
+
+====================================
+3. El script
+
+RUTA = ops/backup/backup-db.ps1:
+
+*******************
+$ErrorActionPreference = "Stop"
+
+$MysqlDump  = "C:\Program Files\MySQL\MySQL Server 8.0\bin\mysqldump.exe"  # ajusta a tu ruta
+$Database   = "system_inventory_prod"
+$ConfigFile = "D:\respaldos\.backup.cnf"
+$BackupDir  = "D:\respaldos\inventario"
+$KeepDays   = 30
+
+New-Item -ItemType Directory -Force -Path $BackupDir | Out-Null
+
+$stamp = Get-Date -Format "yyyy-MM-dd_HHmm"
+$sql   = Join-Path $BackupDir "${Database}_$stamp.sql"
+$zip   = "$sql.zip"
+
+# --defaults-extra-file debe ser la primera opción.
+# --result-file evita redirigir con ">", que en Windows PowerShell 5.1 guarda UTF-16 y corrompe el volcado.
+& $MysqlDump "--defaults-extra-file=$ConfigFile" `
+  --single-transaction --no-tablespaces --default-character-set=utf8mb4 `
+  "--result-file=$sql" $Database
+
+if ($LASTEXITCODE -ne 0) { throw "mysqldump falló con código $LASTEXITCODE" }
+if ((Get-Item $sql).Length -lt 1KB) { throw "El respaldo parece vacío" }
+
+Compress-Archive -Path $sql -DestinationPath $zip -Force
+Remove-Item $sql
+
+# Retención: borra los respaldos de más de $KeepDays días.
+Get-ChildItem $BackupDir -Filter "*.zip" |
+  Where-Object LastWriteTime -lt (Get-Date).AddDays(-$KeepDays) |
+  Remove-Item
+
+Write-Host "Respaldo creado: $zip"
+*******************
+
+====================================
+4. Automatizarlo
+Una vez, en PowerShell como administrador (ajusta la ruta del repo):
+
+PowerShell
+
+*******************
+schtasks /Create /TN "Respaldo inventario" /SC DAILY /ST 18:30 /RU SYSTEM `
+  /TR "powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\apps\e-yonda-ts\ops\backup\backup-db.ps1"
+*******************
+
+Programa la hora dentro de la jornada, con la máquina encendida. 
+En el Programador de tareas, abre la tarea → Configuración y marca “Ejecutar la tarea lo antes posible si se perdió un inicio programado”.
+====================================
+
+====================================
+- Flujo de actualización:
+
+***************
+pnpm backup:db
+pnpm migrate:prod.
+***************
+====================================
+
+====================================
+5. La segunda copia
+
+Un respaldo en el mismo disco no te protege de un fallo del disco, un robo o un incendio. Elige una de estas:
+
+Un disco externo o USB que alguien conecte y copie cada semana. Es simple, pero depende de una persona.
+Una carpeta sincronizada (OneDrive o Google Drive) apuntando a D:\respaldos\inventario. 
+Es automático, pero ese archivo contiene datos personales: si sale de la empresa, cífralo con 7-Zip (-p) antes de subirlo.
+
+====================================
+
+====================================
+6. Probar la restauración
+
+Un respaldo que nunca se restauró no es un respaldo. 
+Una vez al mes (y hoy, al montarlo), restaura en una base de prueba, nunca sobre la de producción:
+
+PowerShell
+****************
+Expand-Archive "D:\respaldos\inventario\<archivo>.sql.zip" -DestinationPath "D:\respaldos\restore" -Force
+mysql -u root -p -e "CREATE DATABASE restore_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
+cmd /c "mysql -u root -p restore_test < D:\respaldos\restore\<archivo>.sql"
+****************
+====================================
+
+
+####################
+Resumen del ritmo
+
+Diario: respaldo automático, con retención de 30 días.
+Antes de cada migración: pnpm backup:db.
+Semanal: copia a un lugar fuera de la máquina.
+Mensual: prueba de restauración.
+####################

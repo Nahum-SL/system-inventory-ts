@@ -5,21 +5,30 @@
   "main": "src/server.ts",
   "scripts": {
     "test": "vitest run",
-    "test:watch": "vitest",
+    "test:watch": "vitest",    
     
     "dev:frontend": "pnpm --dir frontend dev",
+
     "build:frontend": "pnpm --dir frontend install --frozen-lockfile && pnpm --dir frontend build",
     "build:all": "pnpm build && pnpm build:frontend",
+
     "start": "node dist/server.js",
 
+    "start:prod": "node --env-file=.env.production dist/server.js",
+    "migrate:prod": "tsx --env-file=.env.production ./node_modules/knex/bin/cli.js migrate:latest",
+    "seed:prod": "tsx --env-file=.env.production ./node_modules/knex/bin/cli.js seed:run",
+
     "typecheck": "tsc --noEmit",
+
     "knex": "tsx ./node_modules/knex/bin/cli.js",
     "migrate:make": "pnpm knex migrate:make",
     "migrate:latest": "pnpm knex migrate:latest",
     "migrate:rollback": "pnpm knex migrate:rollback",
     "migrate:status": "pnpm knex migrate:status",
     "seed:make": "pnpm knex seed:make",
-    "seed:run": "pnpm knex seed:run"
+    "seed:run": "pnpm knex seed:run",
+
+    "backup:db": "powershell -NoProfile -ExecutionPolicy Bypass -File ops/backup/backup-db.ps1"
   },
   "keywords": [],
   "author": "",
