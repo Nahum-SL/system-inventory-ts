@@ -13,7 +13,7 @@ export default function AssetQr({
 
   return (
     <section className="rounded-lg border border-slate-200 bg-white p-4 text-center">
-      <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-slate-500">
+      <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-brand-700">
         Código QR
       </h2>
       <img

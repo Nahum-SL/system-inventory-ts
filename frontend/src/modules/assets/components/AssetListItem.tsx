@@ -6,10 +6,11 @@ export default function AssetListItem({ asset }: { asset: Asset }) {
   return (
     <Link
       to={`/activos/${encodeURIComponent(asset.codigoInventario)}`}
-      className="block rounded-lg border border-slate-200 bg-white p-3 hover:border-blue-400"
+      className="block rounded-lg border border-slate-200 bg-white p-3 
+      transition hover:border-brand-400 hover:shadow-sm"
     >
       <div className="flex items-start justify-between gap-2">
-        <span className="font-mono text-sm font-semibold">
+        <span className="font-mono text-sm font-semibold text-brand-700">
           {asset.codigoInventario}
         </span>
         <StatusBadge estado={asset.estado} />

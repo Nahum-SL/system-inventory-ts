@@ -1,9 +1,13 @@
 import { Link, useParams } from "react-router";
+// Componente de estilo de carga
 import Spinner from "@/shared/components/Spinner";
+// Manejo de erro HTTP
 import { ApiError } from "@/shared/lib/api-error";
+// Subcomponentes 
 import AssetQr from "../components/AssetQr";
 import HistorySection from "../components/HistorySection";
 import StatusBadge from "../components/StatusBadge";
+// hooks
 import { useAssetCard } from "../hooks/useAssetCard";
 
 function Row({ label, value }: { label: string; value: string }) {

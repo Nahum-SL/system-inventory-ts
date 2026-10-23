@@ -1,0 +1,110 @@
+diff --git a/frontend/src/index.css b/frontend/src/index.css
+index c4b94ee..28f5fe8 100644
+--- a/frontend/src/index.css
++++ b/frontend/src/index.css
+@@ -1,5 +1,19 @@
+ @import "tailwindcss";
+ 
++/* Paleta de marca (naranja). Para ajustar al naranja exacto de la empresa,
++   basta con cambiar estos valores: toda la UI usa bg-brand-*, text-brand-*, etc. */
++@theme {
++  --color-brand-50: #fff7ed;
++  --color-brand-100: #ffedd5;
++  --color-brand-200: #fed7aa;
++  --color-brand-300: #fdba74;
++  --color-brand-400: #fb923c;
++  --color-brand-500: #f97316;
++  --color-brand-600: #ea580c;
++  --color-brand-700: #c2410c;
++  --color-brand-800: #9a3412;
++}
++
+ :root {
+   --text: #6b6375;
+   --text-h: #08060d;
+diff --git a/frontend/src/modules/assets/components/AssetFilters.tsx b/frontend/src/modules/assets/components/AssetFilters.tsx
+index 9f71945..a6b7417 100644
+--- a/frontend/src/modules/assets/components/AssetFilters.tsx
++++ b/frontend/src/modules/assets/components/AssetFilters.tsx
+@@ -21,12 +21,12 @@ export default function AssetFilters({
+         value={q}
+         onChange={(e) => onQChange(e.target.value)}
+         placeholder="Buscar por código, descripción, marca, área…"
+-        className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
++        className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+       />
+       <select
+         value={estado}
+         onChange={(e) => onEstadoChange(e.target.value as AssetStatus | "")}
+-        className="rounded-md border border-slate-300 bg-white px-3 py-2"
++        className="rounded-md border border-slate-300 bg-white px-3 py-2 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+       >
+         <option value="">Todos los estados</option>
+         {(Object.keys(STATUS_LABELS) as AssetStatus[]).map((s) => (
+diff --git a/frontend/src/modules/assets/components/AssetListItem.tsx b/frontend/src/modules/assets/components/AssetListItem.tsx
+index 0f32338..be7b4e5 100644
+--- a/frontend/src/modules/assets/components/AssetListItem.tsx
++++ b/frontend/src/modules/assets/components/AssetListItem.tsx
+@@ -6,10 +6,10 @@ export default function AssetListItem({ asset }: { asset: Asset }) {
+   return (
+     <Link
+       to={`/activos/${encodeURIComponent(asset.codigoInventario)}`}
+-      className="block rounded-lg border border-slate-200 bg-white p-3 hover:border-blue-400"
++      className="block rounded-lg border border-slate-200 bg-white p-3 transition hover:border-brand-400 hover:shadow-sm"
+     >
+       <div className="flex items-start justify-between gap-2">
+-        <span className="font-mono text-sm font-semibold">
++        <span className="font-mono text-sm font-semibold text-brand-700">
+           {asset.codigoInventario}
+         </span>
+         <StatusBadge estado={asset.estado} />
+diff --git a/frontend/src/modules/assets/components/AssetQr.tsx b/frontend/src/modules/assets/components/AssetQr.tsx
+index 88c00da..3e2a32f 100644
+--- a/frontend/src/modules/assets/components/AssetQr.tsx
++++ b/frontend/src/modules/assets/components/AssetQr.tsx
+@@ -13,7 +13,7 @@ export default function AssetQr({
+ 
+   return (
+     <section className="rounded-lg border border-slate-200 bg-white p-4 text-center">
+-      <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-slate-500">
++      <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-brand-700">
+         Código QR
+       </h2>
+       <img
+diff --git a/frontend/src/modules/assets/components/HistorySection.tsx b/frontend/src/modules/assets/components/HistorySection.tsx
+index 3c913c4..6befba1 100644
+--- a/frontend/src/modules/assets/components/HistorySection.tsx
++++ b/frontend/src/modules/assets/components/HistorySection.tsx
+@@ -105,7 +105,7 @@ export default function HistorySection({ assetId }: { assetId: number }) {
+ 
+   return (
+     <section className="rounded-lg border border-slate-200 bg-white p-4">
+-      <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-slate-500">
++      <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-brand-700">
+         Historial
+       </h2>
+ 
+@@ -118,8 +118,8 @@ export default function HistorySection({ assetId }: { assetId: number }) {
+             onClick={() => setTab(t.id)}
+             className={`-mb-px border-b-2 px-3 py-2 text-sm ${
+               tab === t.id
+-                ? "border-blue-600 font-medium text-blue-700"
+-                : "border-transparent text-slate-500 hover:text-slate-700"
++                ? "border-brand-600 font-medium text-brand-700"
++                : "border-transparent text-slate-500 hover:text-brand-700"
+             }`}
+           >
+             {t.label}
+diff --git a/frontend/src/shared/components/Spinner.tsx b/frontend/src/shared/components/Spinner.tsx
+index 4778eb7..681ab81 100644
+--- a/frontend/src/shared/components/Spinner.tsx
++++ b/frontend/src/shared/components/Spinner.tsx
+@@ -5,7 +5,7 @@ export default function Spinner() {
+       role="status"
+       aria-label="Cargando"
+     >
+-      <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-blue-600" />
++      <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-100 border-t-brand-500" />
+     </div>
+   );
+ }
