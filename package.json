@@ -6,9 +6,12 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
-    "dev": "tsx watch src/server.ts",
-    "build": "tsc",
+    
+    "dev:frontend": "pnpm --dir frontend dev",
+    "build:frontend": "pnpm --dir frontend install --frozen-lockfile && pnpm --dir frontend build",
+    "build:all": "pnpm build && pnpm build:frontend",
     "start": "node dist/server.js",
+
     "typecheck": "tsc --noEmit",
     "knex": "tsx ./node_modules/knex/bin/cli.js",
     "migrate:make": "pnpm knex migrate:make",
