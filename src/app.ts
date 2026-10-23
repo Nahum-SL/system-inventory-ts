@@ -59,7 +59,13 @@ app.set("trust proxy", 1);
 // ======================================
 
 // helmet(): configura cabeceras HTTP de seguridad.
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: { "upgrade-insecure-requests": null },
+    },
+  }),
+);
 // cors(): habilita CORS con su configuración predeterminada. Más adelante restringiremos los orígenes permitidos.
 app.use(
   cors({
