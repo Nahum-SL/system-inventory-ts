@@ -12,11 +12,11 @@ export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/activos" element={<AssetsPage />} />
-      <Route path="/activos/:codigo" element={<AssetCardPage />} />
-      
+
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
+          <Route path="/activos" element={<AssetsPage />} />
+          <Route path="/activos/:codigo" element={<AssetCardPage />} />
           <Route index element={<Navigate to="/activos" replace />} />
           <Route
             path="*"

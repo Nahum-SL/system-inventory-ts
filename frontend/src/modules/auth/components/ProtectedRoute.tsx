@@ -1,7 +1,7 @@
 import { Navigate, Outlet, useLocation } from "react-router";
 import Spinner from "../../../shared/components/Spinner";
 import { useSession } from "../hooks/useSessions";
-
+//
 export default function ProtectedRoute() {
   const { data: user, isPending, error, refetch } = useSession();
   const location = useLocation();
