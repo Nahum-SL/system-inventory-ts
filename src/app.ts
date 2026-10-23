@@ -7,6 +7,10 @@ import cors from "cors";
 // de algunas vulnerabilidades web conocidas al establecer encabezados HTTP apropiados.
 import helmet from "helmet";
 
+// Necesarios para el levante del /frontend
+import fs from "node:fs";
+import path from "node:path";
+
 // ===========
 // MODULOS
 // ===========
@@ -41,7 +45,11 @@ import { NotFoundError } from "./shared/errors/AppError.js";
 import { errorHandler } from "./shared/middlewares/error.middleware.js";
 import { env } from "./config/env.js";
 
+// APLICACION
 const app = express();
+
+// Funciona igual desde src/app.ts (tsx) y desde dist/app.js (compilado).
+const frontendDist = path.resolve(import.meta.dirname, "../frontend/dist");
 
 // Detrás de un proxy inverso (Nginx, etc.). Ajusta el número a los saltos reales.
 app.set("trust proxy", 1);
@@ -86,6 +94,23 @@ app.use("/api/positions", positionsRoutes);
 app.use("/api", movementsRoutes);
 app.use("/api", maintenanceRoutes);
 app.use("/api", assignmentRoutes);
+
+// Una ruta /api inexistente debe seguir respondiendo JSON, no el index.html.
+app.use("/api", (_req, _res, next) => {
+  next(new NotFoundError("La ruta solicitada no existe"));
+});
+
+// Solo en producción y si el build existe.
+if (env.NODE_ENV === "production" && fs.existsSync(frontendDist)) {
+  app.use(express.static(frontendDist, { index: false }));
+
+  // Fallback de la SPA: /activos/INV-0001 (la URL del QR) y el resto de rutas de React.
+  // En Express 5 el comodín debe llevar nombre.
+  app.get("/{*splat}", (_req, res) => {
+    res.setHeader("Cache-Control", "no-cache");
+    res.sendFile(path.join(frontendDist, "index.html"));
+  });
+}
 
 // 404 handler - Middleware para manejar rutas no encontradas
 app.use((_req, _res, next) => {
