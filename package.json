@@ -7,8 +7,10 @@
     "test": "vitest run",
     "test:watch": "vitest",    
     
+    "dev": "tsx watch src/server.ts",
     "dev:frontend": "pnpm --dir frontend dev",
 
+    "build": "tsc",
     "build:frontend": "pnpm --dir frontend install --frozen-lockfile && pnpm --dir frontend build",
     "build:all": "pnpm build && pnpm build:frontend",
 
