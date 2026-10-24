@@ -29,6 +29,10 @@
   --font-mono: ui-monospace, Consolas, monospace;
 }
 
+
+@page {
+  margin: 8mm;
+}
 /* =========================================================
    BASE GLOBAL
    Va dentro de @layer base para que las utilidades de Tailwind

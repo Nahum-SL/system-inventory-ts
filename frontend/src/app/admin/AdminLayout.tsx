@@ -13,7 +13,10 @@ export default function AdminLayout() {
 
       <div className="min-w-0 flex-1">
         {/* Barra superior solo en móvil */}
-        <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-slate-200 bg-white px-4 py-3 lg:hidden">
+        <header
+          className="sticky top-0 z-30 flex items-center gap-3 border-b border-slate-200 
+        bg-white px-4 py-3 lg:hidden print:hidden"
+        >
           <button
             onClick={() => setSidebarOpen(true)}
             aria-label="Abrir menú"
@@ -24,7 +27,7 @@ export default function AdminLayout() {
           <span className="font-semibold text-blue-700">System Inventory</span>
         </header>
 
-        <main className="mx-auto max-w-5xl p-4 lg:p-6">
+        <main className="mx-auto max-w-5xl p-4 lg:p-6 print:max-w-none print:p-0">
           <Outlet />
         </main>
       </div>

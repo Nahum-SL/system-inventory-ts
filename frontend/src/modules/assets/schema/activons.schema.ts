@@ -1,7 +1,5 @@
 import { z } from "zod";
-
-/**ID seleccionado */
-export const selectId = (msg: string) => z.string().regex(/^\d+$/, msg).transform(Number);
+import { selectId } from "@/shared/lib/zod";
 
 /** 
  * Para el texto de `observaciones` de la tabla `Mantenimiento`

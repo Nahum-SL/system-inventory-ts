@@ -9,6 +9,12 @@ import AssetActions from "./components/AssetActions";
 // PAGES
 import AdminDashboardPage from "./pages/AdminDashboardPage";
 import AssetCreatePage from "./pages/AssetCreatePages";
+import LabelsPage from "./pages/LabelsPage";
+import {
+  NamedCatalogPage,
+  PeoplePage,
+  PositionsPage,
+} from "@/modules/catalogs";
 
 export const adminRoutes: RouteObject = {
   path: "admin",
@@ -41,6 +47,24 @@ export const adminRoutes: RouteObject = {
             <AssetCardPage actions={(a) => <AssetActions asset={a} />} />
           ),
         },
+        {
+          path: "etiquetas",
+          element: <LabelsPage />,
+        },
+        {
+          path: "areas",
+          element: <NamedCatalogPage key="areas" kind="areas" />,
+        },
+        {
+          path: "marcas",
+          element: <NamedCatalogPage key="brands" kind="brands" />,
+        },
+        {
+          path: "categorias",
+          element: <NamedCatalogPage key="categories" kind="categories" />,
+        },
+        { path: "cargos", element: <PositionsPage /> },
+        { path: "personas", element: <PeoplePage /> },
       ],
     },
   ],

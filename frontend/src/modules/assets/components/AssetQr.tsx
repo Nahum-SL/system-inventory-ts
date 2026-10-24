@@ -1,4 +1,4 @@
-import { useAssetQr } from "../hooks/useAssetQr";
+import { useAssetQrs } from "../hooks/useAssetQrs";
 
 export default function AssetQr({
   id,
@@ -7,8 +7,9 @@ export default function AssetQr({
   id: number;
   codigo: string;
 }) {
-  const { data: svg } = useAssetQr(id);
-
+  const [result] = useAssetQrs([id]);
+  const svg = result?.data;
+  
   if (!svg) return null;
 
   return (

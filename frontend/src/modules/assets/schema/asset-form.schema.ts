@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { selectId } from "./activons.schema";
+import { selectId } from "@/shared/lib/zod";
 
 export const createAssetSchema = z.object({
   marcaId: selectId("Elige una marca"),

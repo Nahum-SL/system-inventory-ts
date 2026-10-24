@@ -5,6 +5,12 @@ import {
   ScanLine,
   LogOut,
   X,
+  QrCode,
+  Building2,
+  Tag,
+  Layers,
+  Briefcase,
+  Users,
   type LucideIcon,
 } from "lucide-react";
 import { useLogout, useSession } from "@/modules/auth";
@@ -21,6 +27,12 @@ interface MenuItem {
 const menuItems: MenuItem[] = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard, end: true },
   { name: "Activos", href: "/admin/activos", icon: Boxes },
+  { name: "Etiquetas", href: "/admin/etiquetas", icon: QrCode },
+  { name: "Áreas", href: "/admin/areas", icon: Building2 },
+  { name: "Marcas", href: "/admin/marcas", icon: Tag },
+  { name: "Categorías", href: "/admin/categorias", icon: Layers },
+  { name: "Cargos", href: "/admin/cargos", icon: Briefcase },
+  { name: "Personas", href: "/admin/personas", icon: Users },
 ];
 
 interface SidebarProps {

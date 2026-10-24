@@ -8,6 +8,8 @@ import {
   listPositions,
 } from "../api/catalog.api";
 
+import type { NamedKind } from "../types";
+
 const staleTime = 5 * 60_000;
 
 export const catalogKeys = {
@@ -17,6 +19,12 @@ export const catalogKeys = {
   brands: ["catalogs", "brands"] as const,
   categories: ["catalogs", "categories"] as const,
 };
+
+const NAMED = {
+  areas: { key: catalogKeys.areas, fn: listAreas },
+  brands: { key: catalogKeys.brands, fn: listBrands },
+  categories: { key: catalogKeys.categories, fn: listCategories },
+} as const;
 
 export const useAreas = () =>
   useQuery({ queryKey: catalogKeys.areas, queryFn: listAreas, staleTime });
@@ -39,3 +47,6 @@ export const useCategories = () =>
     queryFn: listCategories,
     staleTime,
   });
+
+export const useNamedCatalog = (kind: NamedKind) =>
+  useQuery({ queryKey: NAMED[kind].key, queryFn: NAMED[kind].fn, staleTime });

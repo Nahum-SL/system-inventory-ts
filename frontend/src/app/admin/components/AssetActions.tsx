@@ -89,12 +89,12 @@ export default function AssetActions({ asset }: { asset: AssetCard }) {
           </Button>
         )}
 
-        <Button variant="danger" onClick={() => setModal("decommission")}>
-          Dar de baja
-        </Button>
-
         <Button variant="secondary" onClick={() => setModal("edit")}>
           Editar datos
+        </Button>
+
+        <Button variant="danger" onClick={() => setModal("decommission")}>
+          Dar de baja
         </Button>
       </div>
 
@@ -131,14 +131,14 @@ export default function AssetActions({ asset }: { asset: AssetCard }) {
         open={modal === "return"}
         onClose={close}
       />
+      <EditAssetModal asset={asset} open={modal === "edit"} onClose={close} />
+
       <DecommissionModal
         asset={asset}
         open={modal === "decommission"}
         onClose={close}
         onDone={() => navigate("/admin/activos", { replace: true })}
       />
-
-      <EditAssetModal asset={asset} open={modal === "edit"} onClose={close} />
     </section>
   );
 }
