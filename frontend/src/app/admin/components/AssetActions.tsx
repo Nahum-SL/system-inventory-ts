@@ -8,6 +8,7 @@ import {
   ChangeStatusModal,
   CloseMaintenanceModal,
   DecommissionModal,
+  EditAssetModal,
   MoveModal,
   OpenMaintenanceModal,
   ReturnAssignmentModal,
@@ -22,6 +23,7 @@ type ModalName =
   | "assign"
   | "return"
   | "decommission"
+  | "edit"
   | null;
 
 export default function AssetActions({ asset }: { asset: AssetCard }) {
@@ -32,7 +34,11 @@ export default function AssetActions({ asset }: { asset: AssetCard }) {
   const inMaintenance = asset.estado === "mantenimiento";
   const canAssign = asset.estado === "operativo" && !asset.asignacionActual;
 
-  console.log({ estado: asset.estado, asignacion: asset.asignacionActual, modal });
+  console.log({
+    estado: asset.estado,
+    asignacion: asset.asignacionActual,
+    modal,
+  });
 
   return (
     <section className="space-y-3 rounded-lg border border-blue-200 bg-blue-50 p-4">
@@ -86,6 +92,10 @@ export default function AssetActions({ asset }: { asset: AssetCard }) {
         <Button variant="danger" onClick={() => setModal("decommission")}>
           Dar de baja
         </Button>
+
+        <Button variant="secondary" onClick={() => setModal("edit")}>
+          Editar datos
+        </Button>
       </div>
 
       {!asset.asignacionActual && !canAssign && (
@@ -127,6 +137,8 @@ export default function AssetActions({ asset }: { asset: AssetCard }) {
         onClose={close}
         onDone={() => navigate("/admin/activos", { replace: true })}
       />
+
+      <EditAssetModal asset={asset} open={modal === "edit"} onClose={close} />
     </section>
   );
 }
