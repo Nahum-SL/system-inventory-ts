@@ -105,7 +105,8 @@ export default function HistorySection({ assetId }: { assetId: number }) {
 
   return (
     <section className="rounded-lg border border-slate-200 bg-white p-4">
-      <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-brand-700">
+      <h2 className="mb-2 text-sm font-semibold uppercase 
+      text-center tracking-wide text-brand-700">
         Historial
       </h2>
 

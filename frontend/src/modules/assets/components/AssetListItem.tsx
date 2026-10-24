@@ -2,10 +2,15 @@ import { Link } from "react-router";
 import type { Asset } from "../types";
 import StatusBadge from "./StatusBadge";
 
-export default function AssetListItem({ asset }: { asset: Asset }) {
+interface Props {
+  asset: Asset;
+  basePath: string;
+}
+
+export default function AssetListItem({ asset, basePath }: Props) {
   return (
     <Link
-      to={`/activos/${encodeURIComponent(asset.codigoInventario)}`}
+      to={`${basePath}/${encodeURIComponent(asset.codigoInventario)}`}
       className="block rounded-lg border border-slate-200 bg-white p-3 
       transition hover:border-brand-400 hover:shadow-sm"
     >

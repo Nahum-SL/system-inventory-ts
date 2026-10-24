@@ -3,12 +3,18 @@ import { Link, useParams } from "react-router";
 import Spinner from "@/shared/components/Spinner";
 // Manejo de erro HTTP
 import { ApiError } from "@/shared/lib/api-error";
-// Subcomponentes 
+// Subcomponentes
 import AssetQr from "../components/AssetQr";
 import HistorySection from "../components/HistorySection";
 import StatusBadge from "../components/StatusBadge";
 // hooks
 import { useAssetCard } from "../hooks/useAssetCard";
+import type { AssetCard } from "@/shared/types";
+import type { ReactNode } from "react";
+
+interface Props {
+  actions?: (asset: AssetCard) => ReactNode;
+}
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
@@ -22,7 +28,7 @@ function Row({ label, value }: { label: string; value: string }) {
 const sectionTitle =
   "mb-1 text-sm font-semibold uppercase tracking-wide text-slate-500";
 
-export default function AssetCardPage() {
+export default function AssetCardPage({actions }: Props) {
   const { codigo = "" } = useParams();
   const { data: asset, isPending, error } = useAssetCard(codigo);
 
@@ -73,6 +79,7 @@ export default function AssetCardPage() {
         <StatusBadge estado={asset.estado} />
       </header>
 
+      {actions?.(asset)}
       {asset.mantenimientoAbierto && (
         <div className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm">
           <p className="font-semibold">

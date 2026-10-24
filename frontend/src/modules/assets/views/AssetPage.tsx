@@ -6,7 +6,11 @@ import AssetListItem from "../components/AssetListItem";
 import { useAssets } from "../hooks/useAsset";
 import type { AssetStatus } from "../types";
 
-export default function AssetsPage() {
+interface Props {
+  basePath: string;
+}
+
+export default function AssetsPage({ basePath }: Props) {
   const [q, setQ] = useState("");
   const [estado, setEstado] = useState<AssetStatus | "">("");
   const debouncedQ = useDebounce(q.trim());
@@ -35,7 +39,7 @@ export default function AssetsPage() {
           <ul className="space-y-2">
             {data.map((asset) => (
               <li key={asset.id}>
-                <AssetListItem asset={asset} />
+                <AssetListItem asset={asset} basePath={basePath} />
               </li>
             ))}
           </ul>
