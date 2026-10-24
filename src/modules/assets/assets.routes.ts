@@ -57,13 +57,11 @@ assetsRoutes.post(
 );
 
 // Endpoints para el QR
-assetsRoutes.get("/", validate(listAssetsQuerySchema, "query"), listAssets);
 assetsRoutes.get(
   "/code/:codigo",
   validate(assetCodeParamSchema, "params"),
   getAssetByCode,
 );
 assetsRoutes.get("/:id/qr", getAssetQr);
-assetsRoutes.get("/:id", getAssetById);
 
 export default assetsRoutes;
