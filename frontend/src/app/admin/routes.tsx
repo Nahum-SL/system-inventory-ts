@@ -2,7 +2,7 @@ import type { RouteObject } from "react-router";
 import { AssetCardPage, AssetsPage } from "@/modules/assets";
 import AdminLayout from "./AdminLayout";
 import AdminRoute from "./AdminRoute";
-import AssetActions from "./componets/AssetSections";
+import AssetActions from "../../modules/assets/components/AssetSections";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
 
 export const adminRoutes: RouteObject = {

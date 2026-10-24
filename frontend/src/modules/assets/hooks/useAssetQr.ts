@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { getAssetQr } from "../api/assets.api";
-import { assetKeys } from "./useAsset";
+
+import { assetKeys } from "../utils/asset-query-keys";
 
 export function useAssetQr(id: number | undefined) {
   return useQuery({

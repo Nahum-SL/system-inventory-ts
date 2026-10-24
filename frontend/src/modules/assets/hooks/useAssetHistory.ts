@@ -4,7 +4,8 @@ import {
   getMaintenanceHistory,
   getMovementHistory,
 } from "../api/assets.api";
-import { assetKeys } from "./useAsset";
+
+import { assetKeys } from "../utils/asset-query-keys";
 
 export const useAssignmentHistory = (id: number) =>
   useQuery({

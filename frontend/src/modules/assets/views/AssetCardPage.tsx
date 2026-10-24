@@ -54,7 +54,7 @@ export default function AssetCardPage({actions }: Props) {
         <h1 className="font-semibold">{title}</h1>
         <p className="text-sm">{error.message}</p>
         <Link
-          to="/activos"
+          to="/admin/activos"
           className="inline-block text-sm text-blue-700 underline"
         >
           Volver a la lista
@@ -65,10 +65,6 @@ export default function AssetCardPage({actions }: Props) {
 
   return (
     <article className="space-y-4">
-      <Link to="/activos" className="text-sm text-blue-700 underline">
-        ← Activos
-      </Link>
-
       <header className="flex items-start justify-between gap-3">
         <div>
           <h1 className="font-mono text-2xl font-bold">

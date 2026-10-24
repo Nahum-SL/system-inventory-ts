@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Outlet } from "react-router";
 import { Menu } from "lucide-react";
+// Components
 import Sidebar from "@/shared/components/Sidebar";
 
 export default function AdminLayout() {
