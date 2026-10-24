@@ -2,7 +2,7 @@ import Spinner from "@/shared/components/Spinner";
 import { useAssets } from "@/modules/assets";
 import type { DashboardStats } from "@/shared/types/admin/stats";
 import { DashboardKpiGrid } from "../components/stats/dashboard-kpi-grid";
-import { LoadingState } from "@/shared/components/states/LoadingState";
+import { LoadingState } from "@/shared/components/ui/states/LoadingState";
 
 export default function AdminDashboardPage() {
   const { data: assets, isPending, error } = useAssets({});

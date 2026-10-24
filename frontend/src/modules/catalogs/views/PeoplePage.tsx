@@ -1,74 +1,82 @@
 import { useState } from "react";
-// COMPONENTES ATOMICOS
+
+// COMPONENTES ATÓMICOS
 import Alert from "@/shared/components/ui/Alert";
 import Button from "@/shared/components/ui/Buttons/button";
-import DataTable from "@/shared/components/ui/tables/DateTable";
-import Spinner from "@/shared/components/Spinner";
-import { controlClass } from "@/shared/components/ui/Buttons/style.button";
-// COMPONENTS - FORM
-import PersonModal from "../components/form/PersonModal";
+
+// COMPONENTES - FORM
+import PersonModal from "@/modules/catalogs/components/form/PersonModal";
+
+// TABLES
+import PersonTable from "@/modules/catalogs/components/tables/person-table";
+
 // HOOKS
-import { usePeople } from "../hooks/use-catalog-queries";
+import { usePeople } from "@/modules/catalogs";
+
 // TYPES
-import type { Person } from "../types";
+import type { Person } from "@/modules/catalogs";
+import SearchInput from "@/shared/components/ui/inputs/SearchInput";
 
 export default function PeoplePage() {
-  const { data, isPending, error } = usePeople();
+  const { data, isPending, error, refetch } = usePeople();
+
   const [editing, setEditing] = useState<Person | "new" | null>(null);
   const [q, setQ] = useState("");
 
   const term = q.trim().toLowerCase();
-  const rows = (data ?? []).filter((p) =>
-    `${p.apellidos} ${p.nombres} ${p.numerodoc} ${p.email}`
+
+  const rows = (data ?? []).filter((person) =>
+    `${person.apellidos} ${person.nombres} ${person.numerodoc} ${person.email}`
       .toLowerCase()
       .includes(term),
   );
 
   return (
-    <section className="space-y-4">
-      <div className="flex items-center justify-between gap-3">
-        <h1 className="text-xl font-semibold">Personas</h1>
+    <section className="space-y-5">
+      <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-xl font-bold tracking-tight text-slate-900 ">
+            Personas
+          </h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-gray-400">
+            Gestiona las personas registradas en el sistema.
+          </p>
+        </div>
+
         <Button onClick={() => setEditing("new")}>Nueva persona</Button>
+      </header>
+
+      <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+        <label
+          htmlFor="people-search"
+          className="mb-2 block text-sm font-medium text-slate-700 dark:text-gray-300"
+        >
+          Buscar personas
+        </label>
+
+        <SearchInput
+          value={q}
+          onChange={setQ}
+          placeholder="Nombre, DNI o correo electrónico..."
+        />
+
+        <p
+          className="mt-3 text-xs text-slate-500 dark:text-gray-400"
+          aria-live="polite"
+        >
+          {isPending ? "Cargando registros..." : `${rows.length} resultado(s)`}
+        </p>
       </div>
 
-      <input
-        type="search"
-        value={q}
-        onChange={(e) => setQ(e.target.value)}
-        placeholder="Buscar por nombre, DNI o correo…"
-        className={controlClass}
+      {error && rows.length > 0 && <Alert>{error.message}</Alert>}
+
+      <PersonTable
+        rows={rows}
+        isLoading={isPending}
+        error={error}
+        onEdit={setEditing}
+        onRetry={() => void refetch()}
       />
-
-      {isPending && <Spinner />}
-      {error && <Alert>{error.message}</Alert>}
-
-      {data && (
-        <>
-          <p className="text-sm text-slate-500">{rows.length} resultado(s)</p>
-          <DataTable
-            rows={rows}
-            rowKey={(r) => r.id}
-            columns={[
-              {
-                header: "Persona",
-                cell: (r) => `${r.apellidos}, ${r.nombres}`,
-              },
-              { header: "DNI", cell: (r) => r.numerodoc },
-              {
-                header: "Teléfono",
-                cell: (r) => r.telefono,
-                className: "hidden sm:table-cell",
-              },
-              {
-                header: "Correo",
-                cell: (r) => r.email,
-                className: "hidden md:table-cell",
-              },
-            ]}
-            onEdit={setEditing}
-          />
-        </>
-      )}
 
       <PersonModal
         item={editing === "new" ? undefined : (editing ?? undefined)}
