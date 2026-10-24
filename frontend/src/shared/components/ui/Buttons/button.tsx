@@ -28,7 +28,7 @@ export default function Button({
       type="button"
       disabled={disabled || loading}
       className={cn(
-        "rounded-md px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60",
+        "rounded-md px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer",
         VARIANTS[variant],
         className,
       )}

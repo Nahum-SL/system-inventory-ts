@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Link, useParams } from "react-router";
 // Componente de estilo de carga
 import Spinner from "@/shared/components/Spinner";
@@ -9,8 +10,8 @@ import HistorySection from "../components/HistorySection";
 import StatusBadge from "../components/StatusBadge";
 // hooks
 import { useAssetCard } from "../hooks/useAssetCard";
-import type { AssetCard } from "@/shared/types";
-import type { ReactNode } from "react";
+// Types
+import type { AssetCard } from "../types";
 
 interface Props {
   actions?: (asset: AssetCard) => ReactNode;
@@ -28,7 +29,7 @@ function Row({ label, value }: { label: string; value: string }) {
 const sectionTitle =
   "mb-1 text-sm font-semibold uppercase tracking-wide text-slate-500";
 
-export default function AssetCardPage({actions }: Props) {
+export default function AssetCardPage({ actions }: Props) {
   const { codigo = "" } = useParams();
   const { data: asset, isPending, error } = useAssetCard(codigo);
 

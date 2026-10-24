@@ -3,10 +3,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 // Componentes Atomicos
 import Alert from "@/shared/components/ui/Alert";
-import Button from "../../../../shared/components/ui/Buttons/button";
-import FormField from "../../../../shared/components/ui/form/FormField";
-import Modal from "../../../../shared/components/ui/dialog/Modal";
-import { controlClass } from "../../../../shared/components/ui/Buttons/style.button";
+import Button from "@/shared/components/ui/Buttons/button";
+import FormField from "@/shared/components/ui/form/FormField";
+import Modal from "@/shared/components/ui/dialog/Modal";
+import { controlClass } from "@/shared/components/ui/Buttons/style.button";
 
 import { useChangeStatus } from "@/modules/assets/hooks/use-asset-mutation";
 // Schema - Activos
@@ -15,7 +15,7 @@ import {
   type ChangeStatusInput,
   type ChangeStatusValues,
 } from "@/modules/assets/schema/asset-status.schema";
-import type { AssetCard } from "../../../../shared/types";
+import type { AssetCard } from "../../types";
 
 interface Props {
   asset: AssetCard;

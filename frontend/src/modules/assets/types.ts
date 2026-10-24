@@ -2,8 +2,11 @@ export type AssetStatus = "operativo" | "mantenimiento" | "fuera_de_servicio";
 
 export interface Asset {
   id: number;
+  marcaId: number;
   marcaNombre: string;
+  categoriaId: number;
   categoriaNombre: string;
+  areaId: number;
   areaNombre: string;
   codigoInventario: string;
   fechaIngreso: string;
@@ -14,11 +17,13 @@ export interface Asset {
 export interface AssetCard extends Asset {
   disponibilidad: "disponible" | "asignado";
   asignacionActual: {
+    id: number;
     personaNombre: string;
     cargoNombre: string;
     fechaInicio: string;
   } | null;
   mantenimientoAbierto: {
+    id: number;
     tipo: "preventivo" | "correctivo";
     fecha: string;
     descripcion: string;
@@ -40,6 +45,10 @@ export interface AssignmentRecord {
   condicionDevolucion: string | null;
 }
 
+// ==================================
+// MANTENIMIENTO DEL ASSET / ACTIVO
+// ==================================
+
 export interface MaintenanceRecord {
   id: number;
   tipo: "preventivo" | "correctivo";
@@ -49,6 +58,10 @@ export interface MaintenanceRecord {
   observaciones: string | null;
   costo: number;
 }
+
+// ==================================
+// MOVIMIENTO DEL ASSET / ACTIVO
+// ==================================
 
 export interface MovementRecord {
   id: number;

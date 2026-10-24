@@ -1,16 +1,21 @@
-import { useState } from "react";
-import Spinner from "@/shared/components/Spinner";
+import { useState, type ReactNode } from "react";
 import { useDebounce } from "@/shared/hooks/useDebounce";
+// COMPONENT UI
+import Spinner from "@/shared/components/Spinner";
+// ASSET COMPONENTS
 import AssetFilters from "../components/AssetFilters";
 import AssetListItem from "../components/AssetListItem";
+// HOOKS
 import { useAssets } from "../hooks/useAsset";
+// TYPES
 import type { AssetStatus } from "../types";
 
 interface Props {
   basePath: string;
+  headerAction?: ReactNode;
 }
 
-export default function AssetsPage({ basePath }: Props) {
+export default function AssetsPage({ basePath, headerAction }: Props) {
   const [q, setQ] = useState("");
   const [estado, setEstado] = useState<AssetStatus | "">("");
   const debouncedQ = useDebounce(q.trim());
@@ -19,8 +24,11 @@ export default function AssetsPage({ basePath }: Props) {
 
   return (
     <section className="space-y-4">
-      <h1 className="text-xl font-semibold">Activos</h1>
-
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="text-xl font-semibold">Activos</h1>
+        {headerAction}
+      </div>
+      
       <AssetFilters
         q={q}
         estado={estado}

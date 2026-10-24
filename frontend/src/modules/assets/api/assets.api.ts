@@ -1,13 +1,11 @@
 // API CLIENT
-import { api } from "../../../shared/lib/api-client";
+import { api } from "@/shared/lib/api-client";
 // Types API
 import type {
   ApiResponse,
   ListResponse,
 } from "../../../shared/types/api.types";
 
-//
-import type { ChangeStatusValues } from "../schema/asset-status.schema";
 // Types
 import type {
   Asset,
@@ -61,14 +59,3 @@ export const getMovementHistory = async (
 ): Promise<MovementRecord[]> =>
   (await api.get<ListResponse<MovementRecord>>(`/assets/${id}/movements`)).data;
 
-/**
- * Cambiar estado de un Activo
- * @param id
- * @param values
- * @returns
- */
-export const changeAssetStatus = async (
-  id: number,
-  values: ChangeStatusValues,
-): Promise<Asset> =>
-  (await api.patch<ApiResponse<Asset>>(`/assets/${id}/status`, values)).data;
