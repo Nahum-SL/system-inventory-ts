@@ -8,9 +8,9 @@ import { validate } from "../../shared/middlewares/validate.middleware.js";
 
 // MODULO USER
 // Schema Validacion de campos
-import { createUserSchema } from "./users.schema.js";
+import { createUserSchema, resetPasswordSchema, updateUserSchema } from "./users.schema.js";
 // controladores
-import { createUser, getUserById, listUsers } from "./users.controller.js";
+import { createUser, getUserById, listUsers, resetUserPassword, updateUser } from "./users.controller.js";
 
 const userRoutes = Router();
 
@@ -21,5 +21,7 @@ userRoutes.use(authenticate, authorize("admin"));
 userRoutes.get("/", listUsers);
 userRoutes.get("/:id", getUserById);
 userRoutes.post("/", validate(createUserSchema), createUser);
+userRoutes.patch("/:id", validate(updateUserSchema), updateUser);
+userRoutes.patch("/:id/password", validate(resetPasswordSchema), resetUserPassword);
 
 export default userRoutes;
