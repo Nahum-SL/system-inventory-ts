@@ -1,25 +1,15 @@
 import type { RequestHandler } from "express";
 import jwt from "jsonwebtoken";
-
-// Configuracion validada de los .env
 import { env } from "../../config/env.js";
-// Clase para manejar errores
+import { usersRepository } from "../../modules/users/users.repository.js";
 import { UnauthorizedError } from "../errors/AppError.js";
 
 /**
- * Autentica la petición con un JWT enviado en el header
- * `Authorization: Bearer <token>`.
- *
- * Comprueba que:
- * - exista el header con formato Bearer,
- * - la firma sea válida (HS256) y el token no haya expirado,
- * - `sub`, `username` y `rol` tengan el formato esperado.
- *
- * Si todo es correcto, deja `{ id, username, rol }` en `req.auth`.
- *
- * @throws {UnauthorizedError} (401) Si falta el token, es inválido o expiró.
+ * Autentica con un JWT en `Authorization: Bearer <token>` y confirma contra la BD
+ * que la cuenta siga activa y que el token no haya sido invalidado
+ * (cambio de contraseña o desactivación). El rol sale de la BD, no del token.
  */
-export const authenticate: RequestHandler = (req, _res, next) => {
+export const authenticate: RequestHandler = async (req, _res, next) => {
   const authorization = req.headers.authorization;
 
   if (!authorization?.startsWith("Bearer ")) {
@@ -34,30 +24,36 @@ export const authenticate: RequestHandler = (req, _res, next) => {
     return;
   }
 
-  try {
-    const payload = jwt.verify(token, env.JWT_SECRET, {
-      algorithms: ["HS256"],
-    });
+  let payload: jwt.JwtPayload | string;
 
-    if (
-      typeof payload === "string" ||
-      typeof payload.sub !== "string" ||
-      !/^[1-9]\d*$/.test(payload.sub) ||
-      typeof payload.username !== "string" ||
-      (payload.rol !== "admin" && payload.rol !== "usuario")
-    ) {
-      next(new UnauthorizedError("Token inválido"));
+  try {
+    payload = jwt.verify(token, env.JWT_SECRET, { algorithms: ["HS256"] });
+  } catch {
+    next(new UnauthorizedError("Token inválido o expirado"));
+    return;
+  }
+
+  if (
+    typeof payload === "string" ||
+    typeof payload.sub !== "string" ||
+    !/^[1-9]\d*$/.test(payload.sub) ||
+    typeof payload.ver !== "number"
+  ) {
+    next(new UnauthorizedError("Token inválido"));
+    return;
+  }
+
+  try {
+    const account = await usersRepository.findAuthState(Number(payload.sub));
+
+    if (!account || !account.activo || account.tokenVersion !== payload.ver) {
+      next(new UnauthorizedError("La sesión ya no es válida"));
       return;
     }
 
-    req.auth = {
-      id: Number(payload.sub),
-      username: payload.username,
-      rol: payload.rol,
-    };
-
+    req.auth = { id: account.id, username: account.username, rol: account.rol };
     next();
-  } catch {
-    next(new UnauthorizedError("Token inválido o expirado"));
+  } catch (error) {
+    next(error);
   }
 };
