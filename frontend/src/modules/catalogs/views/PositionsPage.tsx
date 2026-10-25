@@ -1,47 +1,89 @@
 import { useState } from "react";
-// COMPONENTES ATOMICOS
+
+// COMPONENTES
 import Alert from "@/shared/components/ui/Alert";
 import Button from "@/shared/components/ui/Buttons/button";
-import DataTable from "@/shared/components/ui/tables/DateTable";
-import Spinner from "@/shared/components/Spinner";
+import SearchInput from "@/shared/components/ui/inputs/SearchInput";
+
 // COMPONENTS - FORM
 import PositionModal from "../components/form/PositionModal";
+
+// TABLE
+import PositionTable from "../components/tables/position-table";
+
 // HOOKS
 import { useAreas, usePositions } from "../hooks/use-catalog-queries";
+
 // TYPES
 import type { Position } from "../types";
 
 export default function PositionsPage() {
-  const { data, isPending, error } = usePositions();
-  const [editing, setEditing] = useState<Position | "new" | null>(null);
+  const { data, isPending, error, refetch } = usePositions();
 
-  // Precarga las áreas para que el select ya tenga opciones al abrir el modal.
+  const [editing, setEditing] = useState<Position | "new" | null>(null);
+  const [q, setQ] = useState("");
+
+  // Precarga las áreas para que el select tenga opciones al abrir el modal.
   useAreas();
 
+  const term = q.trim().toLowerCase();
+
+  const rows = (data ?? []).filter((position) =>
+    `${position.areaNombre} ${position.nombre}`.toLowerCase().includes(term),
+  );
+
   return (
-    <section className="space-y-4">
-      <div className="flex items-center justify-between gap-3">
-        <h1 className="text-xl font-semibold">Cargos</h1>
+    <section className="space-y-5">
+      <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-xl font-bold tracking-tight text-slate-900">
+            Cargos
+          </h1>
+
+          <p className="mt-1 text-sm text-slate-500 dark:text-gray-400">
+            Gestiona los cargos y sus áreas correspondientes.
+          </p>
+        </div>
+
         <Button onClick={() => setEditing("new")}>Nuevo cargo</Button>
+      </header>
+
+      <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+        <label
+          htmlFor="position-search"
+          className="mb-2 block text-sm font-medium text-slate-700 dark:text-gray-300"
+        >
+          Buscar cargos
+        </label>
+
+        <SearchInput
+          value={q}
+          onChange={setQ}
+          placeholder="Nombre del cargo o área..."
+        />
+
+        <div className="mt-3 flex items-center justify-between gap-3">
+          <p
+            className="text-xs text-slate-500 dark:text-gray-400"
+            aria-live="polite"
+          >
+            {isPending
+              ? "Cargando registros..."
+              : `${rows.length} resultado(s)`}
+          </p>
+        </div>
       </div>
 
-      {isPending && <Spinner />}
-      {error && <Alert>{error.message}</Alert>}
+      {error && rows.length > 0 && <Alert>{error.message}</Alert>}
 
-      {data && (
-        <>
-          <p className="text-sm text-slate-500">{data.length} registro(s)</p>
-          <DataTable
-            rows={data}
-            rowKey={(r) => r.id}
-            columns={[
-              { header: "Área", cell: (r) => r.areaNombre },
-              { header: "Cargo", cell: (r) => r.nombre },
-            ]}
-            onEdit={setEditing}
-          />
-        </>
-      )}
+      <PositionTable
+        rows={rows}
+        isLoading={isPending}
+        error={error}
+        searchTerm={term}
+        onEdit={setEditing}
+        onRetry={() => void refetch()}
+      />
 
       <PositionModal
         item={editing === "new" ? undefined : (editing ?? undefined)}

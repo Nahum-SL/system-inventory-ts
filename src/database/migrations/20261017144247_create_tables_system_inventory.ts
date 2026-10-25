@@ -91,6 +91,8 @@ export async function up(knex: Knex): Promise<void> {
     table.string("username", 150).notNullable().unique();
     table.string("password", 255).notNullable();
     table.enu("rol", ["admin", "usuario"]).notNullable();
+    table.boolean("activo").notNullable().defaultTo(true);
+    table.integer("token_version").unsigned().notNullable().defaultTo(0);
   });
 
   // 7. Activos
@@ -264,7 +266,7 @@ export async function up(knex: Knex): Promise<void> {
     table.timestamp("fecharegistro").notNullable().defaultTo(knex.fn.now());
   });
 
-await knex.raw(`
+  await knex.raw(`
   ALTER TABLE mantenimientos
   ADD COLUMN abierto TINYINT GENERATED ALWAYS AS (IF(fecha_fin IS NULL, 1, NULL)) VIRTUAL,
   ADD UNIQUE KEY uq_mantenimiento_abierto (activo_id, abierto)
