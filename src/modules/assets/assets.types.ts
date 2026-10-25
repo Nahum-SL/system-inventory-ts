@@ -16,6 +16,7 @@ export type DecommissionResult =
   q?: string;
   estado?: AssetStatus;
   areaId?: number;
+  asignacion?: string;
 }
 
 export interface Asset {

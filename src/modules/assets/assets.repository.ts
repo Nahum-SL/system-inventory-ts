@@ -39,7 +39,7 @@ export class AssetsRepository {
         fechaRegistro: "a.fecharegistro",
         eliminado: "a.eliminado",
         fechaEliminacion: "a.fecha_eliminacion",
-        motivoEliminacion: "a.motivo_eliminacion"
+        motivoEliminacion: "a.motivo_eliminacion",
       });
 
     if (!options.includeDeleted) query.where("a.eliminado", false);
@@ -97,6 +97,16 @@ export class AssetsRepository {
 
     if (filters.areaId !== undefined) {
       query.where("a.area_id", filters.areaId);
+    }
+
+    if (filters.asignacion) {
+      const openAssignment = db("asignaciones as asi")
+        .select(db.raw("1"))
+        .whereRaw("asi.activo_id = a.id")
+        .whereNull("asi.fecha_fin");
+
+      if (filters.asignacion === "asignado") query.whereExists(openAssignment);
+      else query.whereNotExists(openAssignment);
     }
 
     if (filters.q?.trim()) {
