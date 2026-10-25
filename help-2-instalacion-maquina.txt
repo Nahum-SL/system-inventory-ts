@@ -1,0 +1,7 @@
+IP reservada en el router y perfil de red Privado.
+Node con el MSI oficial, MySQL y un usuario propio (no root).
+git checkout v1.0.0, pnpm install, .env.production con PUBLIC_APP_URL=http://<ip>:3000 y JWT_SECRET nuevo.
+pnpm build:all, pnpm migrate:prod, pnpm seed:prod.
+install-service.ps1, y pnpm smoke http://<ip>:3000 desde un celular.
+Cambia la contraseña del admin, borra INITIAL_ADMIN_PASSWORD del .env.production y programa el respaldo diario.
+Reinicia la máquina y comprueba que el sistema vuelve solo.

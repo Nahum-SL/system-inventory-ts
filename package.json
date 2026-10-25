@@ -1,5 +1,5 @@
 {
-  "name": "e-yonda-ts",
+  "name": "System Inventory QRs",
   "version": "1.0.0",
   "description": "",
   "main": "src/server.ts",
@@ -43,7 +43,6 @@
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "dotenv": "^18.0.8",
-    "e-yonda-ts": "link:",
     "express": "^5.3.0",
     "express-rate-limit": "^8.7.1",
     "helmet": "^8.3.0",
@@ -64,7 +63,6 @@
     "@types/supertest": "^7.2.1",
     "cross-env": "^10.1.0",
     "express-list-endpoints": "^7.1.1",
-    "nodemon": "^3.1.14",
     "supertest": "^7.3.1",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
