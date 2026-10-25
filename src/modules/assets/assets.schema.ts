@@ -69,6 +69,7 @@ export const listAssetsQuerySchema = z.object({
   q: z.string().trim().optional(),
   estado: z.enum(ESTADOS).optional(),
   areaId: z.coerce.number().int().positive().optional(),
+  asignacion: z.enum(["asignado", "libre"]).optional(),
 });
 
 /** Datos para dar de baja un activo. El motivo queda en el registro. */
@@ -87,6 +88,8 @@ export const assetCodeParamSchema = z.object({
 
 
 export type CreateAssetInput = z.infer<typeof createAssetSchema>;
+
 export type UpdateAssetInput = z.infer<typeof updateAssetSchema>;
 export type UpdateAssetStatusInput = z.infer<typeof updateAssetStatusSchema>;
+
 export type DecommissionAssetInput = z.infer<typeof decommissionAssetSchema>;
