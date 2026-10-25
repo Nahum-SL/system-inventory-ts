@@ -1,11 +1,18 @@
 import bcrypt from "bcrypt";
-
+// Manejo de errores
 import { ConflictError, NotFoundError } from "../../shared/errors/AppError.js";
 import { isDuplicateEntryError } from "../../shared/utils/isDuplicateEntryError.js";
+// ===============
+// REPOSITORES
+// ===============
+// Personas
 import { peopleRepository } from "../people/people.repository.js";
+// Users
 import { usersRepository } from "./users.repository.js";
+// TYPES
 import type { PublicUser } from "./users.types.js";
-import type { CreateUserInput } from "./users.schema.js";
+// SCHEMA - USER
+import type { CreateUserInput, ResetPasswordInput, UpdateUserInput } from "./users.schema.js";
 
 const BCRYPT_COST = 12;
 
@@ -66,6 +73,46 @@ export class UsersService {
       }
 
       throw error;
+    }
+  }
+
+  /**
+   * Cambia el rol o el estado de una cuenta.
+   * @throws {NotFoundError} Si no existe (404).
+   * @throws {ConflictError} Si intentas desactivarte o quitarte el rol, o si es el último admin activo (409).
+   */
+  async update(
+    id: number,
+    actorId: number,
+    input: UpdateUserInput,
+  ): Promise<PublicUser> {
+    const result = await usersRepository.updateAccount(id, input, actorId);
+
+    switch (result.status) {
+      case "not_found":
+        throw new NotFoundError("El usuario no existe");
+      case "self_change":
+        throw new ConflictError(
+          "No puedes desactivar tu propia cuenta ni quitarte el rol de administrador",
+        );
+      case "last_admin":
+        throw new ConflictError("Debe quedar al menos un administrador activo");
+      case "ok":
+        return result.user;
+    }
+  }
+
+  /**
+   * Restablece la contraseña de una cuenta. Cierra sus sesiones abiertas.
+   * @throws {NotFoundError} Si no existe (404).
+   */
+  async resetPassword(id: number, input: ResetPasswordInput): Promise<void> {
+    await this.getById(id);
+
+    const passwordHash = await bcrypt.hash(input.password, BCRYPT_COST);
+
+    if ((await usersRepository.updatePassword(id, passwordHash)) === null) {
+      throw new NotFoundError("El usuario no existe");
     }
   }
 }
