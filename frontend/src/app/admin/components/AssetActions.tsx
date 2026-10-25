@@ -34,12 +34,6 @@ export default function AssetActions({ asset }: { asset: AssetCard }) {
   const inMaintenance = asset.estado === "mantenimiento";
   const canAssign = asset.estado === "operativo" && !asset.asignacionActual;
 
-  console.log({
-    estado: asset.estado,
-    asignacion: asset.asignacionActual,
-    modal,
-  });
-
   return (
     <section className="space-y-3 rounded-lg border border-blue-200 bg-blue-50 p-4">
       <h2 className="text-sm font-semibold uppercase tracking-wide text-blue-800">

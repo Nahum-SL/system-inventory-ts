@@ -32,7 +32,6 @@ export interface DashboardSummary {
   recentMovements: RecentMovement[];
 }
 
-
 export interface DashboardStats {
   activos: number;
   operativo: number;
@@ -51,4 +50,15 @@ export interface KpiItemConfig {
   bg: string;
   bgHover?: string;
   link: string;
+}
+
+export interface AssetExportFilters {
+  q?: string;
+  estado?: string;
+  asignacion?: string;
+}
+
+export interface DateRange {
+  desde?: string;
+  hasta?: string;
 }

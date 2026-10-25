@@ -10,13 +10,19 @@ import AssetListItem from "../components/AssetListItem";
 // HOOKS
 import { useAssetFilters } from "../hooks/useAssetFilters";
 import { useAssets } from "../hooks/useAsset";
+import type { AssetFilters } from "../types";
 
 interface Props {
   basePath: string;
   headerAction?: ReactNode;
+  exportAction?: (filters: AssetFilters) => ReactNode;
 }
 
-export default function AssetsPage({ basePath, headerAction }: Props) {
+export default function AssetsPage({
+  basePath,
+  headerAction,
+  exportAction,
+}: Props) {
   const { filters, text, onSearch, update, clear, hasActive } =
     useAssetFilters();
   const { data, isPending, error } = useAssets(filters);
@@ -54,7 +60,10 @@ export default function AssetsPage({ basePath, headerAction }: Props) {
 
       {data && data.length > 0 && (
         <>
-          <p className="text-sm text-slate-500">{data.length} resultado(s)</p>
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-sm text-slate-500">{data.length} resultado(s)</p>
+            {exportAction?.(filters)}
+          </div>
           <ul className="space-y-2">
             {data.map((asset) => (
               <li key={asset.id}>

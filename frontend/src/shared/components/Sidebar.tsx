@@ -13,6 +13,7 @@ import {
   Users,
   User2,
   type LucideIcon,
+  FileDown
 } from "lucide-react";
 import { useLogout, useSession } from "@/modules/auth";
 import { cn } from "@/shared/lib/utils";
@@ -28,6 +29,7 @@ interface MenuItem {
 const menuItems: MenuItem[] = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard, end: true },
   { name: "Activos", href: "/admin/activos", icon: Boxes },
+  { name: "Reportes", href: "/admin/reportes", icon: FileDown },
   { name: "Etiquetas", href: "/admin/etiquetas", icon: QrCode },
   { name: "Áreas", href: "/admin/areas", icon: Building2 },
   { name: "Marcas", href: "/admin/marcas", icon: Tag },

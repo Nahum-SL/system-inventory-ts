@@ -1,21 +1,24 @@
 import { Link, type RouteObject } from "react-router";
 
-import { AssetCardPage, AssetsPage } from "@/modules/assets";
-
 import AdminLayout from "./AdminLayout";
 import AdminRoute from "./AdminRoute";
-
+// MODULO - ASSET
+import { AssetCardPage, AssetsPage } from "@/modules/assets";
+// MODULO - REPORTS
+import { ExportAssetsButton, ReportsPage } from "@/modules/reports";
+// COMPONENTS
 import AssetActions from "./components/AssetActions";
 // PAGES
 import AdminDashboardPage from "./pages/AdminDashboardPage";
 import AssetCreatePage from "./pages/AssetCreatePages";
 import LabelsPage from "./pages/LabelsPage";
+import UsersPage from "@/modules/users/views/UsersPage";
+// COMPONENTS - CATALOGS
 import {
   NamedCatalogPage,
   PeoplePage,
   PositionsPage,
 } from "@/modules/catalogs";
-import UsersPage from "@/modules/users/views/UsersPage";
 
 export const adminRoutes: RouteObject = {
   path: "admin",
@@ -38,6 +41,9 @@ export const adminRoutes: RouteObject = {
                   Nuevo activo
                 </Link>
               }
+              exportAction={(filters) => (
+                <ExportAssetsButton filters={filters} />
+              )}
             />
           ),
         },
@@ -70,6 +76,7 @@ export const adminRoutes: RouteObject = {
         { path: "cargos", element: <PositionsPage /> },
         { path: "personas", element: <PeoplePage /> },
         { path: "usuarios", element: <UsersPage /> },
+        { path: "reportes", element: <ReportsPage /> },
       ],
     },
   ],

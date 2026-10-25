@@ -70,6 +70,14 @@ const withBody = (method: string, body?: unknown): RequestInit => ({
 
 export const api = {
   get: async <T>(path: string): Promise<T> => (await request(path)).json(),
+  getFile: async (path: string): Promise<{ blob: Blob; filename: string }> => {
+    const res = await request(path);
+    const match = /filename="([^"]+)"/.exec(
+      res.headers.get("Content-Disposition") ?? "",
+    );
+
+    return { blob: await res.blob(), filename: match?.[1] ?? "reporte.csv" };
+  },
   getText: async (path: string): Promise<string> =>
     (await request(path)).text(),
   post: async <T>(path: string, body?: unknown): Promise<T> =>
