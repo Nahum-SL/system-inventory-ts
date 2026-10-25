@@ -1,7 +1,7 @@
 // src/features/admin/dashboard/stats/utils/dashboard-kpi.ts
 import { Package, CheckCircle, Wrench, Ban } from "lucide-react";
-import type { DashboardStats } from "@/shared/types/admin/stats";
-import type { KpiItemConfig } from "@/shared/types/admin/stats";
+import type { DashboardStats } from "../../types";
+import type { KpiItemConfig } from "../../types";
 
 export function getKpiItemsConfig(stats: DashboardStats): KpiItemConfig[] {
   return [

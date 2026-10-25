@@ -1,5 +1,5 @@
 // src/features/admin/dashboard/stats/components/dashboard-kpi-grid.tsx
-import type { DashboardStats } from "@/shared/types/admin/stats";
+import type { DashboardStats } from "../../types";
 import { DashboardKpiCard } from "./dashboard-kpi-stats";
 import { getKpiItemsConfig } from "./dashboard-kpi";
 
@@ -11,7 +11,7 @@ export function DashboardKpiGrid({ stats }: DashboardKpiGridProps) {
   const kpiItems = getKpiItemsConfig(stats);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {kpiItems.map((kpi) => (
         <DashboardKpiCard key={kpi.title} {...kpi} />
       ))}
