@@ -17,3 +17,18 @@ export const getCurrentUser = asyncHandler(async (req, res) => {
 
   res.status(200).json({ status: "success", data: { user } });
 });
+
+/** Cambia la contraseña propia y devuelve un token nuevo. */
+export const changePassword = asyncHandler(async (req, res) => {
+  if (!req.auth) throw new UnauthorizedError("Debes autenticarte primero");
+
+  const result = await authService.changePassword(req.auth.id, req.body);
+
+  res
+    .status(200)
+    .json({
+      status: "success",
+      message: "Contraseña actualizada correctamente",
+      data: result,
+    });
+});
