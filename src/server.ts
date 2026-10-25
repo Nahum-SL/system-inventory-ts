@@ -42,6 +42,7 @@ const server = app.listen(env.PORT, () => {
     console.table([
       { Método: "GET", Ruta: "/api/health" },
       ...collectRoutes(authRoutes, "/api/auth"),
+      ...collectRoutes(userRoutes, "/api/users"),
       ...collectRoutes(assetsRoutes, "/api/assets"),
       ...collectRoutes(peopleRoutes, "/api/people"),
       ...collectRoutes(areasRoutes, "/api/areas"),

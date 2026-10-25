@@ -1,6 +1,3 @@
-// src/components/ui/table/TableButton.tsx
-"use client";
-
 import { Link } from "react-router";
 import { cn } from "@/shared/lib/utils";
 import {
