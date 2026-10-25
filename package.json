@@ -4,24 +4,19 @@
   "description": "",
   "main": "src/server.ts",
   "scripts": {
-    "test": "vitest run",
-    "test:watch": "vitest",    
-    
+    "test": "cross-env NODE_ENV=test vitest run",
+    "test:watch": "vitest",
     "dev": "tsx watch src/server.ts",
+    "dev:test": "tsx --env-file=.env.test watch src/server.ts",
     "dev:frontend": "pnpm --dir frontend dev",
-
     "build": "tsc",
     "build:frontend": "pnpm --dir frontend install --frozen-lockfile && pnpm --dir frontend build",
     "build:all": "pnpm build && pnpm build:frontend",
-
     "start": "node dist/server.js",
-
     "start:prod": "node --env-file=.env.production dist/server.js",
     "migrate:prod": "tsx --env-file=.env.production ./node_modules/knex/bin/cli.js migrate:latest",
     "seed:prod": "tsx --env-file=.env.production ./node_modules/knex/bin/cli.js seed:run",
-
     "typecheck": "tsc --noEmit",
-
     "knex": "tsx ./node_modules/knex/bin/cli.js",
     "migrate:make": "pnpm knex migrate:make",
     "migrate:latest": "pnpm knex migrate:latest",
@@ -29,7 +24,6 @@
     "migrate:status": "pnpm knex migrate:status",
     "seed:make": "pnpm knex seed:make",
     "seed:run": "pnpm knex seed:run",
-
     "backup:db": "powershell -NoProfile -ExecutionPolicy Bypass -File ops/backup/backup-db.ps1"
   },
   "keywords": [],
@@ -67,6 +61,7 @@
     "@types/node": "^26.6.5",
     "@types/qrcode": "^1.5.6",
     "@types/supertest": "^7.2.1",
+    "cross-env": "^10.1.0",
     "express-list-endpoints": "^7.1.1",
     "nodemon": "^3.1.14",
     "supertest": "^7.3.1",
