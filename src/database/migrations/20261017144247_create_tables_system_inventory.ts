@@ -188,8 +188,8 @@ export async function up(knex: Knex): Promise<void> {
 
   await knex.raw(`
   ALTER TABLE asignaciones
-  ADD COLUMN abierta TINYINT GENERATED ALWAYS AS (IF(fecha_fin IS NULL, 1, NULL)) VIRTUAL,
-  ADD UNIQUE KEY uq_asignacion_abierta (activo_id, abierta)
+  ADD COLUMN abierto TINYINT GENERATED ALWAYS AS (IF(fecha_fin IS NULL, 1, NULL)) VIRTUAL,
+  ADD UNIQUE KEY uq_asignacion_abierta (activo_id, abierto)
 `);
 
   // 9. Movimientos

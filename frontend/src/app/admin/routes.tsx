@@ -15,6 +15,7 @@ import {
   PeoplePage,
   PositionsPage,
 } from "@/modules/catalogs";
+import UsersPage from "@/modules/users/views/UsersPage";
 
 export const adminRoutes: RouteObject = {
   path: "admin",
@@ -65,6 +66,7 @@ export const adminRoutes: RouteObject = {
         },
         { path: "cargos", element: <PositionsPage /> },
         { path: "personas", element: <PeoplePage /> },
+        { path: "usuarios", element: <UsersPage /> },
       ],
     },
   ],

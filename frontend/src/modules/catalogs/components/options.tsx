@@ -57,13 +57,23 @@ export function AreaOptions({ excludeId }: { excludeId?: number }) {
   );
 }
 
-export function PersonOptions() {
+export function PersonOptions({ excludeIds = [] }: { excludeIds?: number[] }) {
+  const { data, isPending, error } = usePeople();
+
+  if (isPending) return <option value="">Cargando…</option>;
+  if (error) return <option value="">No se pudo cargar la lista</option>;
+
   return (
-    <Options
-      query={usePeople()}
-      placeholder="Selecciona una persona…"
-      label={(p) => `${p.apellidos}, ${p.nombres} · ${p.numerodoc}`}
-    />
+    <>
+      <option value="">Selecciona una persona…</option>
+      {data
+        .filter((p) => !excludeIds.includes(p.id))
+        .map((p) => (
+          <option key={p.id} value={p.id}>
+            {`${p.apellidos}, ${p.nombres} · ${p.numerodoc}`}
+          </option>
+        ))}
+    </>
   );
 }
 

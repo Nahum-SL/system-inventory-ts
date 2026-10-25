@@ -11,6 +11,7 @@ import {
   Layers,
   Briefcase,
   Users,
+  User2,
   type LucideIcon,
 } from "lucide-react";
 import { useLogout, useSession } from "@/modules/auth";
@@ -33,6 +34,7 @@ const menuItems: MenuItem[] = [
   { name: "Categorías", href: "/admin/categorias", icon: Layers },
   { name: "Cargos", href: "/admin/cargos", icon: Briefcase },
   { name: "Personas", href: "/admin/personas", icon: Users },
+  { name: "Usuarios", href: "/admin/usuarios", icon: User2 },
 ];
 
 interface SidebarProps {
