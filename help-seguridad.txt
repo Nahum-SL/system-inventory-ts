@@ -18,3 +18,11 @@ powershell -ExecutionPolicy Bypass -File .\ops\windows\install-service.ps1
 4. Detener la operacion
 C:\tools\nssm\nssm.exe stop SystemInventory
 C:\tools\nssm\nssm.exe remove SystemInventory confirm
+
+5.
+C:\tools\nssm\nssm.exe status SystemInventory debe decir SERVICE_RUNNING, 
+y luego pnpm smoke http://localhost:3000 debe pasar las 7.
+
+6.
+Cuando termines el ensayo en la laptop, quita el servicio: 
+C:\tools\nssm\nssm.exe remove SystemInventory confirm.

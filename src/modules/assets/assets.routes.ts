@@ -1,36 +1,42 @@
 import { Router } from "express";
-// MIDDLEWARES
 import { authenticate } from "../../shared/middlewares/auth.middleware.js";
 import { authorize } from "../../shared/middlewares/authorize.middleware.js";
 import { validate } from "../../shared/middlewares/validate.middleware.js";
 import {
+  assetCodeParamSchema,
   createAssetSchema,
-  updateAssetSchema,
-  updateAssetStatusSchema,
   decommissionAssetSchema,
   listAssetsQuerySchema,
-  assetCodeParamSchema,
+  updateAssetSchema,
+  updateAssetStatusSchema,
 } from "./assets.schema.js";
 import {
   createAsset,
+  decommissionAsset,
+  getAssetByCode,
   getAssetById,
+  getAssetQr,
   listAssets,
   updateAsset,
   updateAssetStatus,
-  decommissionAsset,
-  getAssetByCode,
-  getAssetQr,
 } from "./assets.controller.js";
 
 const assetsRoutes = Router();
 
+// Este router está montado en /api/assets: todo lo que cuelga de ahí exige sesión.
 assetsRoutes.use(authenticate);
 
+// Lectura (cualquier usuario autenticado)
 assetsRoutes.get("/", validate(listAssetsQuerySchema, "query"), listAssets);
-// Ficha por código (paso 3): va ANTES de "/:id".
-// assetsRoutes.get("/code/:codigo", getAssetByCode);
+assetsRoutes.get(
+  "/code/:codigo",
+  validate(assetCodeParamSchema, "params"),
+  getAssetByCode,
+);
 assetsRoutes.get("/:id", getAssetById);
+assetsRoutes.get("/:id/qr", getAssetQr);
 
+// Escritura (solo admin)
 assetsRoutes.post(
   "/",
   authorize("admin"),
@@ -55,13 +61,5 @@ assetsRoutes.post(
   validate(decommissionAssetSchema),
   decommissionAsset,
 );
-
-// Endpoints para el QR
-assetsRoutes.get(
-  "/code/:codigo",
-  validate(assetCodeParamSchema, "params"),
-  getAssetByCode,
-);
-assetsRoutes.get("/:id/qr", getAssetQr);
 
 export default assetsRoutes;

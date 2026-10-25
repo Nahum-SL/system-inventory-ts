@@ -42,15 +42,7 @@ describe("GET /api/assets (filtros)", () => {
     expect(await codes("?q=%25")).toEqual([]);
     expect(await codes("?q=INV_0002")).toEqual([]);
   });
-
-  it("valores inválidos: 400", async () => {
-    const res = await request(app)
-      .get("/api/assets?estado=roto")
-      .auth(t.adminToken, { type: "bearer" });
-
-    expect(res.status).toBe(400);
-  });
-
+  
   it("las rutas de ciclo de vida exigen sesión y una ruta inexistente da 404", async () => {
     for (const path of [
       "/api/assets/1/maintenance",

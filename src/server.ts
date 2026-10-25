@@ -18,7 +18,7 @@ import assignmentRoutes from "./modules/assigments/assignments.routes.js";
 // Personas
 import peopleRoutes from "./modules/people/people.routes.js";
 // Areas
-import areasRoutes from "./modules/areas/area.routes.js";
+import areasRoutes from "./modules/areas/areas.routes.js";
 // Marcas
 import brandsRoutes from "./modules/brands/brands.routes.js";
 // Categorias
