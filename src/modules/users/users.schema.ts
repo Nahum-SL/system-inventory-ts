@@ -1,6 +1,6 @@
 import { z } from "zod";
+import { passwordSchema } from "../../shared/schemas/password.schema.js";
 
-/** Datos para crear una cuenta. Solo un administrador puede hacerlo. */
 export const createUserSchema = z.object({
   personaId: z
     .number({ error: "La persona es obligatoria y debe ser un número" })
@@ -16,13 +16,24 @@ export const createUserSchema = z.object({
       /^[a-z0-9._-]+$/,
       "El usuario solo puede tener letras, números, punto, guion y guion bajo",
     ),
-  password: z
-    .string()
-    .min(12, "La contraseña debe tener al menos 12 caracteres")
-    .refine((v) => Buffer.byteLength(v, "utf8") <= 72, {
-      message: "La contraseña no puede superar los 72 bytes",
-    }),
+  password: passwordSchema,
   rol: z.enum(["admin", "usuario"]),
 });
 
+/** Cambio de rol y/o estado. Se debe enviar al menos un campo. */
+export const updateUserSchema = z
+  .object({
+    rol: z.enum(["admin", "usuario"]).optional(),
+    activo: z.boolean().optional(),
+  })
+  .refine((data) => Object.keys(data).length > 0, {
+    message: "Debes enviar al menos un campo para actualizar",
+    path: ["body"],
+  });
+
+/** Restablecimiento de contraseña por un administrador. */
+export const resetPasswordSchema = z.object({ password: passwordSchema });
+
 export type CreateUserInput = z.infer<typeof createUserSchema>;
+export type UpdateUserInput = z.infer<typeof updateUserSchema>;
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
