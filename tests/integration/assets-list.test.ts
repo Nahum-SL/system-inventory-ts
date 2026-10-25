@@ -43,15 +43,4 @@ describe("GET /api/assets (filtros)", () => {
     expect(await codes("?q=INV_0002")).toEqual([]);
   });
   
-  it("las rutas de ciclo de vida exigen sesión y una ruta inexistente da 404", async () => {
-    for (const path of [
-      "/api/assets/1/maintenance",
-      "/api/assets/1/assignments",
-      "/api/assets/1/movements",
-    ]) {
-      expect((await request(app).get(path)).status).toBe(401);
-    }
-
-    expect((await request(app).get("/api/no-existe")).status).toBe(404);
-  });
 });

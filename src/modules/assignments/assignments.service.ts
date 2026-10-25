@@ -16,7 +16,7 @@ import type { Assignment } from "./assignments.types.js";
 import type {
   CreateAssignmentInput,
   ReturnAssignmentInput,
-} from "./assignments.shema.js";
+} from "./assignments.schema.js";
 
 const ALREADY_ASSIGNED =
   "El activo ya tiene una asignación pendiente de devolución";

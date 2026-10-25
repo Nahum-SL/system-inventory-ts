@@ -10,7 +10,7 @@ import type { Maintenance } from "./maintenance.types.js";
 import type {
   CloseMaintenanceInput,
   CreateMaintenanceInput,
-} from "./maintenance.shema.js";
+} from "./maintenance.schema.js";
 
 const OPEN_MESSAGE = "El activo ya tiene un mantenimiento en curso";
 

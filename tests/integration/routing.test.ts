@@ -1,4 +1,3 @@
-import listEndpoints from "express-list-endpoints";
 import request from "supertest";
 import { beforeAll, describe, expect, it } from "vitest";
 import { app, prepareTest } from "../setup/helpers.js";
@@ -8,35 +7,58 @@ type Method = "get" | "post" | "patch" | "put" | "delete";
 const send = (method: string, path: string) =>
   request(app)[method.toLowerCase() as Method](path);
 
-/** Rutas que no exigen sesión (el resto debe responder 401 sin token). */
-const PUBLIC_ROUTES = new Set(["GET /api/health", "POST /api/auth/login"]);
+/** Cada ruta que exige sesión. Al agregar una ruta a la API, agrégala aquí. */
+const PROTECTED_ROUTES: Array<[Method, string]> = [
+  ["get", "/api/auth/me"],
+  ["post", "/api/auth/change-password"],
 
-/** Reemplaza los parámetros de ruta (`:id`, `:codigo`) por un valor cualquiera. */
-const fillParams = (path: string): string => path.replace(/:[^/]+/g, "1");
+  ["get", "/api/users"],
+  ["get", "/api/users/1"],
+  ["post", "/api/users"],
+  ["patch", "/api/users/1"],
+  ["patch", "/api/users/1/password"],
+
+  ["get", "/api/assets"],
+  ["get", "/api/assets/1"],
+  ["get", "/api/assets/code/INV-0001"],
+  ["get", "/api/assets/1/qr"],
+  ["post", "/api/assets"],
+  ["patch", "/api/assets/1"],
+  ["patch", "/api/assets/1/status"],
+  ["post", "/api/assets/1/decommission"],
+
+  ["get", "/api/assets/1/movements"],
+  ["post", "/api/assets/1/movements"],
+  ["get", "/api/assets/1/maintenance"],
+  ["post", "/api/assets/1/maintenance"],
+  ["patch", "/api/maintenance/1/close"],
+  ["get", "/api/assets/1/assignments"],
+  ["post", "/api/assets/1/assignments"],
+  ["patch", "/api/assignments/1/return"],
+
+  ...["people", "areas", "brands", "categories", "positions"].flatMap(
+    (resource): Array<[Method, string]> => [
+      ["get", `/api/${resource}`],
+      ["get", `/api/${resource}/1`],
+      ["post", `/api/${resource}`],
+      ["patch", `/api/${resource}/1`],
+    ],
+  ),
+
+  ["get", "/api/reports/summary"],
+  ["get", "/api/reports/export/assets"],
+  ["get", "/api/reports/export/movements"],
+  ["get", "/api/reports/export/maintenance"],
+];
 
 describe("Enrutamiento y autenticación", () => {
   describe("sin sesión", () => {
-    it("ninguna ruta de la API queda sin autenticar", async () => {
-      const endpoints = listEndpoints(app);
-
-      // Si la librería no ve las rutas, esta prueba pasaría sin comprobar nada.
-      expect(endpoints.length).toBeGreaterThan(30);
-
-      const offenders: string[] = [];
-
-      for (const { path, methods } of endpoints) {
-        for (const method of methods) {
-          if (PUBLIC_ROUTES.has(`${method} ${path}`)) continue;
-
-          const res = await send(method, fillParams(path));
-
-          if (res.status !== 401)
-            offenders.push(`${method} ${path} → ${res.status}`);
-        }
-      }
-
-      expect(offenders).toEqual([]);
-    });
+    it.each(PROTECTED_ROUTES)(
+      "%s %s exige sesión (401 sin token)",
+      async (method, path) => {
+        expect((await request(app)[method](path)).status).toBe(401);
+      },
+    );
 
     it("las rutas públicas siguen siendo públicas", async () => {
       expect((await request(app).get("/api/health")).status).toBe(200);

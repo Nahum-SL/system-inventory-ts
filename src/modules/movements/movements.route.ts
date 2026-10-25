@@ -10,7 +10,8 @@ import { createMovement, getMovementHistory } from "./movements.controller.js";
 
 const movementsRoutes = Router();
 
-movementsRoutes.use(authenticate);
+// Router montado en la raíz de /api: cada ruta declara su propia autenticación.
+// Un use(authenticate) aquí interceptaría también las rutas inexistentes (401 en vez de 404).
 
 movementsRoutes.get("/assets/:id/movements", authenticate, getMovementHistory);
 

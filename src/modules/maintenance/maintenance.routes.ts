@@ -13,11 +13,11 @@ import {
 import {
   createMaintenanceSchema,
   closeMaintenanceSchema,
-} from "./maintenance.shema.js";
+} from "./maintenance.schema.js";
 
 const maintenanceRoutes = Router();
 
-maintenanceRoutes.use(authenticate);
+// Router montado en la raíz de /api: cada ruta declara su propia autenticación.
 
 maintenanceRoutes.get(
   "/assets/:id/maintenance",
