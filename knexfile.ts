@@ -8,10 +8,18 @@ dotenv.config();
  * @param name
  * @returns
  */
-function required(name: string): string {
+function required(name: string, { allowEmpty = false } = {}): string {
   const value = process.env[name];
-  if (!value) throw new Error(`Falta la variable de entorno ${name}`);
+
+  if (value === undefined || (!allowEmpty && value === "")) {
+    throw new Error(`Falta la variable de entorno ${name}`);
+  }
+
   return value;
+}
+
+if (process.env.NODE_ENV !== "production") {
+  dotenv.config({ quiet: true });
 }
 
 // Configuración de Knex para diferentes entornos
@@ -24,7 +32,7 @@ const config: { [key: string]: Knex.Config } = {
         charset: "utf8mb4",
         database: required("DB_NAME"),
         user: required("DB_USER"),
-        password: required("DB_PASSWORD"),
+        password: required("DB_PASSWORD", { allowEmpty: true }),
         host: required("DB_HOST"),
         port: Number(required("DB_PORT")),
       },
