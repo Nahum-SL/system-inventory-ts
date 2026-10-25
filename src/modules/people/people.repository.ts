@@ -1,4 +1,5 @@
 import db from "../../database/knex.js";
+import { escapeLike } from "../../shared/utils/escapeLike.js";
 
 //types
 import type {
@@ -78,7 +79,7 @@ export class PeopleRepository {
     });
 
     if (filters.q) {
-      const term = `%${filters.q.trim()}%`;
+      const term = `%${escapeLike(filters.q.trim())}%`;
 
       query.where((builder) => {
         builder

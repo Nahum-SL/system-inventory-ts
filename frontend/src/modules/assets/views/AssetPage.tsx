@@ -1,14 +1,15 @@
-import { useState, type ReactNode } from "react";
-import { useDebounce } from "@/shared/hooks/useDebounce";
-// COMPONENT UI
+import type { ReactNode } from "react";
+import { SearchX } from "lucide-react";
+// COMPONENTS - ATOMICOS
+import Alert from "@/shared/components/ui/Alert";
 import Spinner from "@/shared/components/Spinner";
-// ASSET COMPONENTS
-import AssetFilters from "../components/AssetFilters";
+import { EmptyState } from "@/shared/components/ui/states/EmptyState";
+// COMPONENTS - ASSETS
+import AssetFiltersBar from "../components/AssetFilters";
 import AssetListItem from "../components/AssetListItem";
 // HOOKS
+import { useAssetFilters } from "../hooks/useAssetFilters";
 import { useAssets } from "../hooks/useAsset";
-// TYPES
-import type { AssetStatus } from "../types";
 
 interface Props {
   basePath: string;
@@ -16,11 +17,9 @@ interface Props {
 }
 
 export default function AssetsPage({ basePath, headerAction }: Props) {
-  const [q, setQ] = useState("");
-  const [estado, setEstado] = useState<AssetStatus | "">("");
-  const debouncedQ = useDebounce(q.trim());
-
-  const { data, isPending, error } = useAssets({ q: debouncedQ, estado });
+  const { filters, text, onSearch, update, clear, hasActive } =
+    useAssetFilters();
+  const { data, isPending, error } = useAssets(filters);
 
   return (
     <section className="space-y-4">
@@ -28,20 +27,32 @@ export default function AssetsPage({ basePath, headerAction }: Props) {
         <h1 className="text-xl font-semibold">Activos</h1>
         {headerAction}
       </div>
-      
-      <AssetFilters
-        q={q}
-        estado={estado}
-        onQChange={setQ}
-        onEstadoChange={setEstado}
+
+      <AssetFiltersBar
+        filters={filters}
+        text={text}
+        hasActive={hasActive}
+        onSearch={onSearch}
+        onChange={update}
+        onClear={clear}
       />
 
       {isPending && <Spinner />}
-      {error && (
-        <p className="rounded-md bg-red-50 p-3 text-red-700">{error.message}</p>
+      {error && <Alert>{error.message}</Alert>}
+
+      {data && data.length === 0 && (
+        <EmptyState
+          icon={SearchX}
+          title={hasActive ? "Sin resultados" : "Aún no hay activos"}
+          description={
+            hasActive
+              ? "Prueba con otros filtros o límpialos."
+              : "Registra el primero desde «Nuevo activo»."
+          }
+        />
       )}
 
-      {data && (
+      {data && data.length > 0 && (
         <>
           <p className="text-sm text-slate-500">{data.length} resultado(s)</p>
           <ul className="space-y-2">

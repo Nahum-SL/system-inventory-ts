@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Link, useParams } from "react-router";
+import { Link, useParams, useLocation } from "react-router";
 // Componente de estilo de carga
 import Spinner from "@/shared/components/Spinner";
 // Manejo de erro HTTP
@@ -15,6 +15,7 @@ import type { AssetCard } from "../types";
 
 interface Props {
   actions?: (asset: AssetCard) => ReactNode;
+  backTo?: string;
 }
 
 function Row({ label, value }: { label: string; value: string }) {
@@ -29,9 +30,12 @@ function Row({ label, value }: { label: string; value: string }) {
 const sectionTitle =
   "mb-1 text-sm font-semibold uppercase tracking-wide text-slate-500";
 
-export default function AssetCardPage({ actions }: Props) {
+export default function AssetCardPage({ actions, backTo }: Props) {
   const { codigo = "" } = useParams();
   const { data: asset, isPending, error } = useAssetCard(codigo);
+
+  const { state } = useLocation();
+  const back = `${backTo}${(state as { listSearch?: string } | null)?.listSearch ?? ""}`;
 
   if (isPending) return <Spinner />;
 
@@ -55,7 +59,7 @@ export default function AssetCardPage({ actions }: Props) {
         <h1 className="font-semibold">{title}</h1>
         <p className="text-sm">{error.message}</p>
         <Link
-          to="/admin/activos"
+          to={back}
           className="inline-block text-sm text-blue-700 underline"
         >
           Volver a la lista
@@ -66,6 +70,10 @@ export default function AssetCardPage({ actions }: Props) {
 
   return (
     <article className="space-y-4">
+      <Link to={back} className="text-sm text-blue-700 underline">
+        ← Activos
+      </Link>
+
       <header className="flex items-start justify-between gap-3">
         <div>
           <h1 className="font-mono text-2xl font-bold">

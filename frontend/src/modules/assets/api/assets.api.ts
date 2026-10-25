@@ -23,8 +23,12 @@ import type {
  */
 export const listAssets = async (filters: AssetFilters): Promise<Asset[]> => {
   const params = new URLSearchParams();
+
+  // VALIDACION POR URL
   if (filters.q) params.set("q", filters.q);
   if (filters.estado) params.set("estado", filters.estado);
+  if (filters.asignacion) params.set("asignacion", filters.asignacion);
+
   const qs = params.toString();
 
   return (await api.get<ListResponse<Asset>>(`/assets${qs ? `?${qs}` : ""}`))
@@ -58,4 +62,3 @@ export const getMovementHistory = async (
   id: number,
 ): Promise<MovementRecord[]> =>
   (await api.get<ListResponse<MovementRecord>>(`/assets/${id}/movements`)).data;
-

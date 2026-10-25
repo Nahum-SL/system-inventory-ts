@@ -4,8 +4,6 @@ import Alert from "@/shared/components/ui/Alert";
 import Button from "@/shared/components/ui/Buttons/button";
 import Spinner from "@/shared/components/Spinner";
 import { controlClass } from "@/shared/components/ui/Buttons/style.button";
-// Hooks
-import { useDebounce } from "@/shared/hooks/useDebounce";
 // Modulo Asset
 import {
   AssetFiltersBar,
@@ -14,18 +12,19 @@ import {
   useAssets,
   LABEL_SIZES,
   type Asset,
-  type AssetStatus,
   type LabelSizeId,
+  useAssetFilters,
 } from "@/modules/assets";
 
 export default function LabelsPage() {
-  const [q, setQ] = useState("");
-  const [estado, setEstado] = useState<AssetStatus | "">("");
+
+  // Borra los estados q y estado, debouncedQ y los imports de useState de AssetStatus y useDebounce:
+
   const [size, setSize] = useState<LabelSizeId>("pequena");
   const [selected, setSelected] = useState<Map<number, Asset>>(new Map());
 
-  const debouncedQ = useDebounce(q.trim());
-  const { data, isPending, error } = useAssets({ q: debouncedQ, estado });
+  const { filters, text, onSearch, update, clear, hasActive } = useAssetFilters();
+  const { data, isPending, error } = useAssets(filters);
 
   const chosen = [...selected.values()];
   const qrs = useAssetQrs(chosen.map((a) => a.id));
@@ -54,10 +53,12 @@ export default function LabelsPage() {
         <h1 className="text-xl font-semibold">Etiquetas QR</h1>
 
         <AssetFiltersBar
-          q={q}
-          estado={estado}
-          onQChange={setQ}
-          onEstadoChange={setEstado}
+          filters={filters}
+          text={text}
+          hasActive={hasActive}
+          onSearch={onSearch}
+          onChange={update}
+          onClear={clear}
         />
 
         <div className="flex flex-wrap items-center gap-2">

@@ -1,4 +1,5 @@
 import db from "../../database/knex.js";
+import { escapeLike } from "../../shared/utils/escapeLike.js";
 
 // Types necesarios para la clase
 import type {
@@ -110,18 +111,17 @@ export class AssetsRepository {
     }
 
     if (filters.q?.trim()) {
-      const term = `%${filters.q.trim()}%`;
+      const term = `%${escapeLike(filters.q.trim())}%`;
 
       query.where((builder) => {
         builder
-          .whereLike("a.codigo_inventario", term)
-          .orWhereLike("a.descripcion", term)
-          .orWhereLike("m.nombre", term)
-          .orWhereLike("c.nombre", term)
-          .orWhereLike("ar.nombre", term);
+          .where("a.codigo_inventario", "like", term)
+          .orWhere("a.descripcion", "like", term)
+          .orWhere("m.nombre", "like", term)
+          .orWhere("c.nombre", "like", term)
+          .orWhere("ar.nombre", "like", term);
       });
     }
-
     // Almacena lo consulta en la constante rows
     // Retornando las celdas mapeadas
     const rows = await query;

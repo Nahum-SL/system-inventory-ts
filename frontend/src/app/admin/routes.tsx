@@ -45,7 +45,10 @@ export const adminRoutes: RouteObject = {
         {
           path: "activos/:codigo",
           element: (
-            <AssetCardPage actions={(a) => <AssetActions asset={a} />} />
+            <AssetCardPage
+              backTo="/admin/activos"
+              actions={(a) => <AssetActions asset={a} />}
+            />
           ),
         },
         {

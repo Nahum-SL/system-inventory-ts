@@ -3,8 +3,10 @@ export { default as AssetsPage } from "./views/AssetPage";
 export { default as AssetCardPage } from "./views/AssetCardPage";
 // COMPONENTS
 export { default as StatusBadge } from "./components/StatusBadge";
+export { default as AssetFiltersBar } from "./components/AssetFilters";
 // HOOKS
 export { useAssets } from "./hooks/useAsset";
+export { useAssetFilters } from "./hooks/useAssetFilters";
 // MODALS
 export { default as ChangeStatusModal } from "./components/actions/ChangeStatusModal";
 export { default as DecommissionModal } from "./components/actions/DecommissionModal";
@@ -19,9 +21,9 @@ export { default as CreateAssetForm } from "./components/forms/CreateAssetForm";
 // UTILS
 export { assetKeys } from "./utils/asset-query-keys";
 export { STATUS_LABELS } from "./utils/status";
+export { buildAssetsLink } from "./utils/filters";
 // TYPES
 export type { AssetCard, AssetStatus } from "./types";
-export { default as AssetFiltersBar } from "./components/AssetFilters";
 export { useAssetQrs } from "./hooks/useAssetQrs";
 // types
 export type { Asset } from "./types";

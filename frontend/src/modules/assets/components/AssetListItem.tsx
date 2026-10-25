@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 import type { Asset } from "../types";
 import StatusBadge from "./StatusBadge";
 
@@ -8,9 +8,12 @@ interface Props {
 }
 
 export default function AssetListItem({ asset, basePath }: Props) {
+  const { search } = useLocation();
+
   return (
     <Link
       to={`${basePath}/${encodeURIComponent(asset.codigoInventario)}`}
+      state={{ listSearch: search }}
       className="block rounded-lg border border-slate-200 bg-white p-3 
       transition hover:border-brand-400 hover:shadow-sm"
     >

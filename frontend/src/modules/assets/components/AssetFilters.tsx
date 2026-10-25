@@ -1,42 +1,82 @@
-import type { AssetStatus } from "../types";
+import { controlClass } from "@/shared/components/ui/Buttons/style.button";
+import type { AssetFilters, AssetStatus, AssignmentFilter } from "../types";
+import { ASSET_STATUSES, ASSIGNMENT_LABELS } from "../utils/filters";
 import { STATUS_LABELS } from "../utils/status";
 
 interface Props {
-  q: string;
-  estado: AssetStatus | "";
-  onQChange: (value: string) => void;
-  onEstadoChange: (value: AssetStatus | "") => void;
+  filters: AssetFilters;
+  text: string;
+  hasActive: boolean;
+  onSearch: (value: string) => void;
+  onChange: (patch: Partial<AssetFilters>) => void;
+  onClear: () => void;
 }
 
-export default function AssetFilters({
-  q,
-  estado,
-  onQChange,
-  onEstadoChange,
+export default function AssetFiltersBar({
+  filters,
+  text,
+  hasActive,
+  onSearch,
+  onChange,
+  onClear,
 }: Props) {
   return (
-    <div className="flex flex-col gap-2 sm:flex-row">
+    <div className="space-y-2">
       <input
         type="search"
-        value={q}
-        onChange={(e) => onQChange(e.target.value)}
+        value={text}
+        onChange={(e) => onSearch(e.target.value)}
         placeholder="Buscar por código, descripción, marca, área…"
-        className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 
-        outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+        className={controlClass}
       />
-      <select
-        value={estado}
-        onChange={(e) => onEstadoChange(e.target.value as AssetStatus | "")}
-        className="rounded-md border border-slate-300 bg-white px-3 py-2 
-        outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
-      >
-        <option value="">Todos los estados</option>
-        {(Object.keys(STATUS_LABELS) as AssetStatus[]).map((s) => (
-          <option key={s} value={s}>
-            {STATUS_LABELS[s]}
-          </option>
-        ))}
-      </select>
+
+      <div className="flex flex-wrap items-center gap-2">
+        <select
+          aria-label="Filtrar por estado"
+          value={filters.estado ?? ""}
+          onChange={(e) =>
+            onChange({
+              estado: ASSET_STATUSES.find(
+                (s: AssetStatus) => s === e.target.value,
+              ),
+            })
+          }
+          className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
+        >
+          <option value="">Todos los estados</option>
+          {ASSET_STATUSES.map((s) => (
+            <option key={s} value={s}>
+              {STATUS_LABELS[s]}
+            </option>
+          ))}
+        </select>
+
+        <select
+          aria-label="Filtrar por responsable"
+          value={filters.asignacion ?? ""}
+          onChange={(e) =>
+            onChange({
+              asignacion: (
+                Object.keys(ASSIGNMENT_LABELS) as AssignmentFilter[]
+              ).find((a) => a === e.target.value),
+            })
+          }
+          className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
+        >
+          <option value="">Con o sin responsable</option>
+          {(Object.keys(ASSIGNMENT_LABELS) as AssignmentFilter[]).map((a) => (
+            <option key={a} value={a}>
+              {ASSIGNMENT_LABELS[a]}
+            </option>
+          ))}
+        </select>
+
+        {hasActive && (
+          <button onClick={onClear} className="text-sm text-blue-700 underline">
+            Limpiar filtros
+          </button>
+        )}
+      </div>
     </div>
   );
 }

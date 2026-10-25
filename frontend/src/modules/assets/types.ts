@@ -30,9 +30,11 @@ export interface AssetCard extends Asset {
   } | null;
 }
 
+export type AssignmentFilter = "asignado" | "libre";
 export interface AssetFilters {
-  q?: string;
-  estado?: AssetStatus | "";
+  q: string;
+  estado?: AssetStatus;
+  asignacion?: AssignmentFilter;
 }
 
 export interface AssignmentRecord {

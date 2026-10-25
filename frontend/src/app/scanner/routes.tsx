@@ -10,7 +10,12 @@ export const scannerRoutes: RouteObject = {
     { path: "activos", element: <AssetsPage basePath="/activos" /> },
     {
       path: "activos/:codigo",
-      element: <AssetCardPage actions={(a) => <AdminShortcut asset={a} />} />,
+      element: (
+        <AssetCardPage
+          backTo="/activos"
+          actions={(a) => <AdminShortcut asset={a} />}
+        />
+      ),
     },
   ],
 };
