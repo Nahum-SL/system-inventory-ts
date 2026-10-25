@@ -44,6 +44,7 @@ import { NotFoundError } from "./shared/errors/AppError.js";
 // Importa el middleware de manejo de errores
 import { errorHandler } from "./shared/middlewares/error.middleware.js";
 import { env } from "./config/env.js";
+import reportsRoutes from "./modules/reports/reports.routes.js";
 
 // APLICACION
 const app = express();
@@ -95,6 +96,7 @@ app.use("/api/areas", areasRoutes);
 app.use("/api/brands", brandsRoutes);
 app.use("/api/categories", categoriesRoutes);
 app.use("/api/positions", positionsRoutes);
+app.use("/api/reports", reportsRoutes);
 
 // Módulos con rutas completas (/assets/:id/..., /maintenance/:id/close, etc.)
 app.use("/api", movementsRoutes);

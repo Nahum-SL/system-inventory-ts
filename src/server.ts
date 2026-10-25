@@ -29,6 +29,7 @@ import positionsRoutes from "./modules/positions/positions.routes.js";
 import app from "./app.js";
 import { env } from "./config/env.js";
 import db from "./database/knex.js";
+import reportsRoutes from "./modules/reports/reports.routes.js";
 
 // Inicia el servidor en el puerto especificado en las variables de entorno
 const server = app.listen(env.PORT, () => {
@@ -49,6 +50,7 @@ const server = app.listen(env.PORT, () => {
       ...collectRoutes(brandsRoutes, "/api/brands"),
       ...collectRoutes(categoriesRoutes, "/api/categories"),
       ...collectRoutes(positionsRoutes, "/api/positions"),
+      ...collectRoutes(reportsRoutes, "/api/reports"),
 
       ...collectRoutes(movementsRoutes, "/api"),
       ...collectRoutes(maintenanceRoutes, "/api"),
