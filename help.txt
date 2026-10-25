@@ -1,3 +1,39 @@
+Flujo de trabajo
+
+=================
+Entorno development
+=================
+inicia el backend
+``` bash
+pnpm dev
+```
+
+inicia el frontend
+``` bash
+pnpm dev:frontend
+```
+
+=================
+Entorno testing
+=================
+``` bash
+pnpm test
+pnpm test:watch
+```
+
+=================
+Entorno production
+=================
+``` bash
+pnpm start
+pnpm start:prod
+
+```
+
+
+
+
+
 creacion del frontend con vite
 
 pnpm create vite frontend --template react-ts
