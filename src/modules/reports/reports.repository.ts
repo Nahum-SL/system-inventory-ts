@@ -3,6 +3,10 @@ import db from "../../database/knex.js";
 import type {
   CountByName,
   DashboardTotals,
+  ExportRange,
+  MaintenanceExportRow,
+  MovementExportRow,
+  OpenAssignmentInfo,
   RecentMovement,
 } from "./reports.types.js";
 
@@ -115,6 +119,105 @@ export class ReportsRepository {
       areaDestinoNombre: String(r.areaDestinoNombre),
       username: String(r.username),
       fechaMovimiento: String(r.fechaMovimiento),
+    }));
+  }
+
+  /** Todas las asignaciones abiertas, indexadas por activo. */
+  async findOpenAssignments(): Promise<Map<number, OpenAssignmentInfo>> {
+    const rows = await db("asignaciones as asi")
+      .innerJoin("personas as p", "p.id", "asi.persona_id")
+      .innerJoin("cargos as c", "c.id", "asi.cargo_id")
+      .select({
+        activoId: "asi.activo_id",
+        nombres: "p.nombres",
+        apellidos: "p.apellidos",
+        cargo: "c.nombre",
+        desde: "asi.fecha_inicio",
+      })
+      .whereNull("asi.fecha_fin");
+
+    return new Map(
+      (rows as Row[]).map((r) => [
+        Number(r.activoId),
+        {
+          responsable: `${String(r.apellidos)}, ${String(r.nombres)}`,
+          cargo: String(r.cargo),
+          desde: String(r.desde).slice(0, 10),
+        },
+      ]),
+    );
+  }
+
+  /** Historial de traslados (incluye activos dados de baja). */
+  async findMovementsForExport(
+    range: ExportRange,
+  ): Promise<MovementExportRow[]> {
+    const query = db("movimientos as mv")
+      .innerJoin("activos as a", "a.id", "mv.activo_id")
+      .leftJoin("areas as origen", "origen.id", "mv.area_origen_id")
+      .innerJoin("areas as destino", "destino.id", "mv.area_destino_id")
+      .innerJoin("usuarios as u", "u.id", "mv.usuario_id")
+      .select({
+        fecha: "mv.fecha_movimiento",
+        codigo: "a.codigo_inventario",
+        descripcion: "a.descripcion",
+        origen: "origen.nombre",
+        destino: "destino.nombre",
+        usuario: "u.username",
+        motivo: "mv.motivo",
+      })
+      .orderBy("mv.fecha_movimiento", "desc")
+      .orderBy("mv.id", "desc");
+
+    if (range.desde)
+      query.where("mv.fecha_movimiento", ">=", `${range.desde} 00:00:00`);
+    if (range.hasta)
+      query.whereRaw("mv.fecha_movimiento < DATE_ADD(?, INTERVAL 1 DAY)", [
+        range.hasta,
+      ]);
+
+    return ((await query) as Row[]).map((r) => ({
+      fecha: String(r.fecha),
+      codigo: String(r.codigo),
+      descripcion: String(r.descripcion),
+      origen: r.origen == null ? null : String(r.origen),
+      destino: String(r.destino),
+      usuario: String(r.usuario),
+      motivo: r.motivo == null ? null : String(r.motivo),
+    }));
+  }
+
+  /** Historial de mantenimientos (incluye activos dados de baja). */
+  async findMaintenanceForExport(
+    range: ExportRange,
+  ): Promise<MaintenanceExportRow[]> {
+    const query = db("mantenimientos as m")
+      .innerJoin("activos as a", "a.id", "m.activo_id")
+      .select({
+        codigo: "a.codigo_inventario",
+        descripcion: "a.descripcion",
+        tipo: "m.tipo",
+        fecha: "m.fecha",
+        fechaFin: "m.fecha_fin",
+        detalle: "m.descripcion",
+        observaciones: "m.observaciones",
+        costo: "m.costo",
+      })
+      .orderBy("m.fecha", "desc")
+      .orderBy("m.id", "desc");
+
+    if (range.desde) query.where("m.fecha", ">=", range.desde);
+    if (range.hasta) query.where("m.fecha", "<=", range.hasta);
+
+    return ((await query) as Row[]).map((r) => ({
+      codigo: String(r.codigo),
+      descripcion: String(r.descripcion),
+      tipo: String(r.tipo),
+      fecha: String(r.fecha).slice(0, 10),
+      fechaFin: r.fechaFin == null ? null : String(r.fechaFin).slice(0, 10),
+      detalle: String(r.detalle),
+      observaciones: r.observaciones == null ? null : String(r.observaciones),
+      costo: Number(r.costo),
     }));
   }
 }

@@ -30,3 +30,40 @@ export interface DashboardSummary {
   byCategory: CountByName[];
   recentMovements: RecentMovement[];
 }
+
+export interface ExportRange {
+  desde?: string;
+  hasta?: string;
+}
+
+export interface OpenAssignmentInfo {
+  responsable: string;
+  cargo: string;
+  desde: string;
+}
+
+export interface MovementExportRow {
+  fecha: string;
+  codigo: string;
+  descripcion: string;
+  origen: string | null;
+  destino: string;
+  usuario: string;
+  motivo: string | null;
+}
+
+export interface MaintenanceExportRow {
+  codigo: string;
+  descripcion: string;
+  tipo: string;
+  fecha: string;
+  fechaFin: string | null;
+  detalle: string;
+  observaciones: string | null;
+  costo: number;
+}
+
+export interface CsvFile {
+  filename: string;
+  content: string;
+}
