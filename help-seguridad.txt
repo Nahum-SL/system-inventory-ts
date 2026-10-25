@@ -1,0 +1,20 @@
+
+
+``` Powershell
+New-Item -ItemType Directory -Force C:\tools\nssm | Out-Null
+Invoke-WebRequest https://nssm.cc/release/nssm-2.24.zip -OutFile $env:TEMP\nssm.zip
+Expand-Archive $env:TEMP\nssm.zip -DestinationPath $env:TEMP\nssm -Force
+Copy-Item $env:TEMP\nssm\nssm-2.24\win64\nssm.exe C:\tools\nssm\nssm.exe
+C:\tools\nssm\nssm.exe version
+```
+
+2
+cd C:\Users\salaz\NahumSL\senati\e-yonda-ts <- RUTA DONDE ESTA EL PROYECTO
+Test-Path .\ops\windows\install-service.ps1  <- Si da False pasar al 3.
+
+3.
+powershell -ExecutionPolicy Bypass -File .\ops\windows\install-service.ps1
+
+4. Detener la operacion
+C:\tools\nssm\nssm.exe stop SystemInventory
+C:\tools\nssm\nssm.exe remove SystemInventory confirm

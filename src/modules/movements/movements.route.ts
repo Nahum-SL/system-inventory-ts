@@ -12,10 +12,11 @@ const movementsRoutes = Router();
 
 movementsRoutes.use(authenticate);
 
-movementsRoutes.get("/assets/:id/movements", getMovementHistory);
+movementsRoutes.get("/assets/:id/movements", authenticate, getMovementHistory);
 
 movementsRoutes.post(
   "/assets/:id/movements",
+  authenticate,
   authorize("admin"),
   validate(createMovementSchema),
   createMovement,

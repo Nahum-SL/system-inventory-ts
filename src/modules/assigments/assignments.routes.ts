@@ -20,13 +20,11 @@ const assignmentRoutes = Router();
 // Restringe el ENDPOINT para que lo use solo el usuario Autenticado
 assignmentRoutes.use(authenticate);
 
-// ENDPOINTS
-assignmentRoutes.use(authenticate);
-
-assignmentRoutes.get("/assets/:id/assignments", getAssignmentHistory);
+assignmentRoutes.get("/assets/:id/assignments", authenticate, getAssignmentHistory);
 
 assignmentRoutes.post(
   "/assets/:id/assignments",
+  authenticate,
   authorize("admin"),
   validate(createAssignmentSchema),
   createAssignment,
@@ -34,6 +32,7 @@ assignmentRoutes.post(
 
 assignmentRoutes.patch(
   "/assignments/:id/return",
+  authenticate,
   authorize("admin"),
   validate(returnAssignmentSchema),
   returnAssignment,

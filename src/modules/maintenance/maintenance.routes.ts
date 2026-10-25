@@ -19,10 +19,15 @@ const maintenanceRoutes = Router();
 
 maintenanceRoutes.use(authenticate);
 
-maintenanceRoutes.get("/assets/:id/maintenance", getMaintenanceHistory);
+maintenanceRoutes.get(
+  "/assets/:id/maintenance",
+  authenticate,
+  getMaintenanceHistory,
+);
 
 maintenanceRoutes.post(
   "/assets/:id/maintenance",
+  authenticate,
   authorize("admin"),
   validate(createMaintenanceSchema),
   createMaintenance,
@@ -30,6 +35,7 @@ maintenanceRoutes.post(
 
 maintenanceRoutes.patch(
   "/maintenance/:id/close",
+  authenticate,
   authorize("admin"),
   validate(closeMaintenanceSchema),
   closeMaintenance,

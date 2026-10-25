@@ -24,7 +24,8 @@
     "migrate:latest": "pnpm knex migrate:latest",
     "migrate:rollback": "pnpm knex migrate:rollback",
     "migrate:status": "pnpm knex migrate:status",
-    "backup:db": "powershell -NoProfile -ExecutionPolicy Bypass -File ops/backup/backup-db.ps1"
+    "backup:db": "powershell -NoProfile -ExecutionPolicy Bypass -File ops/backup/backup-db.ps1",
+    "smoke": "node ops/smoke.mjs"
   },
   "keywords": [],
   "author": "",

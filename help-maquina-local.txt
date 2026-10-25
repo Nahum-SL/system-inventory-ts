@@ -1,0 +1,30 @@
+2. En la máquina servidora
+
+Requisitos: Node (misma versión mayor que en tu PC), pnpm, Git y MySQL 8.
+
+IP reservada en el router (reserva DHCP por la MAC de la máquina). 
+Anótala: es el PUBLIC_APP_URL. Un nombre .local es poco fiable en Android, 
+así que para este caso la IP reservada es lo más seguro.
+
+Perfil de red Privado y firewall, con los comandos del README.
+
+MySQL: base system_inventory_prod y el usuario inventario_app (no root).
+
+git clone, git checkout v1.0.0, pnpm install.
+
+.env.production con PUBLIC_APP_URL=http://<ip-reservada>:3000 y CORS_ORIGIN igual. 
+Genera un JWT_SECRET nuevo. JWT_EXPIRES_IN=28800.
+
+pnpm build:all, pnpm migrate:prod, pnpm seed:prod.
+Prueba rápida en primer plano: pnpm start y pnpm smoke desde la misma máquina. 
+Luego detén el proceso.
+
+Instala el servicio (siguiente sección).
+
+pnpm smoke http://<ip>:3000 desde otra máquina o desde un celular: 
+así compruebas el firewall y la red.
+
+Entra como admin, cambia la contraseña en Mi cuenta y borra INITIAL_ADMIN_PASSWORD 
+del .env.production.
+
+Crea la tarea programada de respaldo y ejecuta un respaldo manual con pnpm backup:db.
