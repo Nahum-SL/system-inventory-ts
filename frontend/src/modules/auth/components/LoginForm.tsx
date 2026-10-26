@@ -8,7 +8,7 @@ import {
 import { useLogin } from "../hooks/useLogin";
 
 const inputClass =
-  "mt-1 w-full rounded-md border border-slate-300 px-3 py-2 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100";
+  "mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-800 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100";
 
 export default function LoginForm() {
   const login = useLogin();
@@ -30,9 +30,9 @@ export default function LoginForm() {
       noValidate
       className="w-full max-w-sm space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
     >
-      <h1 className="text-xl font-semibold">Iniciar sesión</h1>
+      <h1 className="text-xl font-semibold text-slate-800 text-center">Iniciar sesión</h1>
 
-      <label className="block text-sm font-medium">
+      <label className="block text-sm text-slate-800 font-medium">
         Usuario
         <input
           className={inputClass}
@@ -48,7 +48,7 @@ export default function LoginForm() {
         )}
       </label>
 
-      <label className="block text-sm font-medium">
+      <label className="block text-sm text-slate-800 font-medium">
         Contraseña
         <input
           className={inputClass}

@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ApiError } from "../../../shared/lib/api-client";
 import { getMe } from "../api/auth.api";
 import type { User } from "@/modules/users/types";
-import { tokenStorage } from "../../../shared/lib/token-storage";
+import { tokenStorage } from "@/shared/lib/token-storage";
 
 export const sessionKey = ["auth", "me"] as const;
 

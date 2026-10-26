@@ -29,7 +29,6 @@
   --font-mono: ui-monospace, Consolas, monospace;
 }
 
-
 @page {
   margin: 8mm;
 }
@@ -40,7 +39,31 @@
    ========================================================= */
 @layer base {
   :root {
-    color-scheme: light; /* la UI es clara: blanco + naranja */
+    color-scheme: light;
+
+    --color-surface: #f8fafc;
+    --color-panel: #ffffff;
+    --color-ink: #0f172a;
+    --color-muted: #64748b;
+    --color-line: #e2e8f0;
+
+    --color-table-header: #fffbeb;
+    --color-table-header-ink: #92400e;
+    --color-table-header-line: #fde68a;
+  }
+
+  :root.dark {
+    color-scheme: dark;
+
+    --color-surface: #111827;
+    --color-panel: #1f2937;
+    --color-ink: #f1f5f9;
+    --color-muted: #94a3b8;
+    --color-line: #374151;
+
+    --color-table-header: #1f2937;
+    --color-table-header-ink: #fcd34d;
+    --color-table-header-line: #475569;
   }
 
   body {
@@ -62,14 +85,14 @@
     color: var(--color-brand-900);
   }
 
-  /* Foco visible accesible para teclado en toda la app */
   :focus-visible {
     outline: 2px solid var(--color-brand-500);
     outline-offset: 2px;
   }
 
-  /* Los códigos de inventario usan fuente monoespaciada */
   code {
     font-family: var(--font-mono);
   }
 }
+
+@custom-variant dark (&:where(.dark, .dark *));

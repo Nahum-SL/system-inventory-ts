@@ -94,7 +94,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 cn(
                   "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all",
                   isActive
-                    ? "bg-sky-500 text-white shadow-lg shadow-blue-900/20"
+                    ? "bg-amber-600 text-white shadow-lg shadow-blue-900/20"
                     : "text-slate-400 hover:bg-slate-800 hover:text-white",
                 )
               }

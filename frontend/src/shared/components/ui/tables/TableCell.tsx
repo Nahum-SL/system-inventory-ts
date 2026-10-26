@@ -15,7 +15,7 @@ export function TableCell({
   return (
     <td
       className={cn(
-        "px-8 py-5 text-slate-600 dark:text-gray-300 font-medium align-middle",
+        "px-4 py-3 text-slate-700 dark:text-slate-200",
         align === "right" && "text-right",
         align === "center" && "text-center",
         className,

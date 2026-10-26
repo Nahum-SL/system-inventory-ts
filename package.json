@@ -25,7 +25,9 @@
     "migrate:rollback": "pnpm knex migrate:rollback",
     "migrate:status": "pnpm knex migrate:status",
     "backup:db": "powershell -NoProfile -ExecutionPolicy Bypass -File ops/backup/backup-db.ps1",
-    "smoke": "node ops/smoke.mjs"
+    "smoke": "node ops/smoke.mjs",
+    "lint:frontend": "pnpm --dir frontend lint",
+    "lint:all": "pnpm lint:frontend"
   },
   "keywords": [],
   "author": "",
@@ -62,6 +64,7 @@
     "@types/qrcode": "^1.5.6",
     "@types/supertest": "^7.2.1",
     "cross-env": "^10.1.0",
+    "eslint": "^10.13.0",
     "express-list-endpoints": "^7.1.1",
     "supertest": "^7.3.1",
     "tsx": "^4.23.15",

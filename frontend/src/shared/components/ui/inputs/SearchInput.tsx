@@ -1,3 +1,4 @@
+import { cn } from "@/shared/lib/utils";
 import { Search, X } from "lucide-react";
 
 interface SearchInputProps {
@@ -16,7 +17,12 @@ export default function SearchInput({
 }: SearchInputProps) {
   return (
     <div
-      className={`flex items-center gap-3 rounded-2xl border border-slate-700/80 bg-slate-900 px-4 py-3 shadow-sm transition-colors focus-within:border-slate-500 focus-within:ring-2 focus-within:ring-slate-500/20 ${className}`}
+      className={cn(
+        `flex items-center gap-3 rounded-2xl border border-slate-700/80 bg-slate-900 px-4 
+        py-3 shadow-sm transition-colors focus-within:border-slate-500 focus-within:ring-2 
+        focus-within:ring-slate-500/20 `,
+        className,
+      )}
     >
       <Search
         size={19}

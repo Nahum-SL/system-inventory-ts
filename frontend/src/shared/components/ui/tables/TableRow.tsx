@@ -16,7 +16,9 @@ export function TableRow({ children, className }: TableRowProps) {
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
       className={cn(
-        "group hover:bg-slate-50/60 dark:hover:bg-gray-800/30 transition-colors will-change-transform",
+        "border-b border-slate-100 transition-colors",
+        "hover:bg-amber-50/60",
+        "dark:border-gray-800 dark:hover:bg-gray-800/70",
         className,
       )}
     >

@@ -1,5 +1,5 @@
 import { Link, Outlet } from "react-router";
-import { useLogout, useSession } from "../modules/auth";
+import { useLogout, useSession } from "@/modules/auth";
 
 export default function AppLayout() {
   const { data: user } = useSession();
