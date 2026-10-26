@@ -1,0 +1,202 @@
+02-operacion-diaria.txt
+System Inventory: operacion diaria, actualizacion y recuperacion
+
+Convencion:
+  =====  Secciones de pasos
+  *****  Comandos para copiar
+  #####  Regla a recordar
+
+Todos los comandos: PowerShell COMO ADMINISTRADOR, dentro de C:\apps\e-yonda-ts
+(ajusta la ruta si instalaste en otra carpeta).
+
+Para escribir solo "nssm" en esta ventana:  $env:Path += ";C:\tools\nssm"
+En este archivo se usa la ruta completa para que funcione siempre.
+
+====================================
+A. REVISION RAPIDA (diaria, 1 minuto)
+====================================
+*******************
+C:\tools\nssm\nssm.exe status SystemInventory            # SERVICE_RUNNING
+Invoke-RestMethod http://localhost:3000/api/health       # status: ok
+Get-Content .\logs\error.log -Tail 20                    # nada nuevo
+Get-ChildItem D:\respaldos\inventario | Sort-Object LastWriteTime -Descending | Select-Object -First 3
+Get-PSDrive C, D | Select-Object Name, @{n='LibreGB';e={[math]::Round($_.Free/1GB,1)}}
+*******************
+
+Debe haber un respaldo de hoy (o de ayer, si aun no son las 18:30) y espacio libre en disco.
+
+====================================
+B. VER LOS REGISTROS
+====================================
+*******************
+Get-Content .\logs\error.log -Tail 50
+Get-Content .\logs\out.log -Tail 50
+Get-Content .\logs\error.log -Tail 20 -Wait     # seguir en vivo (Ctrl+C para salir)
+*******************
+
+Los registros rotan solos al llegar a 5 MB. Los errores nunca muestran contraseñas.
+
+====================================
+C. INICIAR, DETENER Y REINICIAR
+====================================
+*******************
+C:\tools\nssm\nssm.exe start SystemInventory
+C:\tools\nssm\nssm.exe stop SystemInventory
+C:\tools\nssm\nssm.exe restart SystemInventory
+*******************
+
+Reinicia el servicio despues de CUALQUIER cambio en .env.production
+(la app lee las variables solo al arrancar).
+
+Si cambias PUBLIC_APP_URL, los QR ya impresos siguen apuntando a la direccion vieja.
+
+====================================
+D. ACTUALIZAR A UNA VERSION NUEVA
+====================================
+Antes: que la version nueva haya pasado pnpm test en la laptop y tenga su tag (por ejemplo v1.0.1).
+Hazlo fuera de la jornada: hay unos minutos sin servicio.
+
+*******************
+cd C:\apps\e-yonda-ts
+pnpm backup:db
+C:\tools\nssm\nssm.exe stop SystemInventory
+
+git fetch --tags
+git checkout v1.0.1
+pnpm install
+pnpm build:all
+pnpm migrate:prod
+
+C:\tools\nssm\nssm.exe start SystemInventory
+pnpm smoke http://localhost:3000
+*******************
+
+- El respaldo previo NO es opcional: es lo que te permite volver atras si una migracion sale mal.
+- Se detiene el servicio antes de compilar para no servir una mezcla de versiones.
+- Si "git checkout" se queja de cambios locales, NO uses "git reset --hard" sin pensar:
+  no deberia haber cambios (.env.production y logs no se versionan). Avisa y revisa qué cambió.
+- Anota la version instalada y la fecha.
+
+####################
+Orden fijo: respaldo, detener, actualizar, migrar, iniciar, smoke.
+####################
+
+====================================
+E. VOLVER A LA VERSION ANTERIOR
+====================================
+E.1 Si la version nueva NO aplico migraciones (o no hay cambios de base de datos):
+
+*******************
+C:\tools\nssm\nssm.exe stop SystemInventory
+git checkout v1.0.0
+pnpm install
+pnpm build:all
+C:\tools\nssm\nssm.exe start SystemInventory
+pnpm smoke http://localhost:3000
+*******************
+
+E.2 Si la migracion YA se aplico y dejo la base incompatible con el codigo viejo:
+    hay que restaurar el respaldo hecho justo antes de actualizar.
+    ES DESTRUCTIVO: borra lo ingresado desde ese respaldo. Pruebalo primero en restore_test.
+
+*******************
+C:\tools\nssm\nssm.exe stop SystemInventory
+Expand-Archive "D:\respaldos\inventario\<ultimo-respaldo>.sql.zip" -DestinationPath "D:\respaldos\restore" -Force
+mysql -u root -p -e "DROP DATABASE system_inventory_prod; CREATE DATABASE system_inventory_prod CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+cmd /c "mysql -u root -p system_inventory_prod < D:\respaldos\restore\<archivo>.sql"
+git checkout v1.0.0
+pnpm install
+pnpm build:all
+C:\tools\nssm\nssm.exe start SystemInventory
+pnpm smoke http://localhost:3000
+*******************
+
+(El respaldo incluye la tabla knex_migrations, asi que el estado de migraciones queda
+coherente con el codigo viejo. Los permisos del usuario inventario_app se conservan.)
+
+####################
+Nunca ejecutes migrate:rollback en produccion.
+####################
+
+====================================
+F. RESPALDOS
+====================================
+Manual (antes de cada migracion y cuando quieras):
+
+*******************
+pnpm backup:db
+*******************
+
+Automatico: tarea "Respaldo inventario", todos los dias a las 18:30.
+
+*******************
+schtasks /Query /TN "Respaldo inventario" /V /FO LIST      # ultima ejecucion y resultado
+schtasks /Run /TN "Respaldo inventario"                    # ejecutarla ahora
+*******************
+
+Ritmo:
+  Diario    : respaldo automatico (retencion de 30 dias).
+  Semanal   : copia a un lugar FUERA de la maquina (disco externo o carpeta sincronizada).
+  Mensual   : restaurar en restore_test y comprobar los conteos (ver 01, seccion 12.7).
+  Antes de cada migracion: pnpm backup:db.
+
+Si "Resultado de la ultima ejecucion" no es 0, abre el script a mano y mira el error
+(ruta de mysqldump, credenciales en .backup.cnf o disco D: no disponible).
+
+====================================
+G. CUENTAS Y CONTRASEÑAS
+====================================
+Todo desde el panel (Usuarios), nunca desde la base de datos:
+  - Nuevo usuario: la persona debe existir antes en "Personas".
+  - Olvidó su contraseña: boton "Clave" (restablecer). Cierra sus sesiones abiertas.
+    Entregale la clave nueva en persona.
+  - Dejo la empresa: editar y poner "Desactivada". Su sesion se corta en la siguiente accion.
+  - Debe quedar SIEMPRE al menos un administrador activo.
+  - Cada quien cambia su propia contraseña en "Mi cuenta".
+
+Si perdiste TODAS las cuentas de administrador, no hay forma desde la aplicacion:
+   1. Restaura un respaldo reciente (seccion E.2), o
+   2. Con las variables ADMIN_* en .env.production y un usuario NUEVO (ADMIN_USERNAME distinto),
+      ejecuta pnpm seed:prod, y desactiva la cuenta sobrante despues.
+
+====================================
+H. RUTINA
+====================================
+Diaria   : revision rapida (A).
+Semanal  : copia del respaldo fuera de la maquina; mirar logs\error.log; revisar espacio en disco.
+Mensual  : prueba de restauracion; actualizaciones de Windows en horario controlado
+           (reiniciar la maquina y comprobar que el sistema vuelve solo).
+Trimestral: revisar usuarios activos y desactivar los que ya no corresponden;
+            considerar renovar JWT_SECRET (cierra todas las sesiones).
+
+====================================
+I. SI ALGO FALLA
+====================================
+Sintoma                                   Causa probable                     Que hacer
+----------------------------------------  ---------------------------------  ---------------------------------------
+Nadie puede entrar / la pagina no carga   Servicio detenido                  nssm status; nssm start; logs\error.log
+Se detiene al instante tras iniciar       .env.production incompleto o       logs\error.log (nombra la variable);
+                                          puerto 3000 ocupado                netstat -ano | findstr :3000
+"ECONNREFUSED" o "Access denied"          BD apagada o clave distinta        Get-Service de la BD; revisar DB_*
+Funciona en el servidor pero no en el     Perfil de red Publico o            Get-NetConnectionProfile; regla
+celular                                   firewall                           "Inventario 3000"; misma WiFi
+Los QR abren una direccion que no carga   La IP del servidor cambio          Reservar la IP en el router (01, 1.1)
+                                                                             y revisar PUBLIC_APP_URL
+Pantalla en blanco                        frontend\dist no existe            pnpm build:all y reiniciar el servicio
+Todos deben volver a iniciar sesion       Cambio JWT_SECRET o restauraron    Normal; sesion dura 8 horas
+                                          un respaldo viejo
+El respaldo no se genero                  Ruta de mysqldump, .backup.cnf     schtasks /Query (resultado); correr
+                                          o disco D:                         el script a mano y leer el error
+Tras reiniciar la maquina no vuelve       La app arranco antes que la BD     DependOnService (01, seccion 9)
+
+Para pedir ayuda, reune estos tres datos:
+*******************
+C:\tools\nssm\nssm.exe status SystemInventory
+Get-Content .\logs\error.log -Tail 30
+git describe --tags
+*******************
+
+####################
+Regla de oro: respaldo antes de tocar la base de datos, y una restauracion probada
+antes de necesitarla.
+####################
