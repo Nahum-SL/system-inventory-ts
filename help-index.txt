@@ -1,0 +1,32 @@
+Orden en la máquina
+
+Lee help-2-instalacion-maquina.txt completo, para ver el panorama.
+
+Red y equipo: IP reservada en el router, perfil Privado, regla de firewall, y los ajustes de energía y actualizaciones.
+
+Software: Node con el MSI, pnpm, Git y MySQL 8.
+
+Base de datos: el SQL de system_inventory_prod y el usuario inventario_app.
+
+Código y configuración: git clone, git checkout v1.0.0, pnpm install (con devDependencies), .env.production y su icacls.
+
+Build y datos: pnpm build:all, pnpm migrate:prod, pnpm seed:prod.
+
+Prueba en primer plano: pnpm start, pnpm smoke desde la misma máquina, y detener el proceso.
+
+Servicio (help-maquin-local.txt): instalar NSSM, la sección Preparación, install-service.ps1, y comprobar con status y smoke.
+
+Resistencia: pruebas A y B, y el orden de arranque con MySQL (DependOnService).
+
+Desde un celular: pnpm smoke http://<ip>:3000 y escanear una etiqueta de prueba.
+
+
+Seguridad: cambiar la contraseña del admin, borrar INITIAL_ADMIN_PASSWORD y reiniciar el servicio.
+
+Respaldo: configurar la tarea, hacer uno manual y probar la restauración.
+
+Reiniciar la máquina y comprobar que http://<ip>:3000/api/health responde sin abrir ninguna terminal.
+
+====================
+Empieza el piloto.
+====================

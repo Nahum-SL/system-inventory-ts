@@ -39,10 +39,16 @@ Copy-Item $env:TEMP\nssm\nssm-2.24\win64\nssm.exe C:\tools\nssm\nssm.exe
 C:\tools\nssm\nssm.exe version
 ```
 
+Firewall
+```
+Get-NetConnectionProfile
+Set-NetConnectionProfile -InterfaceAlias "Wi-Fi" -NetworkCategory Private
+```
+
 - PREPARACION -
 Powerschell
 ```
-cd C:\Users\salaz\NahumSL\senati\e-yonda-ts <- Ruta del proyecto
+cd C:\apps\e-yonda-ts <- Ruta del proyecto
 ```
 
 # El archivo del script no debe estar vacío (la vez anterior corrió sin hacer nada)
@@ -138,14 +144,8 @@ donde mirarás cuando algo falle en el servidor.
 4 ORDEN DE ARRANQUE CON MYSQL Y REINICIO
 Si al reiniciar el equipo tu app arranca antes que MySQL, 
 falla la conexión. Con el nombre que te mostró Get-Service *mysql* (por ejemplo MySQL80):
+
 ```
 C:\tools\nssm\nssm.exe set SystemInventory DependOnService MySQL80
 C:\tools\nssm\nssm.exe restart SystemInventory
-```
-
-FINAL - LIMPIEZA
-```
-C:\tools\nssm\nssm.exe stop SystemInventory
-C:\tools\nssm\nssm.exe remove SystemInventory confirm
-Remove-NetFirewallRule -DisplayName "Inventario 3000"
 ```

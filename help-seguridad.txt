@@ -1,3 +1,5 @@
+==== SOLO EN MAQUINA DE ENSAYO NO EN PRODUCTION ===
+
 
 
 ``` Powershell
@@ -10,7 +12,7 @@ C:\tools\nssm\nssm.exe version
 
 2
 cd C:\Users\salaz\NahumSL\senati\e-yonda-ts <- RUTA DONDE ESTA EL PROYECTO
-Test-Path .\ops\windows\install-service.ps1  <- Si da False pasar al 3.
+Test-Path .\ops\windows\install-service.ps1  <- Si da False significa que el script no existe y hay que crearlo.
 
 3.
 powershell -ExecutionPolicy Bypass -File .\ops\windows\install-service.ps1
@@ -26,3 +28,12 @@ y luego pnpm smoke http://localhost:3000 debe pasar las 7.
 6.
 Cuando termines el ensayo en la laptop, quita el servicio: 
 C:\tools\nssm\nssm.exe remove SystemInventory confirm.
+
+
+=============================
+FINAL - LIMPIEZA - DESTRUCTIVA PARA LA MAQUINA SERVIDOR
+```
+C:\tools\nssm\nssm.exe stop SystemInventory
+C:\tools\nssm\nssm.exe remove SystemInventory confirm
+Remove-NetFirewallRule -DisplayName "Inventario 3000"
+```

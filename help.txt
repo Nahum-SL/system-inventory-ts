@@ -7,7 +7,6 @@ inicia el backend
 ``` bash
 pnpm dev
 ```
-
 inicia el frontend
 ``` bash
 pnpm dev:frontend
@@ -25,9 +24,10 @@ pnpm test:watch
 Entorno production
 =================
 ``` bash
+pnpm build:all
 pnpm start
-pnpm start:prod
-
+pnpm smoke
+pnpm dev:frontend
 ```
 
 
