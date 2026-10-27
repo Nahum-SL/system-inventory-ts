@@ -10,6 +10,8 @@ import {
 import { DashboardKpiGrid } from "@/modules/reports/components/stats/dashboard-kpi-grid";
 // TYPES
 import type { DashboardStats } from "@/modules/reports/types";
+import SectionHeader from "@/shared/components/ui/SectionHeader";
+import { LayoutDashboard } from "lucide-react";
 
 const assetHref = (codigo: string) =>
   `/admin/activos/${encodeURIComponent(codigo)}`;
@@ -41,7 +43,11 @@ export default function AdminDashboardPage() {
 
   return (
     <section className="space-y-6">
-      <h1 className="text-xl font-semibold">Dashboard</h1>
+      <SectionHeader
+        title="Dashboard"
+        description="Panel de vista sobre los activos.."
+        icon={LayoutDashboard}
+      />
 
       <DashboardKpiGrid stats={stats} />
 

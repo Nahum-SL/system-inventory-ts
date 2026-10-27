@@ -1,8 +1,6 @@
-// UTIL
 import { groupTop } from "../../utils/group-top";
-// TYPES
 import type { DashboardSummary } from "../../types";
-// CHARTS - GRAFICOS
+
 import ChartCard from "./ChartCard";
 import CountBarChart from "./CountBarChart";
 import StatusDonutChart from "./StatusDonutChart";
@@ -15,7 +13,7 @@ export default function DashboardCharts({
   const { totals, byArea, byCategory } = summary;
 
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
+    <div className="grid min-w-0 gap-4 lg:grid-cols-2 lg:gap-5">
       <ChartCard title="Activos por estado">
         <StatusDonutChart
           operativos={totals.operativos}

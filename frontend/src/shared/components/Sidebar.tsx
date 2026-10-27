@@ -120,7 +120,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           </p>
           <button
             onClick={() => logout()}
-            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 font-medium text-slate-400 transition-all hover:bg-slate-800 hover:text-white"
+            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 font-medium 
+            text-slate-400 transition-all hover:bg-slate-800 hover:text-white cursor-pointer"
           >
             <LogOut size={18} />
             Salir

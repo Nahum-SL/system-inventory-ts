@@ -28,7 +28,7 @@ export default function Modal({ open, onClose, title, children }: Props) {
     >
       {open && (
         <div className="space-y-4 p-5">
-          <h2 className="text-lg font-semibold">{title}</h2>
+          <h2 className="text-lg font-semibold ">{title}</h2>
           {children}
         </div>
       )}

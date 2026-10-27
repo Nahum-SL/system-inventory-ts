@@ -1,4 +1,4 @@
-import { Link, type RouteObject } from "react-router";
+import type { RouteObject } from "react-router";
 
 import AdminLayout from "./AdminLayout";
 import AdminRoute from "./AdminRoute";
@@ -33,14 +33,6 @@ export const adminRoutes: RouteObject = {
           element: (
             <AssetsPage
               basePath="/admin/activos"
-              headerAction={
-                <Link
-                  to="/admin/activos/nuevo"
-                  className="rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700"
-                >
-                  Nuevo activo
-                </Link>
-              }
               exportAction={(filters) => (
                 <ExportAssetsButton filters={filters} />
               )}

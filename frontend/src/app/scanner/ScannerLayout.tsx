@@ -36,7 +36,8 @@ export default function ScannerLayout() {
             <button
               type="button"
               onClick={() => logout()}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm transition-colors hover:bg-slate-100 dark:border-gray-700 dark:hover:bg-gray-800"
+              className="rounded-lg border border-slate-300 px-3 py-2 text-sm transition-colors 
+              hover:bg-slate-100 dark:border-gray-700 dark:hover:bg-gray-800 cursor-pointer"
             >
               Salir
             </button>

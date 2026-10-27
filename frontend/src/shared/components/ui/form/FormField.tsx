@@ -8,7 +8,7 @@ interface Props {
 
 export default function FormField({ label, error, children }: Props) {
   return (
-    <label className="block text-sm font-medium">
+    <label className="text-sm font-semibold text-slate-900 dark:text-slate-100">
       {label}
       {children}
       {error && (
@@ -19,3 +19,5 @@ export default function FormField({ label, error, children }: Props) {
     </label>
   );
 }
+
+// text-sm font-semibold text-slate-900 dark:text-slate-100

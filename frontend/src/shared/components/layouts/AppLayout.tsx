@@ -18,7 +18,7 @@ export default function AppLayout() {
             </span>
             <button
               onClick={() => logout()}
-              className="rounded-md border border-slate-300 px-3 py-1.5 hover:bg-slate-100"
+              className="rounded-md border border-slate-300 px-3 py-1.5 hover:bg-slate-100 cursor-pointer"
             >
               Salir
             </button>

@@ -1,31 +1,23 @@
-
 import { useState } from "react";
 
 // COMPONENTES
 import Alert from "@/shared/components/ui/Alert";
 import Button from "@/shared/components/ui/Buttons/button";
 import SearchInput from "@/shared/components/ui/inputs/SearchInput";
-
 // CONSTANTS
 import { NAMED_LABELS } from "../constants/namedLabels";
-
 // COMPONENTS - FORM
 import NamedItemModal from "../components/form/NamedItemModal";
-
 // TABLE
 import NamedItemTable from "../components/tables/named-item-table";
-
 // HOOKS
 import { useNamedCatalog } from "../hooks/use-catalog-queries";
-
 // TYPES
 import type { NamedItem, NamedKind } from "../types";
+import SectionHeader from "@/shared/components/ui/SectionHeader";
+import { Layers } from "lucide-react";
 
-export default function NamedCatalogPage({
-  kind,
-}: {
-  kind: NamedKind;
-}) {
+export default function NamedCatalogPage({ kind }: { kind: NamedKind }) {
   const { plural, singular } = NAMED_LABELS[kind];
   const { data, isPending, error, refetch } = useNamedCatalog(kind);
 
@@ -40,21 +32,14 @@ export default function NamedCatalogPage({
 
   return (
     <section className="space-y-5">
-      <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-xl font-bold tracking-tight text-slate-900">
-            {plural}
-          </h1>
-
-          <p className="mt-1 text-sm text-slate-500 dark:text-gray-400">
-            Gestiona los registros de {plural.toLowerCase()} del sistema.
-          </p>
-        </div>
-
-        <Button onClick={() => setEditing("new")}>
-          Nueva {singular}
-        </Button>
-      </header>
+      <SectionHeader
+        title={plural}
+        description={`Gestiona los registros de ${plural.toLowerCase()} del sistema.`}
+        icon={Layers}
+        actions={
+          <Button onClick={() => setEditing("new")}>Nueva {singular}</Button>
+        }
+      />
 
       <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
         <label
@@ -83,9 +68,7 @@ export default function NamedCatalogPage({
         </div>
       </div>
 
-      {error && rows.length > 0 && (
-        <Alert>{error.message}</Alert>
-      )}
+      {error && rows.length > 0 && <Alert>{error.message}</Alert>}
 
       <NamedItemTable
         rows={rows}

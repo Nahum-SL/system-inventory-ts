@@ -3,19 +3,17 @@ import { useState } from "react";
 // COMPONENTES ATÓMICOS
 import Alert from "@/shared/components/ui/Alert";
 import Button from "@/shared/components/ui/Buttons/button";
-
 // COMPONENTES - FORM
 import PersonModal from "@/modules/catalogs/components/form/PersonModal";
-
 // TABLES
 import PersonTable from "@/modules/catalogs/components/tables/person-table";
-
 // HOOKS
 import { usePeople } from "@/modules/catalogs";
-
 // TYPES
 import type { Person } from "@/modules/catalogs";
 import SearchInput from "@/shared/components/ui/inputs/SearchInput";
+import SectionHeader from "@/shared/components/ui/SectionHeader";
+import { Users } from "lucide-react";
 
 export default function PeoplePage() {
   const { data, isPending, error, refetch } = usePeople();
@@ -33,18 +31,14 @@ export default function PeoplePage() {
 
   return (
     <section className="space-y-5">
-      <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-xl font-bold tracking-tight text-slate-900 ">
-            Personas
-          </h1>
-          <p className="mt-1 text-sm text-slate-500 dark:text-gray-400">
-            Gestiona las personas registradas en el sistema.
-          </p>
-        </div>
-
-        <Button onClick={() => setEditing("new")}>Nueva persona</Button>
-      </header>
+      <SectionHeader
+        title="Personas"
+        description="Gestiona las personas registradas en el sistema."
+        icon={Users}
+        actions={
+          <Button onClick={() => setEditing("new")}>Nueva persona</Button>
+        }
+      />
 
       <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
         <label

@@ -1,33 +1,40 @@
+import type { ReactNode } from "react";
 import { Link } from "react-router";
+
 import { cn } from "@/shared/lib/utils";
 import {
   ACCIONES_STYLES,
   type AccionesType,
 } from "@/shared/lib/themes/status-theme";
 
-// Base de propiedades compartidas por ambos tipos de render
 interface BaseProps {
-  children: React.ReactNode;
+  children: ReactNode;
   title: string;
   variant?: AccionesType;
   className?: string;
 }
 
-// Tipo específico cuando actúa como un Botón de acción nativo
 interface AsButtonProps extends BaseProps {
-  href?: never; // Prohibe el uso de href si es botón
+  href?: never;
   onClick?: () => void;
   type?: "button" | "submit" | "reset";
 }
 
-// Tipo específico cuando actúa como un Link de redirección
 interface AsLinkProps extends BaseProps {
-  href: string; // href es obligatorio si es Link
-  onClick?: never; // Prohibe el uso de onClick si es Link
+  href: string;
+  onClick?: never;
   type?: never;
 }
 
 type TableButtonProps = AsButtonProps | AsLinkProps;
+
+const sharedClasses = [
+  "inline-flex items-center justify-center rounded-xl border p-2.5",
+  "transition-colors duration-200 active:scale-95",
+  "focus-visible:outline-none focus-visible:ring-2",
+  "focus-visible:ring-amber-500 focus-visible:ring-offset-2",
+  "dark:focus-visible:ring-offset-gray-900",
+].join(" ");
 
 export function TableButton({
   children,
@@ -38,29 +45,23 @@ export function TableButton({
   onClick,
   type = "button",
 }: TableButtonProps) {
-  // Estilos compartidos de estructura y transiciones (Consistencia visual absoluta)
-  const sharedClasses = cn(
-    "p-2.5 inline-flex items-center justify-center rounded-xl border transition-all duration-200 active:scale-95 cursor-pointer",
-    ACCIONES_STYLES[variant],
-    className,
-  );
+  const classes = cn(sharedClasses, ACCIONES_STYLES[variant], className);
 
-  // Variante 1: Redirección semántica (Next.js Link)
-  if (href) {
+  if (href !== undefined) {
     return (
-      <Link to={href} className={sharedClasses} title={title}>
+      <Link to={href} className={classes} title={title} aria-label={title}>
         {children}
       </Link>
     );
   }
 
-  // Variante 2: Acción de Javascript (Click/Submit/Modal)
   return (
     <button
       type={type}
       onClick={onClick}
-      className={sharedClasses}
+      className={classes}
       title={title}
+      aria-label={title}
     >
       {children}
     </button>

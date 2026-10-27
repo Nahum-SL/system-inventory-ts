@@ -1,6 +1,6 @@
 // src/features/admin/dashboard/stats/components/dashboard-kpi-grid.tsx
 import type { DashboardStats } from "../../types";
-import { DashboardKpiCard } from "./dashboard-kpi-stats";
+import { DashboardKpiCard } from "./DashboardKpiCard";
 import { getKpiItemsConfig } from "./dashboard-kpi";
 
 interface DashboardKpiGridProps {

@@ -7,7 +7,12 @@ export const STATUS_LABELS: Record<AssetStatus, string> = {
 };
 
 export const STATUS_STYLES: Record<AssetStatus, string> = {
-  operativo: "bg-green-100 text-green-800",
-  mantenimiento: "bg-amber-100 text-amber-800",
-  fuera_de_servicio: "bg-red-100 text-red-800",
+  operativo:
+    "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/50 dark:text-emerald-400",
+
+  mantenimiento:
+    "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900/60 dark:bg-amber-950/50 dark:text-amber-400",
+
+  fuera_de_servicio:
+    "border-red-200 bg-red-50 text-red-700 dark:border-red-900/60 dark:bg-red-950/50 dark:text-red-400",
 };

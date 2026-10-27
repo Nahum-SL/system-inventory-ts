@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Users } from "lucide-react";
+import { Users, Users2 } from "lucide-react";
 
 import Button from "@/shared/components/ui/Buttons/button";
 import { EmptyState } from "@/shared/components/ui/states/EmptyState";
@@ -13,6 +13,7 @@ import ResetPasswordModal from "../components/RessetPasswordModal";
 import { useUsers } from "../hooks/use-users-queries";
 import { UsersTable } from "../tables/users-table";
 import type { UserAccount } from "../types";
+import SectionHeader from "@/shared/components/ui/SectionHeader";
 
 type Dialog =
   | { kind: "create" }
@@ -30,21 +31,16 @@ export default function UsersPage() {
   return (
     <section className="space-y-6">
       {/* Encabezado */}
-      <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="space-y-1">
-          <h1 className="text-xl font-semibold tracking-tight text-slate-900">
-            Usuarios
-          </h1>
-
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Administra las cuentas, los roles y el acceso al sistema.
-          </p>
-        </div>
-
-        <Button onClick={() => setDialog({ kind: "create" })}>
-          Nuevo usuario
-        </Button>
-      </header>
+      <SectionHeader
+        title="Usuarios"
+        description="Administra las cuentas, los roles y el acceso al sistema."
+        icon={Users2}
+        actions={
+          <Button onClick={() => setDialog({ kind: "create" })}>
+            Nuevo usuario
+          </Button>
+        }
+      />
 
       {/* Contenido */}
       {error ? (

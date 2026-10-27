@@ -16,6 +16,8 @@ import { useAreas, usePositions } from "../hooks/use-catalog-queries";
 
 // TYPES
 import type { Position } from "../types";
+import SectionHeader from "@/shared/components/ui/SectionHeader";
+import { Briefcase } from "lucide-react";
 
 export default function PositionsPage() {
   const { data, isPending, error, refetch } = usePositions();
@@ -34,19 +36,14 @@ export default function PositionsPage() {
 
   return (
     <section className="space-y-5">
-      <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-xl font-bold tracking-tight text-slate-900">
-            Cargos
-          </h1>
-
-          <p className="mt-1 text-sm text-slate-500 dark:text-gray-400">
-            Gestiona los cargos y sus áreas correspondientes.
-          </p>
-        </div>
-
-        <Button onClick={() => setEditing("new")}>Nuevo cargo</Button>
-      </header>
+      <SectionHeader
+        title="Cargos"
+        description="Gestiona los cargos y sus áreas correspondientes."
+        icon={Briefcase}
+        actions={
+          <Button onClick={() => setEditing("new")}>Nuevo cargo</Button>
+        }
+      />
 
       <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
         <label
