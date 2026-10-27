@@ -1,6 +1,0 @@
-Aplica los tres cambios y corre pnpm typecheck.
-
-Repite pnpm migrate:prod. 
-Luego pnpm seed:prod dos veces (la segunda debe decir que la cuenta ya existe), 
-pnpm build:all, pnpm start y los demás puntos de la lista del ensayo.
-pnpm test una vez más
