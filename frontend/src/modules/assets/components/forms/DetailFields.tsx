@@ -3,13 +3,13 @@ import { useFormContext } from "react-hook-form";
 import FormField from "@/shared/components/ui/form/FormField";
 import { controlClass } from "@/shared/components/ui/Buttons/style.button";
 // SCHEMA
-import type { EditAssetInput } from "../../schema/asset-form.schema";
+import type { CreateAssetInput } from "../../schema/asset-form.schema";
 
 export default function DetailsFields() {
   const {
     register,
     formState: { errors },
-  } = useFormContext<EditAssetInput>();
+  } = useFormContext<CreateAssetInput>();
 
   return (
     <>

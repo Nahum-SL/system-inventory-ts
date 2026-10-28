@@ -8,13 +8,13 @@ import {
   CategoryOptions,
 } from "@/modules/catalogs/components/options";
 // SCHEMA - ASSET FORM
-import type { EditAssetInput } from "../../schema/asset-form.schema";
+import type { CreateAssetInput } from "../../schema/asset-form.schema";
 
 export default function ClassificationFields() {
   const {
     register,
     formState: { errors },
-  } = useFormContext<EditAssetInput>();
+  } = useFormContext<CreateAssetInput>();
 
   return (
     <div className="grid gap-3 sm:grid-cols-2">

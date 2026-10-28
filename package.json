@@ -30,7 +30,7 @@
     "lint:all": "pnpm lint:frontend"
   },
   "keywords": [],
-  "author": "",
+  "author": "Nahun Miguel Salazar Levano",
   "license": "ISC",
   "devEngines": {
     "packageManager": {
