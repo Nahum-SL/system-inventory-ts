@@ -146,6 +146,7 @@ export default function AssetActions({ asset }: { asset: AssetCard }) {
           Editar datos
         </Button>
 
+        <AssetImageButtons asset={asset} buttonClassName={actionButtonClass} />
         <Button
           variant="danger"
           className={actionButtonClass}
@@ -155,7 +156,6 @@ export default function AssetActions({ asset }: { asset: AssetCard }) {
           Dar de baja
         </Button>
         
-        <AssetImageButtons asset={asset} buttonClassName={actionButtonClass} />
       </div>
 
       {(inMaintenance || (!asset.asignacionActual && !canAssign)) && (
