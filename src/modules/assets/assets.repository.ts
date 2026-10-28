@@ -12,6 +12,7 @@ import type {
   CreateAssetData,
   DecommissionResult,
   ManualAssetStatus,
+  SetImageResult,
   UpdateAssetData,
 } from "./assets.types.js";
 
@@ -36,6 +37,7 @@ export class AssetsRepository {
         codigoInventario: "a.codigo_inventario",
         fechaIngreso: "a.fechaingreso",
         descripcion: "a.descripcion",
+        imagenArchivo: "a.imagen_archivo",
         estado: "a.estado",
         fechaRegistro: "a.fecharegistro",
         eliminado: "a.eliminado",
@@ -74,6 +76,8 @@ export class AssetsRepository {
       codigoInventario: String(row.codigoInventario),
       fechaIngreso: normalizeDate(row.fechaIngreso),
       descripcion: String(row.descripcion),
+      imagenArchivo:
+        row.imagenArchivo == null ? null : String(row.imagenArchivo),
       estado: row.estado as AssetStatus,
       fechaRegistro: String(row.fechaRegistro),
       eliminado: Boolean(row.eliminado),
@@ -404,6 +408,33 @@ export class AssetsRepository {
       });
 
       return { status: "ok" };
+    });
+  }
+
+  /** Busca la imagen por su nombre */
+  async findImageName(id: number): Promise<{ imagen: string | null } | null> {
+    const row = await db("activos")
+      .select("imagen_archivo")
+      .where({ id, eliminado: false })
+      .first();
+
+    return row ? { imagen: row.imagen_archivo ?? null } : null;
+  }
+
+  /** Cambia (o quita, con `null`) la imagen y devuelve el nombre anterior. */
+  async setImage(id: number, name: string | null): Promise<SetImageResult> {
+    return db.transaction<SetImageResult>(async (trx) => {
+      const row = await trx("activos")
+        .select("imagen_archivo")
+        .where({ id, eliminado: false })
+        .forUpdate()
+        .first();
+
+      if (!row) return { status: "not_found" };
+
+      await trx("activos").where({ id }).update({ imagen_archivo: name });
+
+      return { status: "ok", previous: row.imagen_archivo ?? null };
     });
   }
 }
