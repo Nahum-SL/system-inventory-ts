@@ -133,6 +133,7 @@ export async function up(knex: Knex): Promise<void> {
     table.string("codigo_inventario", 150).notNullable().unique();
     table.date("fechaingreso").notNullable();
     table.string("descripcion", 250).notNullable();
+    table.string("imagen_archivo", 100).nullable();
     table
       .enu("estado", ["operativo", "mantenimiento", "fuera_de_servicio"])
       .notNullable()
