@@ -22,11 +22,14 @@ const PROTECTED_ROUTES: Array<[Method, string]> = [
   ["get", "/api/assets/1"],
   ["get", "/api/assets/code/INV-0001"],
   ["get", "/api/assets/1/qr"],
+  ["get", "/api/assets/:id/imagen"],
+  ["post", "/api/assets/:id/imagen"],
+  ["delete", "/api/assets/:id/imagen"],
   ["post", "/api/assets"],
   ["patch", "/api/assets/1"],
   ["patch", "/api/assets/1/status"],
   ["post", "/api/assets/1/decommission"],
-
+  
   ["get", "/api/assets/1/movements"],
   ["post", "/api/assets/1/movements"],
   ["get", "/api/assets/1/maintenance"],

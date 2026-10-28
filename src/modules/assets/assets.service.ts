@@ -8,6 +8,7 @@ import {
 } from "../../shared/errors/AppError.js";
 // Utils
 import { withConflictHandling } from "../../shared/utils/withConflictHandling.js";
+import { toWebp } from "../../shared/utils/toWebp.js";
 // REPOSITORIO
 import { assetsRepository } from "./assets.repository.js";
 // types
@@ -19,6 +20,8 @@ import type {
   UpdateAssetInput,
   UpdateAssetStatusInput,
 } from "./assets.schema.js";
+// SHARED STORAGE - MANEJO DE IMAGEN
+import { imageStorage } from "../../shared/storage/image-storage.js";
 
 export class AssetsService {
   /** Lista activos con filtros opcionales (texto, estado, área). */
@@ -211,6 +214,52 @@ export class AssetsService {
       errorCorrectionLevel: "M",
       margin: 2,
     });
+  }
+
+  /** Ruta del archivo de imagen del activo. @throws {NotFoundError} Si no existe el activo o no tiene imagen. */
+  async getImagePath(id: number): Promise<string> {
+    const found = await assetsRepository.findImageName(id);
+    if (!found) throw new NotFoundError("El activo no existe");
+    if (!found.imagen) throw new NotFoundError("El activo no tiene imagen");
+    return imageStorage.pathOf(found.imagen);
+  }
+
+  /**
+   * Guarda la imagen nueva y borra la anterior. Orden: archivo nuevo, base de
+   * datos y por último el borrado, así un fallo nunca deja al activo sin imagen.
+   * @throws {NotFoundError} Si el activo no existe (404).
+   * @throws {BadRequestError} Si el archivo no es una imagen válida (400).
+   */
+  async setImage(id: number, input: Buffer): Promise<Asset> {
+    await this.getById(id);
+
+    const name = await imageStorage.save(await toWebp(input));
+
+    let result;
+    try {
+      result = await assetsRepository.setImage(id, name);
+    } catch (error) {
+      await imageStorage.remove(name);
+      throw error;
+    }
+
+    if (result.status === "not_found") {
+      await imageStorage.remove(name);
+      throw new NotFoundError("El activo no existe");
+    }
+
+    await imageStorage.remove(result.previous).catch(() => undefined);
+    return this.getById(id);
+  }
+
+  /** Quita la imagen del activo. @throws {NotFoundError} Si no existe (404). */
+  async removeImage(id: number): Promise<Asset> {
+    const result = await assetsRepository.setImage(id, null);
+    if (result.status === "not_found")
+      throw new NotFoundError("El activo no existe");
+
+    await imageStorage.remove(result.previous).catch(() => undefined);
+    return this.getById(id);
   }
 }
 

@@ -1,4 +1,5 @@
 // UTILS
+import { NotFoundError } from "../../shared/errors/AppError.js";
 import { asyncHandler } from "../../shared/utils/asyncHandler.js";
 import { parseId } from "../../shared/utils/parseId.js";
 // SERVICIO
@@ -98,4 +99,49 @@ export const getAssetQr = asyncHandler(async (req, res) => {
   );
 
   res.status(200).type("image/svg+xml").send(svg);
+});
+
+export const getAssetImage = asyncHandler(async (req, res, next) => {
+  const file = await assetsService.getImagePath(
+    parseId(req.params.id, "del activo"),
+  );
+
+  res.sendFile(
+    file,
+    {
+      dotfiles: "deny",
+      headers: {
+        "Content-Type": "image/webp",
+        // El nombre cambia con cada imagen nueva, por eso es seguro cachear.
+        "Cache-Control": "private, max-age=31536000, immutable",
+      },
+    },
+    (err) => {
+      if (err && !res.headersSent)
+        next(new NotFoundError("La imagen no está disponible"));
+    },
+  );
+});
+
+export const uploadAssetImage = asyncHandler(async (req, res) => {
+  const asset = await assetsService.setImage(
+    parseId(req.params.id, "del activo"),
+    req.body as Buffer,
+  );
+  res.status(200).json({
+    status: "success",
+    message: "Imagen actualizada correctamente",
+    data: asset,
+  });
+});
+
+export const deleteAssetImage = asyncHandler(async (req, res) => {
+  const asset = await assetsService.removeImage(
+    parseId(req.params.id, "del activo"),
+  );
+  res.status(200).json({
+    status: "success",
+    message: "Imagen eliminada correctamente",
+    data: asset,
+  });
 });

@@ -22,6 +22,7 @@ import StatusBadge from "../components/StatusBadge";
 import { useAssetCard } from "../hooks/useAssetCard";
 // TYPES
 import type { AssetCard } from "../types";
+import AssetImage from "../components/AssetImage";
 
 interface Props {
   actions?: (asset: AssetCard) => ReactNode;
@@ -199,23 +200,27 @@ export default function AssetCardPage({ actions, backTo }: Props) {
           "dark:border-gray-700 dark:bg-gray-900",
         )}
       >
-        <div className="flex min-w-0 items-start gap-3">
-          <div className="flex size-11 shrink-0 items-center justify-center rounded-xl border border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-300">
-            <Package size={22} aria-hidden="true" />
-          </div>
+        <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start">
+          <AssetImage asset={asset} className="sm:w-56 sm:shrink-0" />
 
-          <div className="min-w-0 flex-1">
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-              Detalle del activo
-            </p>
+          <div className="flex min-w-0 flex-1 items-start gap-3">
+            <div className="flex size-11 shrink-0 items-center justify-center rounded-xl border border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-300">
+              <Package size={22} aria-hidden="true" />
+            </div>
+            
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Detalle del activo
+              </p>
 
-            <h1 className="mt-1 wrap-break-word font-mono text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-2xl">
-              {asset.codigoInventario}
-            </h1>
+              <h1 className="mt-1 wrap-break-word font-mono text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-2xl">
+                {asset.codigoInventario}
+              </h1>
 
-            <p className="mt-2 wrap-break-word text-sm leading-6 text-slate-600 dark:text-slate-300 sm:text-base">
-              {asset.descripcion}
-            </p>
+              <p className="mt-2 wrap-break-word text-sm leading-6 text-slate-600 dark:text-slate-300 sm:text-base">
+                {asset.descripcion}
+              </p>
+            </div>
           </div>
         </div>
 

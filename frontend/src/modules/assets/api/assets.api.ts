@@ -62,3 +62,7 @@ export const getMovementHistory = async (
   id: number,
 ): Promise<MovementRecord[]> =>
   (await api.get<ListResponse<MovementRecord>>(`/assets/${id}/movements`)).data;
+
+/** Requiere sesión, por eso se pide con fetch y no con <img src>. */
+export const getAssetImage = (id: number): Promise<Blob> =>
+  api.getBlob(`/assets/${id}/imagen`);

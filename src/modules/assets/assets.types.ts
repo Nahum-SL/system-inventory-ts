@@ -12,6 +12,12 @@ export type DecommissionResult =
   | { status: "not_found" }
   | { status: "in_maintenance" }
   | { status: "has_open_assignment" };
+
+// Nuevo type para la imagen:
+export type SetImageResult =
+  | { status: "ok"; previous: string | null }
+  | { status: "not_found" };
+  
   export interface AssetFilters {
   q?: string;
   estado?: AssetStatus;
@@ -30,6 +36,7 @@ export interface Asset {
   codigoInventario: string;
   fechaIngreso: string;
   descripcion: string;
+  imagenArchivo: string | null;
   estado: AssetStatus;
   fechaRegistro: string;
   eliminado: boolean;

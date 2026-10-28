@@ -4,6 +4,7 @@ export { default as AssetCardPage } from "./views/AssetCardPage";
 // COMPONENTS
 export { default as StatusBadge } from "./components/StatusBadge";
 export { default as AssetFiltersBar } from "./components/AssetFilters";
+export { default as AssetImageButtons } from "./components/AssetImageButtons";
 // HOOKS
 export { useAssets } from "./hooks/useAsset";
 export { useAssetFilters } from "./hooks/useAssetFilters";

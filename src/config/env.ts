@@ -23,6 +23,8 @@ const envSchema = z.object({
 
   JWT_SECRET: z.string().min(32),
   JWT_EXPIRES_IN: z.coerce.number().int().positive(),
+
+  IMAGES_DIR: z.string().min(1),
 });
 
 // Parsea y valida las variables de entorno

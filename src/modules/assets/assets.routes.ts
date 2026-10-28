@@ -13,13 +13,17 @@ import {
 import {
   createAsset,
   decommissionAsset,
+  deleteAssetImage,
   getAssetByCode,
   getAssetById,
+  getAssetImage,
   getAssetQr,
   listAssets,
   updateAsset,
   updateAssetStatus,
+  uploadAssetImage,
 } from "./assets.controller.js";
+import { imageBody } from "../../shared/middlewares/imageBody.middleware.js";
 
 const assetsRoutes = Router();
 
@@ -61,5 +65,14 @@ assetsRoutes.post(
   validate(decommissionAssetSchema),
   decommissionAsset,
 );
+
+// IMAGENES
+
+// Lectura
+assetsRoutes.get("/:id/imagen", getAssetImage);
+
+// Escritura (admin primero, para no recibir 5 MB de quien no tiene permiso)
+assetsRoutes.put("/:id/imagen", authorize("admin"), imageBody, uploadAssetImage);
+assetsRoutes.delete("/:id/imagen", authorize("admin"), deleteAssetImage);
 
 export default assetsRoutes;

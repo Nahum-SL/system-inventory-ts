@@ -6,10 +6,12 @@ import {
   closeMaintenance,
   createAsset,
   decommissionAsset,
+  deleteAssetImage,
   moveAsset,
   openMaintenance,
   returnAssignment,
   updateAsset,
+  uploadAssetImage,
 } from "../api/assets.mutation";
 // SCHEMA - Mutations
 import type { ChangeStatusValues } from "../schema/asset-status.schema";
@@ -111,3 +113,25 @@ export const useReturnAssignment = (assignmentId: number) =>
   useAssetMutation((values: ReturnAssignmentValues) =>
     returnAssignment(assignmentId, values),
   );
+
+// =========================
+// ACCIONES PARA LA IMAGEN
+// =========================
+
+export function useUploadAssetImage(assetId: number) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (file: File) => uploadAssetImage(assetId, file),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: assetKeys.all }),
+  });
+}
+
+export function useDeleteAssetImage(assetId: number) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => deleteAssetImage(assetId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: assetKeys.all }),
+  });
+}
