@@ -8,7 +8,7 @@ import {
 } from "../../shared/errors/AppError.js";
 // Utils
 import { withConflictHandling } from "../../shared/utils/withConflictHandling.js";
-import { toWebp } from "@/shared/utils/toWebp.js";
+import { toWebp } from "../../shared/utils/toWebp.js";
 // REPOSITORIO
 import { assetsRepository } from "./assets.repository.js";
 // types
@@ -21,7 +21,7 @@ import type {
   UpdateAssetStatusInput,
 } from "./assets.schema.js";
 // SHARED STORAGE - MANEJO DE IMAGEN
-import { imageStorage } from "@/shared/storage/image-storage.js";
+import { imageStorage } from "../../shared/storage/image-storage.js";
 
 export class AssetsService {
   /** Lista activos con filtros opcionales (texto, estado, área). */

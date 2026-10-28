@@ -94,3 +94,23 @@ export const changeAssetStatus = async (
   values: ChangeStatusValues,
 ): Promise<Asset> =>
   (await api.patch<ApiResponse<Asset>>(`/assets/${id}/status`, values)).data;
+
+/**
+ * Actualiza la imagen de un activo y elimina el anterior
+ * @param id 
+ * @param file 
+ * @returns 
+ */  
+export const uploadAssetImage = async (
+  id: number,
+  file: Blob,
+): Promise<Asset> =>
+  (await api.putFile<ApiResponse<Asset>>(`/assets/${id}/imagen`, file)).data;
+
+/**
+ * Elimina la imagen del activo
+ * @param id 
+ * @returns 
+ */
+export const deleteAssetImage = async (id: number): Promise<Asset> =>
+  (await api.delete<ApiResponse<Asset>>(`/assets/${id}/imagen`)).data;

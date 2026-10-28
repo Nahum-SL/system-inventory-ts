@@ -30,7 +30,9 @@ async function request(
   const token = tokenStorage.get();
   const headers = new Headers(init.headers);
 
-  if (init.body) headers.set("Content-Type", "application/json");
+  if (init.body && !(init.body instanceof Blob))
+    headers.set("Content-Type", "application/json");
+  
   if (token) headers.set("Authorization", `Bearer ${token}`);
 
   let res: Response;
@@ -84,4 +86,17 @@ export const api = {
     (await request(path, withBody("POST", body))).json(),
   patch: async <T>(path: string, body?: unknown): Promise<T> =>
     (await request(path, withBody("PATCH", body))).json(),
+
+  // PARA IMAGENES
+  getBlob: async (path: string): Promise<Blob> => (await request(path)).blob(),
+  putFile: async <T>(path: string, file: Blob): Promise<T> =>
+    (
+      await request(path, {
+        method: "PUT",
+        body: file,
+        headers: { "Content-Type": file.type },
+      })
+    ).json(),
+  delete: async <T>(path: string): Promise<T> =>
+    (await request(path, { method: "DELETE" })).json(),
 };

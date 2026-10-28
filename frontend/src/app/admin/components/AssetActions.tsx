@@ -14,6 +14,7 @@ import Button from "@/shared/components/ui/Buttons/button";
 import { cn } from "@/shared/lib/utils";
 
 import {
+  AssetImageButtons,
   AssignModal,
   ChangeStatusModal,
   CloseMaintenanceModal,
@@ -153,6 +154,8 @@ export default function AssetActions({ asset }: { asset: AssetCard }) {
           <XCircle size={16} aria-hidden="true" />
           Dar de baja
         </Button>
+        
+        <AssetImageButtons asset={asset} buttonClassName={actionButtonClass} />
       </div>
 
       {(inMaintenance || (!asset.asignacionActual && !canAssign)) && (

@@ -7,4 +7,5 @@ export const assetKeys = {
   qr: (id: number) => ["assets", "qr", id] as const,
   history: (kind: string, id: number) =>
     ["assets", "history", kind, id] as const,
+  image: (id: number, archivo: string) => ["asset-image", id, archivo] as const,
 };

@@ -3,7 +3,7 @@ import { BadRequestError } from "../errors/AppError.js";
 
 const parser = express.raw({
   type: ["image/jpeg", "image/png", "image/webp"],
-  limit: 5 * 1024 * 1024,
+  limit: 12 * 1024 * 1024,
 });
 
 /** Recibe el cuerpo binario de una imagen (máx. 5 MB) en `req.body` como Buffer. */
@@ -15,7 +15,7 @@ export const imageBody: RequestHandler = (req, res, next) => {
           ? (err as { type?: string }).type
           : undefined;
       if (type === "entity.too.large") {
-        return next(new BadRequestError("La imagen supera los 5 MB"));
+        return next(new BadRequestError("La imagen supera los 12 MB"));
       }
       return next(err);
     }

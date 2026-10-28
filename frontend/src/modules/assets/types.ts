@@ -11,6 +11,7 @@ export interface Asset {
   codigoInventario: string;
   fechaIngreso: string;
   descripcion: string;
+  imagenArchivo: string | null;
   estado: AssetStatus;
 }
 

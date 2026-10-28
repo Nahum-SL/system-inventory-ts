@@ -23,7 +23,7 @@ import {
   updateAssetStatus,
   uploadAssetImage,
 } from "./assets.controller.js";
-import { imageBody } from "@/shared/middlewares/imageBody.middleware.js";
+import { imageBody } from "../../shared/middlewares/imageBody.middleware.js";
 
 const assetsRoutes = Router();
 
