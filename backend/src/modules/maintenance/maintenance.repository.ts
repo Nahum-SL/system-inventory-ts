@@ -30,7 +30,6 @@ export class MaintenanceRepository {
         fechaFin: "m.fecha_fin",
         descripcion: "m.descripcion",
         observaciones: "m.observaciones",
-        costo: "m.costo",
         fechaRegistro: "m.fecharegistro",
       });
   }
@@ -61,7 +60,6 @@ export class MaintenanceRepository {
         fecha: data.fecha,
         descripcion: data.descripcion,
         observaciones: data.observaciones ?? null,
-        costo: data.costo,
       });
 
       await trx("activos")
@@ -111,7 +109,6 @@ export class MaintenanceRepository {
           ...(data.observaciones !== undefined
             ? { observaciones: data.observaciones }
             : {}),
-          ...(data.costo !== undefined ? { costo: data.costo } : {}),
         });
 
       await trx("activos")
@@ -142,8 +139,8 @@ export class MaintenanceRepository {
     if (!asset) {
       return null;
     }
-    
-    const rows = await this.selectMaintenance(db)      
+
+    const rows = await this.selectMaintenance(db)
       .where("m.activo_id", activoId)
       .orderBy("m.fecha", "desc")
       .orderBy("m.id", "desc");
@@ -174,8 +171,7 @@ export class MaintenanceRepository {
       fechaFin: row.fechaFin == null ? null : formatDate(row.fechaFin),
       descripcion: String(row.descripcion),
       observaciones:
-      row.observaciones == null ? null : String(row.observaciones),
-      costo: Number(row.costo),
+        row.observaciones == null ? null : String(row.observaciones),
       fechaRegistro: String(row.fechaRegistro),
     };
   }

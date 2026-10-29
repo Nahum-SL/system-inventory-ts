@@ -13,3 +13,14 @@ export const loginLimiter = rateLimit({
   legacyHeaders: false,
   handler: (_req, _res, next) => next(new TooManyRequestsError()),
 });
+
+/**
+ * FLujo de solicitudes (usuarios que se conecten a la api)
+ */
+export const apiLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 120,
+  standardHeaders: true,
+  legacyHeaders: true,
+  message: { message: "Demasiadas solicitudes. intente en un momento" },
+});

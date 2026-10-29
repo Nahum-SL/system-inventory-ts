@@ -6,7 +6,6 @@ const NEW_MAINTENANCE = {
   tipo: "correctivo",
   fecha: "2026-10-20",
   descripcion: "Falla de pantalla",
-  costo: 0,
 };
 
 describe("Mantenimiento", () => {

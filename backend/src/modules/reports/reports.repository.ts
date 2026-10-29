@@ -201,7 +201,6 @@ export class ReportsRepository {
         fechaFin: "m.fecha_fin",
         detalle: "m.descripcion",
         observaciones: "m.observaciones",
-        costo: "m.costo",
       })
       .orderBy("m.fecha", "desc")
       .orderBy("m.id", "desc");
@@ -216,8 +215,7 @@ export class ReportsRepository {
       fecha: String(r.fecha).slice(0, 10),
       fechaFin: r.fechaFin == null ? null : String(r.fechaFin).slice(0, 10),
       detalle: String(r.detalle),
-      observaciones: r.observaciones == null ? null : String(r.observaciones),
-      costo: Number(r.costo),
+      observaciones: r.observaciones == null ? null : String(r.observaciones)
     }));
   }
 }

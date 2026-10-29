@@ -447,7 +447,6 @@ export async function seed(knex: Knex): Promise<void> {
         fin: null,
         desc: "No imprime: cabezal obstruido",
         obs: "Se espera repuesto del proveedor",
-        costo: 0,
       },
       // Cerrados: historial
       {
@@ -457,7 +456,6 @@ export async function seed(knex: Knex): Promise<void> {
         fin: "2025-03-10",
         desc: "Limpieza interna y cambio de pasta térmica",
         obs: "Sin novedades",
-        costo: 40,
       },
       {
         code: "INV-0006",
@@ -466,7 +464,6 @@ export async function seed(knex: Knex): Promise<void> {
         fin: "2026-08-14",
         desc: "El mouse no responde",
         obs: "Sin reparación posible; se declaró fuera de servicio",
-        costo: 0,
       },
       {
         code: "INV-0008",
@@ -475,7 +472,6 @@ export async function seed(knex: Knex): Promise<void> {
         fin: "2025-08-06",
         desc: "Revisión y lubricación general",
         obs: null,
-        costo: 25.5,
       },
     ];
 
@@ -491,7 +487,6 @@ export async function seed(knex: Knex): Promise<void> {
           fecha_fin: m.fin,
           descripcion: m.desc,
           observaciones: m.obs,
-          costo: m.costo,
         },
       );
     }

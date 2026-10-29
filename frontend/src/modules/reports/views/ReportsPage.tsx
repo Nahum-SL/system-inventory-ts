@@ -125,7 +125,7 @@ export default function ReportsPage() {
 
         <ReportCard
           title="Mantenimientos"
-          description="Exporta las intervenciones registradas, sus fechas, observaciones y costos."
+          description="Exporta las intervenciones registradas, sus fechas y sus observaciones."
           icon={<Wrench size={20} aria-hidden="true" />}
         >
           <div className="mb-4 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">

@@ -60,7 +60,6 @@ export interface MaintenanceExportRow {
   fechaFin: string | null;
   detalle: string;
   observaciones: string | null;
-  costo: number;
 }
 
 export interface CsvFile {

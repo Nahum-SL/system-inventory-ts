@@ -14,21 +14,6 @@ const optionalText = (max: number) =>
     .transform((v) => v || undefined);
 
 /**
- * Para el manejo del `costo` de la tabla `Mantenimiento`
- */
-const money = z
-  .string()
-  .trim()
-  .refine(
-    (v) =>
-      v === "" ||
-      (Number.isFinite(Number(v)) &&
-        Number(v) >= 0 &&
-        Number(v) <= 99999999.99),
-    "Ingresa un monto válido",
-  );
-
-/**
  * Para el `motivo` de la tabla `Movimientos`
  */
 export const decommissionSchema = z.object({
@@ -48,7 +33,6 @@ export const openMaintenanceSchema = z.object({
     .min(1, "La descripción es obligatoria")
     .max(250, "La descripción no puede superar los 250 caracteres"),
   observaciones: optionalText(2000),
-  costo: money.transform((v) => (v === "" ? 0 : Number(v))),
 });
 
 export const moveSchema = z.object({
@@ -93,8 +77,6 @@ export const closeMaintenanceSchema = (inicio: string) =>
       error: "Elige un resultado",
     }),
     observaciones: optionalText(2000),
-    // Vacío = se conserva el costo registrado al abrir.
-    costo: money.transform((v) => (v === "" ? undefined : Number(v))),
   });
 
 export type DecommissionInput = z.input<typeof decommissionSchema>;
