@@ -32,19 +32,36 @@ export const createUser = asyncHandler(async (req, res) => {
   });
 });
 
-
 /** Cambia rol y/o estado. El body llega validado. */
 export const updateUser = asyncHandler(async (req, res) => {
   if (!req.auth) throw new UnauthorizedError("Debes autenticarte primero");
 
-  const user = await usersService.update(parseId(req.params.id, "del usuario"), req.auth.id, req.body);
+  const user = await usersService.update(
+    parseId(req.params.id, "del usuario"),
+    req.auth.id,
+    req.body,
+  );
 
-  res.status(200).json({ status: "success", message: "Usuario actualizado correctamente", data: user });
+  res
+    .status(200)
+    .json({
+      status: "success",
+      message: "Usuario actualizado correctamente",
+      data: user,
+    });
 });
 
 /** Restablece la contraseña de una cuenta (solo admin). */
 export const resetUserPassword = asyncHandler(async (req, res) => {
-  await usersService.resetPassword(parseId(req.params.id, "del usuario"), req.body);
+  await usersService.resetPassword(
+    parseId(req.params.id, "del usuario"),
+    req.body,
+  );
 
-  res.status(200).json({ status: "success", message: "Contraseña restablecida correctamente" });
+  res
+    .status(200)
+    .json({
+      status: "success",
+      message: "Contraseña restablecida correctamente",
+    });
 });

@@ -53,7 +53,7 @@ const app = express();
 const frontendDist = path.resolve(import.meta.dirname, "../../frontend/dist");
 
 // Detrás de un proxy inverso (Nginx, etc.). Ajusta el número a los saltos reales.
-app.set("trust proxy", 1);
+app.set("trust proxy", 0);
 
 // ======================================
 // Seguridad y análisis de solicitudes
