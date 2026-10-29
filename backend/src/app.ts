@@ -50,7 +50,7 @@ import reportsRoutes from "./modules/reports/reports.routes.js";
 const app = express();
 
 // Funciona igual desde src/app.ts (tsx) y desde dist/app.js (compilado).
-const frontendDist = path.resolve(import.meta.dirname, "../frontend/dist");
+const frontendDist = path.resolve(import.meta.dirname, "../../frontend/dist");
 
 // Detrás de un proxy inverso (Nginx, etc.). Ajusta el número a los saltos reales.
 app.set("trust proxy", 1);

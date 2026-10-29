@@ -3,15 +3,20 @@ dist/
 .env
 .env.test
 .env.production
+.env.production.example
 
-.env*
+node_modules/
 
-!.env*.example
+# BACKEND
+backend/node_modules
+backend/dist
+backend/logs
 
-node_modules
 
 # FRONTEND
 frontend/node_modules
 frontend/dist
+
+
 
 logs/
