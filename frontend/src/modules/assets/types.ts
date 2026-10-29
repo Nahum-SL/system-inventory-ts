@@ -59,7 +59,6 @@ export interface MaintenanceRecord {
   fechaFin: string | null;
   descripcion: string;
   observaciones: string | null;
-  costo: number;
 }
 
 // ==================================

@@ -51,7 +51,6 @@ function CloseMaintenanceForm({
       fechaFin: todayLocal(),
       resultado: "operativo",
       observaciones: "",
-      costo: "",
     },
   });
 
@@ -95,18 +94,6 @@ function CloseMaintenanceForm({
           rows={2}
           className={controlClass}
           {...register("observaciones")}
-        />
-      </FormField>
-
-      <FormField
-        label="Costo final, S/ (vacío = conservar el registrado)"
-        error={errors.costo?.message}
-      >
-        <input
-          inputMode="decimal"
-          placeholder="0.00"
-          className={controlClass}
-          {...register("costo")}
         />
       </FormField>
 

@@ -109,7 +109,12 @@ app.use("/api", (_req, _res, next) => {
 });
 
 // Solo en producción y si el build existe.
-if (env.NODE_ENV === "production" && fs.existsSync(frontendDist)) {
+if (env.NODE_ENV === "production") {
+  if (!fs.existsSync(frontendDist)) {
+    throw new Error(
+      `No se encontró el build del frontend en ${frontendDist}. Ejecuta pnpm build:all`,
+    );
+  }
   app.use(express.static(frontendDist, { index: false }));
 
   // Fallback de la SPA: /activos/INV-0001 (la URL del QR) y el resto de rutas de React.

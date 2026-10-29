@@ -161,7 +161,6 @@ function Maintenance({ id }: { id: number }) {
             <MutedText>Observaciones: {maintenance.observaciones}</MutedText>
           )}
 
-          <MutedText>Costo: S/ {maintenance.costo.toFixed(2)}</MutedText>
         </HistoryItem>
       ))}
     </State>

@@ -9,14 +9,12 @@ export const createMaintenanceSchema = z.object({
     .min(1, "La descripción es obligatoria")
     .max(250, "La descripción no puede superar los 250 caracteres"),
   observaciones: z.string().trim().max(2000).optional(),
-  costo: z.number().min(0).max(99999999.99).default(0),
 });
 
 export const closeMaintenanceSchema = z.object({
   fechaFin: z.iso.date("La fecha debe tener formato YYYY-MM-DD"),
   resultado: z.enum(["operativo", "fuera_de_servicio"]),
   observaciones: z.string().trim().max(2000).optional(),
-  costo: z.number().min(0).max(99999999.99).optional(),
 });
 
 export type CreateMaintenanceInput = z.infer<typeof createMaintenanceSchema>;

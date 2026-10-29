@@ -104,7 +104,6 @@ export class ReportsService {
         { header: "Fecha de fin", value: (r) => r.fechaFin },
         { header: "Descripción", value: (r) => r.detalle },
         { header: "Observaciones", value: (r) => r.observaciones },
-        { header: "Costo (S/)", value: (r) => r.costo },
       ],
       rows,
     );

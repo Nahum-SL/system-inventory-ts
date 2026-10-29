@@ -12,7 +12,6 @@ export interface CreateMaintenanceData {
   fecha: string;
   descripcion: string;
   observaciones?: string;
-  costo: number;
 }
 
 /**
@@ -27,7 +26,6 @@ export interface Maintenance {
   fechaFin: string | null;
   descripcion: string;
   observaciones: string | null;
-  costo: number;
   fechaRegistro: string;
 }
 
@@ -35,7 +33,6 @@ export interface CloseMaintenanceData {
   fechaFin: string;
   resultado: "operativo" | "fuera_de_servicio";
   observaciones?: string;
-  costo?: number;
 }
 
 export type CreateMaintenanceResult =
