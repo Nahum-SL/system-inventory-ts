@@ -26,6 +26,7 @@ import AssetImage from "../components/AssetImage";
 
 interface Props {
   actions?: (asset: AssetCard) => ReactNode;
+  errorActions?: (codigo: string) => ReactNode;
   backTo?: string;
 }
 
@@ -72,11 +73,13 @@ function ErrorState({
   message,
   back,
   warning = false,
+  children,
 }: {
   title: string;
   message: string;
   back: string;
   warning?: boolean;
+  children?: ReactNode;
 }) {
   return (
     <section
@@ -103,6 +106,9 @@ function ErrorState({
         {message}
       </p>
 
+      {children && (
+        <div className="mt-4 flex flex-wrap items-center gap-2">{children}</div>
+      )}
       <Link
         to={back}
         className={cn(
@@ -120,7 +126,11 @@ function ErrorState({
   );
 }
 
-export default function AssetCardPage({ actions, backTo }: Props) {
+export default function AssetCardPage({
+  actions,
+  backTo,
+  errorActions,
+}: Props) {
   const { codigo = "" } = useParams();
   const { state } = useLocation();
 
@@ -160,7 +170,9 @@ export default function AssetCardPage({ actions, backTo }: Props) {
         message={error.message}
         back={back}
         warning={status === 410}
-      />
+      >
+        {status === 410 && errorActions?.(codigo)}
+      </ErrorState>
     );
   }
 
@@ -207,7 +219,7 @@ export default function AssetCardPage({ actions, backTo }: Props) {
             <div className="flex size-11 shrink-0 items-center justify-center rounded-xl border border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-300">
               <Package size={22} aria-hidden="true" />
             </div>
-            
+
             <div className="min-w-0 flex-1">
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Detalle del activo

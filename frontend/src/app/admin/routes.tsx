@@ -19,6 +19,7 @@ import {
   PeoplePage,
   PositionsPage,
 } from "@/modules/catalogs";
+import AssetSheetButton from "@/modules/reports/components/AssetSheetButton";
 
 export const adminRoutes: RouteObject = {
   path: "admin",
@@ -46,6 +47,7 @@ export const adminRoutes: RouteObject = {
             <AssetCardPage
               backTo="/admin/activos"
               actions={(a) => <AssetActions asset={a} />}
+              errorActions={(codigo) => <AssetSheetButton codigo={codigo} />}
             />
           ),
         },

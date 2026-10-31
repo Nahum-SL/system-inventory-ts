@@ -80,7 +80,7 @@ export const api = {
     const blob = await res.blob();
 
     return {
-      blob: await res.blob(),
+      blob: blob,
       filename:
         match?.[1] ??
         (blob.type === "application/pdf" ? "reporte.pdf" : "reporte.csv"),

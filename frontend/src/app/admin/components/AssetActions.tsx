@@ -25,6 +25,7 @@ import {
   ReturnAssignmentModal,
   type AssetCard,
 } from "@/modules/assets";
+import { AssetSheetButton } from "@/modules/reports";
 
 type ModalName =
   | "status"
@@ -147,6 +148,14 @@ export default function AssetActions({ asset }: { asset: AssetCard }) {
         </Button>
 
         <AssetImageButtons asset={asset} buttonClassName={actionButtonClass} />
+        
+        <AssetSheetButton
+          codigo={asset.codigoInventario}
+          label="Hoja de vida (PDF)"
+          variant="secondary"
+          className={actionButtonClass}
+        />
+        
         <Button
           variant="danger"
           className={actionButtonClass}
@@ -155,7 +164,6 @@ export default function AssetActions({ asset }: { asset: AssetCard }) {
           <XCircle size={16} aria-hidden="true" />
           Dar de baja
         </Button>
-        
       </div>
 
       {(inMaintenance || (!asset.asignacionActual && !canAssign)) && (
