@@ -437,6 +437,11 @@ export class AssetsRepository {
       return { status: "ok", previous: row.imagen_archivo ?? null };
     });
   }
+
+  async findImageNameAnyState(id: number): Promise<string | null> {
+  const row = await db("activos").select("imagen_archivo").where({ id }).first();
+  return row?.imagen_archivo ?? null;
+}
 }
 
 export const assetsRepository = new AssetsRepository();

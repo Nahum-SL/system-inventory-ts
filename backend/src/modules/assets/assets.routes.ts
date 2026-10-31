@@ -24,6 +24,7 @@ import {
   uploadAssetImage,
 } from "./assets.controller.js";
 import { imageBody } from "../../shared/middlewares/imageBody.middleware.js";
+import { exportAssetSheet } from "../reports/reports.controller.js";
 
 const assetsRoutes = Router();
 
@@ -72,7 +73,15 @@ assetsRoutes.post(
 assetsRoutes.get("/:id/imagen", getAssetImage);
 
 // Escritura (admin primero, para no recibir 5 MB de quien no tiene permiso)
-assetsRoutes.put("/:id/imagen", authorize("admin"), imageBody, uploadAssetImage);
+assetsRoutes.put(
+  "/:id/imagen",
+  authorize("admin"),
+  imageBody,
+  uploadAssetImage,
+);
 assetsRoutes.delete("/:id/imagen", authorize("admin"), deleteAssetImage);
+
+// Ruta a exportar a PDF
+assetsRoutes.get("/export/asset-sheet/:codigo", exportAssetSheet);
 
 export default assetsRoutes;

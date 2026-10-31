@@ -1,7 +1,14 @@
 import type { Response } from "express";
-import type { AssetFilters } from "../assets/assets.types.js";
-import type { CsvFile, ExportRange } from "./reports.types.js";
+// MANEJO DE ERRORES
+import { BadRequestError } from "../../shared/errors/AppError.js";
+// UTILS
 import { asyncHandler } from "../../shared/utils/asyncHandler.js";
+// PDF - ASSET SHEET SERVICE
+import { assetSheetService } from "./asset-sheet.service.js";
+
+// TYPES
+import type { CsvFile, ExportRange } from "./reports.types.js";
+import type { AssetFilters } from "../assets/assets.types.js";
 // SERVICE
 import { reportsService } from "./reports.service.js";
 
@@ -38,4 +45,18 @@ export const exportMaintenance = asyncHandler(async (req, res) => {
     res,
     await reportsService.exportMaintenance(req.query as ExportRange),
   );
+});
+
+
+
+export const exportAssetSheet = asyncHandler(async (req, res) => {
+  const codigo = String(req.params.codigo ?? "").trim();
+  if (!codigo || codigo.length > 50) throw new BadRequestError("Código de activo inválido");
+
+  const { pdf, fileName } = await assetSheetService.build(codigo, req.auth!.username);
+
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
+  res.setHeader("Cache-Control", "no-store");
+  res.send(Buffer.from(pdf));
 });
