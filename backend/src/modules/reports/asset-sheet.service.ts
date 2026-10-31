@@ -1,8 +1,10 @@
 import fs from "node:fs/promises";
 import sharp from "sharp";
-
+// MANEJO DE ERRORES
 import { NotFoundError } from "../../shared/errors/AppError.js";
+// STORAGE - IMAGE
 import { imageStorage } from "../../shared/storage/image-storage.js";
+// REPOSITORIES
 import { assetsRepository } from "../assets/assets.repository.js";
 import { assignmentsRepository } from "../assignments/assignments.repository.js";
 import { maintenanceRepository } from "../maintenance/maintenance.repository.js";
@@ -11,7 +13,7 @@ import { movementsRepository } from "../movements/movements.repository.js";
 // RENDER - ASSET
 import { formatDate, formatNowLima } from "./pdf/asset-sheet.helper.js";
 import { renderAssetSheet } from "./pdf/asset-sheet.render.js";
-
+// TYPES
 import type { AssetSheetData, SheetImage } from "./pdf/asset-sheet.types.js";
 import { YONDA_LOGO } from "./pdf/yonda-logo.js";
 

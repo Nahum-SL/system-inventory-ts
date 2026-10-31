@@ -24,7 +24,6 @@ import {
   uploadAssetImage,
 } from "./assets.controller.js";
 import { imageBody } from "../../shared/middlewares/imageBody.middleware.js";
-import { exportAssetSheet } from "../reports/reports.controller.js";
 
 const assetsRoutes = Router();
 
@@ -81,7 +80,5 @@ assetsRoutes.put(
 );
 assetsRoutes.delete("/:id/imagen", authorize("admin"), deleteAssetImage);
 
-// Ruta a exportar a PDF
-assetsRoutes.get("/export/asset-sheet/:codigo", exportAssetSheet);
 
 export default assetsRoutes;

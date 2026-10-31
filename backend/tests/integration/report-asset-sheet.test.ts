@@ -73,24 +73,34 @@ describe("Hoja de vida PDF de activos", () => {
   });
 
   it("un activo dado de baja también genera PDF", async () => {
-    // Obtener el activo que se utilizará para la prueba.
-    const asset = await request(app)
-      .get("/api/assets/code/INV-0002")
+    // Activo nuevo: sin asignaciones ni mantenimientos, así la baja es válida.
+    const base = await request(app)
+      .get("/api/assets/code/INV-0001")
       .auth(t.adminToken, { type: "bearer" });
 
-    expect(asset.status).toBe(200);
-    expect(asset.body.id).toBeDefined();
+    const created = await request(app)
+      .post("/api/assets")
+      .auth(t.adminToken, { type: "bearer" })
+      .send({
+        codigoInventario: "INV-BAJA-01",
+        descripcion: "Activo de prueba para baja",
+        marcaId: base.body.data.marcaId,
+        categoriaId: base.body.data.categoriaId,
+        areaId: base.body.data.areaId,
+        fechaIngreso: "2026-01-15",
+      });
 
-    // Dar de baja el activo.
+    expect(created.status).toBe(201);
+
     const decommission = await request(app)
-      .post(`/api/assets/${asset.body.id}/decommission`)
+      .post(`/api/assets/${created.body.data.id}/decommission`)
       .auth(t.adminToken, { type: "bearer" })
       .send({ motivo: "Prueba de baja" });
 
     expect(decommission.status).toBe(200);
 
     // La hoja de vida debe seguir disponible.
-    const res = await get("INV-0002").buffer(true).parse(parsePdf);
+    const res = await get("INV-BAJA-01").buffer(true).parse(parsePdf);
 
     expect(res.status).toBe(200);
     expect(res.headers["content-type"]).toContain("application/pdf");

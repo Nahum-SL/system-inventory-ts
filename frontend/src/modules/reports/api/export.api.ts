@@ -26,3 +26,6 @@ export const downloadMaintenance = (r: DateRange) =>
   api.getFile(
     `/reports/export/maintenance${query({ desde: r.desde, hasta: r.hasta })}`,
   );
+
+export const downloadAssetSheet = (codigo: string) =>
+  api.getFile(`/reports/export/asset-sheet/${encodeURIComponent(codigo)}`);

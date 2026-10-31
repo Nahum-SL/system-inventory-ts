@@ -32,7 +32,7 @@ async function request(
 
   if (init.body && !(init.body instanceof Blob))
     headers.set("Content-Type", "application/json");
-  
+
   if (token) headers.set("Authorization", `Bearer ${token}`);
 
   let res: Response;
@@ -77,8 +77,14 @@ export const api = {
     const match = /filename="([^"]+)"/.exec(
       res.headers.get("Content-Disposition") ?? "",
     );
+    const blob = await res.blob();
 
-    return { blob: await res.blob(), filename: match?.[1] ?? "reporte.csv" };
+    return {
+      blob: await res.blob(),
+      filename:
+        match?.[1] ??
+        (blob.type === "application/pdf" ? "reporte.pdf" : "reporte.csv"),
+    };
   },
   getText: async (path: string): Promise<string> =>
     (await request(path)).text(),

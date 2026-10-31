@@ -6,6 +6,7 @@ import { validate } from "../../shared/middlewares/validate.middleware.js";
 // CONTROLLER
 import {
   exportAssets,
+  exportAssetSheet,
   exportMaintenance,
   exportMovements,
   getSummary,
@@ -20,7 +21,7 @@ const reportsRoutes = Router();
 // ENDPOINTS
 reportsRoutes.use(authenticate, authorize("admin"));
 reportsRoutes.get("/summary", getSummary);
-reportsRoutes.get("/summary", getSummary);
+
 reportsRoutes.get(
   "/export/assets",
   validate(listAssetsQuerySchema, "query"),
@@ -36,5 +37,7 @@ reportsRoutes.get(
   validate(exportRangeQuerySchema, "query"),
   exportMaintenance,
 );
+
+reportsRoutes.get("/export/asset-sheet/:codigo", exportAssetSheet);
 
 export default reportsRoutes;
