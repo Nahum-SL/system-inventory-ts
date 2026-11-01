@@ -11,10 +11,10 @@ import { maintenanceRepository } from "../maintenance/maintenance.repository.js"
 import { movementsRepository } from "../movements/movements.repository.js";
 
 // RENDER - ASSET
-import { formatDate, formatNowLima } from "./pdf/asset-sheet.helper.js";
-import { renderAssetSheet } from "./pdf/asset-sheet.render.js";
+import { formatDate, formatNowLima } from "./pdf/sheet/asset-sheet.helper.js";
+import { renderAssetSheet } from "./pdf/sheet/asset-sheet.render.js";
 // TYPES
-import type { AssetSheetData, SheetImage } from "./pdf/asset-sheet.types.js";
+import type { AssetSheetData, SheetImage } from "./pdf/sheet/asset-sheet.types.js";
 import { YONDA_LOGO } from "./pdf/yonda-logo.js";
 
 /** pdf-lib solo incrusta JPG/PNG: la foto (WebP) se convierte a JPEG. */

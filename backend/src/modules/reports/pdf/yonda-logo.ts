@@ -1,4 +1,4 @@
-import type { SheetImage } from "./asset-sheet.types.js";
+import type { SheetImage } from "./sheet/asset-sheet.types.js";
 
 /**
  * Logo de Yonda: letras blancas con fondo transparente, recortado al texto.

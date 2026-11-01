@@ -1,3 +1,4 @@
+import type { Knex } from "knex";
 import db from "../../database/knex.js";
 import { escapeLike } from "../../shared/utils/escapeLike.js";
 
@@ -50,6 +51,36 @@ export class AssetsRepository {
     return query;
   }
 
+  /** Filtros de la lista (texto, estado, área, asignación). Compartidos por la lista, el CSV y el PDF. */
+  private applyFilters(query: Knex.QueryBuilder, filters: AssetFilters): void {
+    if (filters.estado) query.where("a.estado", filters.estado);
+
+    if (filters.areaId !== undefined) query.where("a.area_id", filters.areaId);
+
+    if (filters.asignacion) {
+      const openAssignment = db("asignaciones as asi")
+        .select(db.raw("1"))
+        .whereRaw("asi.activo_id = a.id")
+        .whereNull("asi.fecha_fin");
+
+      if (filters.asignacion === "asignado") query.whereExists(openAssignment);
+      else query.whereNotExists(openAssignment);
+    }
+
+    if (filters.q?.trim()) {
+      const term = `%${escapeLike(filters.q.trim())}%`;
+
+      query.where((builder) => {
+        builder
+          .where("a.codigo_inventario", "like", term)
+          .orWhere("a.descripcion", "like", term)
+          .orWhere("m.nombre", "like", term)
+          .orWhere("c.nombre", "like", term)
+          .orWhere("ar.nombre", "like", term);
+      });
+    }
+  }
+
   /**
    * Mapea y normaliza Date (Fecha) para devolverlo como cadena
    * Para luego retornar todo los datos de la tabla Activos
@@ -95,39 +126,8 @@ export class AssetsRepository {
    */
   async findAll(filters: AssetFilters = {}): Promise<Asset[]> {
     const query = this.baseQuery().orderBy("a.id", "desc");
+    this.applyFilters(query, filters);
 
-    if (filters.estado) {
-      query.where("a.estado", filters.estado);
-    }
-
-    if (filters.areaId !== undefined) {
-      query.where("a.area_id", filters.areaId);
-    }
-
-    if (filters.asignacion) {
-      const openAssignment = db("asignaciones as asi")
-        .select(db.raw("1"))
-        .whereRaw("asi.activo_id = a.id")
-        .whereNull("asi.fecha_fin");
-
-      if (filters.asignacion === "asignado") query.whereExists(openAssignment);
-      else query.whereNotExists(openAssignment);
-    }
-
-    if (filters.q?.trim()) {
-      const term = `%${escapeLike(filters.q.trim())}%`;
-
-      query.where((builder) => {
-        builder
-          .where("a.codigo_inventario", "like", term)
-          .orWhere("a.descripcion", "like", term)
-          .orWhere("m.nombre", "like", term)
-          .orWhere("c.nombre", "like", term)
-          .orWhere("ar.nombre", "like", term);
-      });
-    }
-    // Almacena lo consulta en la constante rows
-    // Retornando las celdas mapeadas
     const rows = await query;
     return rows.map((row) => this.mapRow(row));
   }
@@ -439,9 +439,29 @@ export class AssetsRepository {
   }
 
   async findImageNameAnyState(id: number): Promise<string | null> {
-  const row = await db("activos").select("imagen_archivo").where({ id }).first();
-  return row?.imagen_archivo ?? null;
-}
+    const row = await db("activos")
+      .select("imagen_archivo")
+      .where({ id })
+      .first();
+    return row?.imagen_archivo ?? null;
+  }
+  
+  /** Para reportes: ordenado por área y código. Las bajas solo entran sin filtro de estado ni de asignación. */
+  async findAllForReport(
+    filters: AssetFilters = {},
+    options: { includeDeleted?: boolean } = {},
+  ): Promise<Asset[]> {
+    const includeDeleted =
+      Boolean(options.includeDeleted) && !filters.estado && !filters.asignacion;
+
+    const query = this.baseQuery({ includeDeleted })
+      .orderBy("ar.nombre", "asc")
+      .orderBy("a.codigo_inventario", "asc");
+    this.applyFilters(query, filters);
+
+    const rows = await query;
+    return rows.map((row) => this.mapRow(row));
+  }
 }
 
 export const assetsRepository = new AssetsRepository();

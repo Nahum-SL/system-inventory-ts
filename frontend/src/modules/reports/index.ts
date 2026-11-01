@@ -12,5 +12,7 @@ export type { DashboardSummary, DashboardTotals } from "./types";
 export { default as RecentMovements } from "./components/RecentMovements";
 export { default as ExportAssetsButton } from "./components/ExportAssetsButton";
 export { default as AssetSheetButton } from "./components/AssetSheetButton";
+export { default as ExportAssetsPdfButton } from "./components/ExportAssetsPdfButton";
+// VIEWS - PAGES
 // VIEWS - PAGES
 export { default as ReportsPage } from "./views/ReportsPage";

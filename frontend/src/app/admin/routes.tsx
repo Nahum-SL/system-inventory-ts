@@ -5,7 +5,11 @@ import AdminRoute from "./AdminRoute";
 // MODULO - ASSET
 import { AssetCardPage, AssetsPage } from "@/modules/assets";
 // MODULO - REPORTS
-import { ExportAssetsButton, ReportsPage } from "@/modules/reports";
+import {
+  ExportAssetsButton,
+  ExportAssetsPdfButton,
+  ReportsPage,
+} from "@/modules/reports";
 // COMPONENTS
 import AssetActions from "./components/AssetActions";
 // PAGES
@@ -35,7 +39,10 @@ export const adminRoutes: RouteObject = {
             <AssetsPage
               basePath="/admin/activos"
               exportAction={(filters) => (
-                <ExportAssetsButton filters={filters} />
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <ExportAssetsButton filters={filters} />
+                  <ExportAssetsPdfButton filters={filters} />
+                </div>
               )}
             />
           ),

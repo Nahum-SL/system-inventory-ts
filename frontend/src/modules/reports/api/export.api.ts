@@ -29,3 +29,20 @@ export const downloadMaintenance = (r: DateRange) =>
 
 export const downloadAssetSheet = (codigo: string) =>
   api.getFile(`/reports/export/asset-sheet/${encodeURIComponent(codigo)}`);
+
+/**
+ * API PARA EL ENDPOINT DE EXPORTAR LOS ACTIVOS A PDF (SIN HISTORIAL - MOVIMIENTOS ..)
+ * @param f 
+ * @returns 
+ */
+export const downloadAssetsPdf = (
+  f: AssetExportFilters & { incluirBajas?: boolean },
+) =>
+  api.getFile(
+    `/reports/export/assets-pdf${query({
+      q: f.q,
+      estado: f.estado,
+      asignacion: f.asignacion,
+      incluirBajas: f.incluirBajas ? "true" : undefined,
+    })}`,
+  );

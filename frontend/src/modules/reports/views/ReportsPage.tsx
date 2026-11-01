@@ -15,6 +15,7 @@ import { cn } from "@/shared/lib/utils";
 
 import {
   downloadAssets,
+  downloadAssetsPdf,
   downloadMaintenance,
   downloadMovements,
 } from "../api/export.api";
@@ -67,7 +68,6 @@ function ReportCard({
 export default function ReportsPage() {
   return (
     <section className="min-w-0 space-y-6">
-      
       <SectionHeader
         title="Reportes"
         description="Exporta información del inventario para consulta y seguimiento."
@@ -98,15 +98,25 @@ export default function ReportsPage() {
           description="Exporta todos los activos y su responsable actual. Para obtener una lista filtrada, utiliza la opción de exportación en el módulo Activos."
           icon={<Package size={20} aria-hidden="true" />}
         >
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Formato CSV · Todos los activos
+          <div className="space-y-4">
+            <p className="text-xs leading-5 text-slate-500 dark:text-slate-400">
+              CSV: todos los activos · PDF: listado por área con fotos, incluye
+              dados de baja
             </p>
 
-            <ExportButton
-              fetchFile={() => downloadAssets({})}
-              label="Exportar inventario"
-            />
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <ExportButton
+                fetchFile={() => downloadAssetsPdf({ incluirBajas: true })}
+                label="Inventario con fotos (PDF)"
+                variant="primary"
+              />
+              <ExportButton
+                fetchFile={() => downloadAssets({})}
+                label="Exportar inventario (CSV)"
+                variant="secondary"
+              />
+
+            </div>
           </div>
         </ReportCard>
 

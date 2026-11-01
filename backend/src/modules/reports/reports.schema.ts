@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { listAssetsQuerySchema } from "../assets/assets.schema.js";
 
 /** Rango de fechas opcional (`YYYY-MM-DD`), inclusivo en ambos extremos. */
 export const exportRangeQuerySchema = z
@@ -10,3 +11,10 @@ export const exportRangeQuerySchema = z
     message: "'desde' no puede ser posterior a 'hasta'",
     path: ["hasta"],
   });
+
+export const exportAssetsPdfQuerySchema = listAssetsQuerySchema.extend({
+  incluirBajas: z
+    .enum(["true", "false"])
+    .transform((v) => v === "true")
+    .optional(),
+});

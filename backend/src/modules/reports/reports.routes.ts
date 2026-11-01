@@ -7,6 +7,7 @@ import { validate } from "../../shared/middlewares/validate.middleware.js";
 import {
   exportAssets,
   exportAssetSheet,
+  exportAssetsPdf,
   exportMaintenance,
   exportMovements,
   getSummary,
@@ -14,7 +15,7 @@ import {
 // SCHEMA - ASSETS
 import { listAssetsQuerySchema } from "../assets/assets.schema.js";
 // SCHEMA - REPORTS
-import { exportRangeQuerySchema } from "./reports.schema.js";
+import { exportAssetsPdfQuerySchema, exportRangeQuerySchema } from "./reports.schema.js";
 
 const reportsRoutes = Router();
 
@@ -39,5 +40,11 @@ reportsRoutes.get(
 );
 
 reportsRoutes.get("/export/asset-sheet/:codigo", exportAssetSheet);
+
+reportsRoutes.get(
+  "/export/assets-pdf",
+  validate(exportAssetsPdfQuerySchema, "query"),
+  exportAssetsPdf,
+);
 
 export default reportsRoutes;

@@ -11,6 +11,7 @@ import type { CsvFile, ExportRange } from "./reports.types.js";
 import type { AssetFilters } from "../assets/assets.types.js";
 // SERVICE
 import { reportsService } from "./reports.service.js";
+import { assetListService } from "./asset-list.service.js";
 
 function sendCsv(res: Response, file: CsvFile): void {
   res
@@ -54,6 +55,26 @@ export const exportAssetSheet = asyncHandler(async (req, res) => {
   if (!codigo || codigo.length > 50) throw new BadRequestError("Código de activo inválido");
 
   const { pdf, fileName } = await assetSheetService.build(codigo, req.auth!.username);
+
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
+  res.setHeader("Cache-Control", "no-store");
+  res.send(Buffer.from(pdf));
+});
+
+/**
+ * CONTROLADOR PARA LA EXPORTACION DE LOS PDFS DE ACTIVOS (IGNORANDO EL HISTORIAL -> TRANSACCIONES - MANTENIMIENTO..)
+ */
+export const exportAssetsPdf = asyncHandler(async (req, res) => {
+  const { incluirBajas = false, ...filters } = req.query as AssetFilters & {
+    incluirBajas?: boolean;
+  };
+
+  const { pdf, fileName } = await assetListService.build(
+    filters,
+    incluirBajas,
+    req.auth!.username,
+  );
 
   res.setHeader("Content-Type", "application/pdf");
   res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
