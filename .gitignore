@@ -12,6 +12,7 @@ backend/node_modules
 backend/dist
 backend/logs
 
+backend/ops/backup/backup.cnf
 
 # FRONTEND
 frontend/node_modules

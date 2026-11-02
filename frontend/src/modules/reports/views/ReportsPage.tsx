@@ -100,8 +100,8 @@ export default function ReportsPage() {
         >
           <div className="space-y-4">
             <p className="text-xs leading-5 text-slate-500 dark:text-slate-400">
-              CSV: todos los activos · PDF: listado por área con fotos, incluye
-              dados de baja
+              CSV: todos los activos · PDF: listado por área con fotos y
+              responsable, incluye dados de baja,
             </p>
 
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -115,7 +115,6 @@ export default function ReportsPage() {
                 label="Exportar inventario (CSV)"
                 variant="secondary"
               />
-
             </div>
           </div>
         </ReportCard>

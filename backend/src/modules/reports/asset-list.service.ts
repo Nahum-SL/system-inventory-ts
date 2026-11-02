@@ -1,11 +1,15 @@
 import sharp from "sharp";
 
 import { imageStorage } from "../../shared/storage/image-storage.js";
+// REPOSITORIES
 import { assetsRepository } from "../assets/assets.repository.js";
+import { reportsRepository } from "./reports.repository.js";
+// TYPES
 import type { AssetFilters, AssetStatus } from "../assets/assets.types.js";
-
+// PDF - ASSET LIST - ACTIVOS
 import { renderAssetList } from "./pdf/list/asset-list.render.js";
 import type { AssetListData } from "./pdf/list/asset-list.types.js";
+// PDF - ASSET SHEET - HOJA DE VIDA
 import { formatNowLima } from "./pdf/sheet/asset-sheet.helper.js";
 import type { SheetImage } from "./pdf/sheet/asset-sheet.types.js";
 import { YONDA_LOGO } from "./pdf/yonda-logo.js";
@@ -59,9 +63,12 @@ export const assetListService = {
     incluirBajas: boolean,
     generadoPor: string,
   ) {
-    const assets = await assetsRepository.findAllForReport(filters, {
-      includeDeleted: incluirBajas,
-    });
+    const [assets, assignments] = await Promise.all([
+      assetsRepository.findAllForReport(filters, {
+        includeDeleted: incluirBajas,
+      }),
+      reportsRepository.findOpenAssignments(),
+    ]);
 
     const bajasIncluidas =
       incluirBajas && !filters.estado && !filters.asignacion;
@@ -88,16 +95,22 @@ export const assetListService = {
       generadoEn: formatNowLima(),
       generadoPor,
       filtros,
-      activos: assets.map((a, i) => ({
-        codigoInventario: a.codigoInventario,
-        descripcion: a.descripcion ?? "",
-        marcaNombre: a.marcaNombre,
-        categoriaNombre: a.categoriaNombre,
-        areaNombre: a.areaNombre,
-        estado: a.estado,
-        eliminado: a.eliminado,
-        foto: fotos[i] ?? null,
-      })),
+      activos: assets.map((a, i) => {
+        const asignacion = assignments.get(a.id);
+        return {
+          codigoInventario: a.codigoInventario,
+          descripcion: a.descripcion ?? "",
+          marcaNombre: a.marcaNombre,
+          categoriaNombre: a.categoriaNombre,
+          areaNombre: a.areaNombre,
+          estado: a.estado,
+          eliminado: a.eliminado,
+          responsable: asignacion
+            ? { nombre: asignacion.responsable, cargo: asignacion.cargo }
+            : null,
+          foto: fotos[i] ?? null,
+        };
+      }),
       logo: YONDA_LOGO,
     };
 

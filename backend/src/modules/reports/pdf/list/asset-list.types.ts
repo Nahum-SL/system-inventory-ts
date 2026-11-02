@@ -1,4 +1,7 @@
-import type { SheetAssetStatus, SheetImage } from "../sheet/asset-sheet.types.js";
+import type {
+  SheetAssetStatus,
+  SheetImage,
+} from "../sheet/asset-sheet.types.js";
 
 export interface AssetListItem {
   codigoInventario: string;
@@ -8,6 +11,8 @@ export interface AssetListItem {
   areaNombre: string;
   estado: SheetAssetStatus;
   eliminado: boolean;
+  /** Responsable actual (asignación abierta) o `null` si está libre o dado de baja. */
+  responsable: { nombre: string; cargo: string } | null;
   /** Miniatura ya reducida (JPG/PNG) o `null`. */
   foto: SheetImage | null;
 }
