@@ -42,14 +42,21 @@ try {
         throw "El nombre de la base de datos no puede estar vacio."
     }
 
-    # Localizar mysqldump
-    $command = Get-Command mysqldump.exe -ErrorAction SilentlyContinue
+    # # Localizar mysqldump
+    # $command = Get-Command mysqldump.exe -ErrorAction SilentlyContinue
 
-    if (-not $command) {
-        throw "No se encontro mysqldump.exe. Agrega MySQL Server\bin al PATH o configura su ruta."
+    # if (-not $command) {
+    #     throw "No se encontro mysqldump.exe. Agrega MySQL Server\bin al PATH o configura su ruta."
+    # }
+
+    # $DumpExe = $command.Source
+
+    # Localizar mysqldump de XAMPP
+    $DumpExe = "C:\xampp\mysql\bin\mysqldump.exe"
+
+    if (-not (Test-Path -LiteralPath $DumpExe -PathType Leaf)) {
+        throw "No se encontro mysqldump.exe en: $DumpExe"
     }
-
-    $DumpExe = $command.Source
 
     # Preparar directorios
     New-Item -ItemType Directory -Force -Path $Dest | Out-Null
@@ -81,8 +88,14 @@ try {
         "--result-file=$tempFile"
     )
 
-    if ($SinCrearBase) { $dumpArgs += $Database }
-    else { $dumpArgs += @("--databases", $Database) }
+    if ($SinCrearBase) {
+        Write-Log "Modo traslado: sin CREATE DATABASE ni USE."
+        $dumpArgs += @("--skip-add-drop-table", $Database)
+    }
+    else {
+        Write-Log "Modo respaldo completo: incluye CREATE DATABASE."
+        $dumpArgs += @("--databases", $Database)
+    }
 
     & $DumpExe @dumpArgs
 
