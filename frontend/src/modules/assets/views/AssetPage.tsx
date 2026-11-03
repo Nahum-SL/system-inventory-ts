@@ -15,15 +15,18 @@ import { useAssetFilters } from "../hooks/useAssetFilters";
 import { useAssets } from "../hooks/useAsset";
 import type { AssetFilters } from "../types";
 import SectionHeader from "@/shared/components/ui/SectionHeader";
-import { Link } from "react-router";
-import { cn } from "@/shared/lib/utils";
 
 interface Props {
   basePath: string;
+  createAction?: ReactNode;
   exportAction?: (filters: AssetFilters) => ReactNode;
 }
 
-export default function AssetsPage({ basePath, exportAction }: Props) {
+export default function AssetsPage({
+  basePath,
+  createAction,
+  exportAction,
+}: Props) {
   const { filters, text, onSearch, update, clear, hasActive } =
     useAssetFilters();
 
@@ -33,6 +36,8 @@ export default function AssetsPage({ basePath, exportAction }: Props) {
   const hasAssets = assets.length > 0;
   const isEmpty = !isPending && !error && assets.length === 0;
 
+  const exportContent = exportAction?.(filters);
+
   return (
     <section className="space-y-6">
       {/* Encabezado */}
@@ -40,25 +45,9 @@ export default function AssetsPage({ basePath, exportAction }: Props) {
         title="Activos"
         description="Consulta y administra los activos registrados."
         icon={Package}
-        actions={
-          <Link
-            to="/admin/activos/nuevo"
-            className={cn(
-              "inline-flex min-h-10 items-center justify-center gap-2",
-              "rounded-xl border border-transparent px-4 py-2",
-              "text-sm font-medium transition-colors duration-200",
-              "bg-amber-600 text-white hover:bg-amber-700",
-              "dark:bg-amber-500 dark:text-gray-950 dark:hover:bg-amber-400",
-              "focus-visible:outline-none focus-visible:ring-2",
-              "focus-visible:ring-amber-500 focus-visible:ring-offset-2",
-              "dark:focus-visible:ring-offset-gray-900",
-            )}
-          >
-            <Plus size={16} aria-hidden="true" />
-            Nuevo activo
-          </Link>
-        }
+        actions={createAction}
       />
+
       {/* Filtros y búsqueda */}
       <AssetFiltersBar
         filters={filters}
@@ -120,10 +109,8 @@ export default function AssetsPage({ basePath, exportAction }: Props) {
               </span>
             </div>
 
-            {exportAction?.(filters) && (
-              <div className="flex items-center gap-2">
-                {exportAction(filters)}
-              </div>
+            {exportContent && (
+              <div className="flex items-center gap-2">{exportContent}</div>
             )}
           </div>
 

@@ -1,6 +1,9 @@
 import { Suspense } from "react";
+import { LayoutDashboard } from "lucide-react";
+// AOMTIC COMPONENTS
 import Alert from "@/shared/components/ui/Alert";
 import { LoadingState } from "@/shared/components/ui/states/LoadingState";
+// REPORTS COMPONENTS
 import {
   DashboardCharts,
   RecentMovements,
@@ -8,10 +11,10 @@ import {
 } from "@/modules/reports";
 // COMPONENTS
 import { DashboardKpiGrid } from "@/modules/reports/components/stats/dashboard-kpi-grid";
+import SectionHeader from "@/shared/components/ui/SectionHeader";
 // TYPES
 import type { DashboardStats } from "@/modules/reports/types";
-import SectionHeader from "@/shared/components/ui/SectionHeader";
-import { LayoutDashboard } from "lucide-react";
+
 
 const assetHref = (codigo: string) =>
   `/admin/activos/${encodeURIComponent(codigo)}`;

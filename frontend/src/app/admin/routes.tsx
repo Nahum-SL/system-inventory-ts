@@ -1,4 +1,4 @@
-import type { RouteObject } from "react-router";
+import { Link, type RouteObject } from "react-router";
 
 import AdminLayout from "./AdminLayout";
 import AdminRoute from "./AdminRoute";
@@ -24,6 +24,8 @@ import {
   PositionsPage,
 } from "@/modules/catalogs";
 import AssetSheetButton from "@/modules/reports/components/AssetSheetButton";
+import { Plus } from "lucide-react";
+import { cn } from "@/shared/lib/utils";
 
 export const adminRoutes: RouteObject = {
   path: "admin",
@@ -38,6 +40,24 @@ export const adminRoutes: RouteObject = {
           element: (
             <AssetsPage
               basePath="/admin/activos"
+              createAction={
+                <Link
+                  to="/admin/activos/nuevo"
+                  className={cn(
+                    "inline-flex min-h-10 items-center justify-center gap-2",
+                    "rounded-xl border border-transparent px-4 py-2",
+                    "text-sm font-medium transition-colors duration-200",
+                    "bg-amber-600 text-white hover:bg-amber-700",
+                    "dark:bg-amber-500 dark:text-gray-950 dark:hover:bg-amber-400",
+                    "focus-visible:outline-none focus-visible:ring-2",
+                    "focus-visible:ring-amber-500 focus-visible:ring-offset-2",
+                    "dark:focus-visible:ring-offset-gray-900",
+                  )}
+                >
+                  <Plus size={16} aria-hidden="true" />
+                  Nuevo activo
+                </Link>
+              }
               exportAction={(filters) => (
                 <div className="flex flex-col gap-2 sm:flex-row">
                   <ExportAssetsPdfButton filters={filters} />
