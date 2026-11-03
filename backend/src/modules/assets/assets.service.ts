@@ -197,6 +197,11 @@ export class AssetsService {
     };
   }
 
+  /** Código sugerido para el próximo activo. */
+  async getNextCode(): Promise<string> {
+    return assetsRepository.findNextCode();
+  }
+
   /**
    * Genera el QR (SVG) de un activo. Codifica una URL a la ficha en el frontend:
    * `${PUBLIC_APP_URL}/activos/<codigo>`. No se guarda; se genera al vuelo.

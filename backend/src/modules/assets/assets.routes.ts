@@ -18,6 +18,7 @@ import {
   getAssetById,
   getAssetImage,
   getAssetQr,
+  getNextAssetCode,
   listAssets,
   updateAsset,
   updateAssetStatus,
@@ -47,6 +48,10 @@ assetsRoutes.post(
   validate(createAssetSchema),
   createAsset,
 );
+
+// Invoca el endpoint que sugiere el próximo código de activo. Solo admin puede ver esto.
+assetsRoutes.get("/next-code", authorize("admin"), getNextAssetCode);
+
 assetsRoutes.patch(
   "/:id",
   authorize("admin"),

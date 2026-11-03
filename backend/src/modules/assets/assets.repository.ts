@@ -445,7 +445,7 @@ export class AssetsRepository {
       .first();
     return row?.imagen_archivo ?? null;
   }
-  
+
   /** Para reportes: ordenado por área y código. Las bajas solo entran sin filtro de estado ni de asignación. */
   async findAllForReport(
     filters: AssetFilters = {},
@@ -461,6 +461,38 @@ export class AssetsRepository {
 
     const rows = await query;
     return rows.map((row) => this.mapRow(row));
+  }
+
+  /**
+   * Sugiere el siguiente código de inventario. Toma el prefijo y el ancho numérico
+   * del último activo registrado (dados de baja incluidos: su código sigue ocupado)
+   * y suma 1 al mayor número usado con ese prefijo. Solo es una sugerencia.
+   */
+  async findNextCode(): Promise<string> {
+    const last = await db("activos")
+      .select("codigo_inventario")
+      .orderBy("id", "desc")
+      .first();
+
+    const parsed = /^(.*?)(\d+)$/.exec(String(last?.codigo_inventario ?? ""));
+    const prefix = parsed?.[1] ?? "INV-";
+    const width = parsed?.[2]?.length ?? 4;
+
+    const rows = await db("activos")
+      .select("codigo_inventario")
+      .where("codigo_inventario", "like", `${escapeLike(prefix)}%`);
+
+    let max = 0;
+    for (const row of rows) {
+      const code = String(row.codigo_inventario);
+      // La base compara sin distinguir mayúsculas: "inv-0012" choca con "INV-0012".
+      if (!code.toLowerCase().startsWith(prefix.toLowerCase())) continue;
+
+      const digits = code.slice(prefix.length);
+      if (/^\d{1,9}$/.test(digits)) max = Math.max(max, Number(digits));
+    }
+
+    return `${prefix}${String(max + 1).padStart(width, "0")}`;
   }
 }
 

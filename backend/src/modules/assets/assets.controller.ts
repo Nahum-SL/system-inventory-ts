@@ -101,6 +101,9 @@ export const getAssetQr = asyncHandler(async (req, res) => {
   res.status(200).type("image/svg+xml").send(svg);
 });
 
+/**
+ * Devuelve la imagen del activo, si existe. No da de baja ni borra el activo. El activo debe existir.
+ */
 export const getAssetImage = asyncHandler(async (req, res, next) => {
   const file = await assetsService.getImagePath(
     parseId(req.params.id, "del activo"),
@@ -123,6 +126,9 @@ export const getAssetImage = asyncHandler(async (req, res, next) => {
   );
 });
 
+/**
+ * Sube o reemplaza la imagen del activo. No borra el activo ni lo da de baja. El activo debe existir.
+ */
 export const uploadAssetImage = asyncHandler(async (req, res) => {
   const asset = await assetsService.setImage(
     parseId(req.params.id, "del activo"),
@@ -135,6 +141,9 @@ export const uploadAssetImage = asyncHandler(async (req, res) => {
   });
 });
 
+/**
+ * Borra la imagen del activo. No borra el activo ni lo da de baja. El activo debe existir y tener imagen.
+ */
 export const deleteAssetImage = asyncHandler(async (req, res) => {
   const asset = await assetsService.removeImage(
     parseId(req.params.id, "del activo"),
@@ -144,4 +153,13 @@ export const deleteAssetImage = asyncHandler(async (req, res) => {
     message: "Imagen eliminada correctamente",
     data: asset,
   });
+});
+
+/**
+ * Invoca el endpoint que sugiere el próximo código de activo. Solo admin puede ver esto.
+ */
+export const getNextAssetCode = asyncHandler(async (_req, res) => {
+  const codigo = await assetsService.getNextCode();
+
+  res.status(200).json({ status: "success", data: { codigo } });
 });
