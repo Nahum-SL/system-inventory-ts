@@ -4,6 +4,8 @@ export {
   PersonOptions,
   PositionOptions,
 } from "./components/options";
+
+export { PersonSelect, PositionSelect } from "./components/select";
 // HOOKS
 export {
   catalogKeys,

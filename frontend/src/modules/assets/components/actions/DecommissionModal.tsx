@@ -14,7 +14,7 @@ import {
   decommissionSchema,
   type DecommissionInput,
   type DecommissionValues,
-} from "../../schema/activons.schema";
+} from "../../schema/asset.schema";
 // TYPES
 import type { AssetCard } from "../../types";
 

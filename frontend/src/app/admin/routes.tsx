@@ -40,8 +40,8 @@ export const adminRoutes: RouteObject = {
               basePath="/admin/activos"
               exportAction={(filters) => (
                 <div className="flex flex-col gap-2 sm:flex-row">
-                  <ExportAssetsButton filters={filters} />
                   <ExportAssetsPdfButton filters={filters} />
+                  <ExportAssetsButton filters={filters} />
                 </div>
               )}
             />

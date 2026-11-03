@@ -23,7 +23,7 @@ import type {
   MoveValues,
   AssignValues,
   ReturnAssignmentValues,
-} from "../schema/activons.schema";
+} from "../schema/asset.schema";
 // Keys
 import { assetKeys } from "../utils/asset-query-keys";
 import type { EditAssetValues } from "../schema/asset-form.schema";

@@ -11,7 +11,7 @@ import type {
   MoveValues,
   OpenMaintenanceValues,
   ReturnAssignmentValues,
-} from "../schema/activons.schema";
+} from "../schema/asset.schema";
 import type { ChangeStatusValues } from "../schema/asset-status.schema";
 import type {
   CreateAssetValues,

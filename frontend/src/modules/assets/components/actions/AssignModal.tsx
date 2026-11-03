@@ -1,4 +1,4 @@
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 // Componentes Atomicos
@@ -10,7 +10,7 @@ import { controlClass } from "@/shared/components/ui/Buttons/style.button";
 /// LIB - MANEJO DEL DATE
 import { todayLocal } from "@/shared/lib/date";
 // MODULO - CATALOGS
-import { PersonOptions, PositionOptions } from "@/modules/catalogs";
+import { PersonSelect, PositionSelect } from "@/modules/catalogs";
 // HOOKS
 import { useAssignAsset } from "../../hooks/use-asset-mutation";
 // SCHEMA - ACTIONS
@@ -18,7 +18,7 @@ import {
   assignSchema,
   type AssignInput,
   type AssignValues,
-} from "../../schema/activons.schema";
+} from "../../schema/asset.schema";
 // TYPES
 import type { AssetCard } from "../../types";
 
@@ -30,8 +30,10 @@ interface Props {
 
 function AssignForm({ asset, onClose }: Omit<Props, "open">) {
   const mutation = useAssignAsset(asset.id);
+
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors },
   } = useForm<AssignInput, unknown, AssignValues>({
@@ -56,15 +58,33 @@ function AssignForm({ asset, onClose }: Omit<Props, "open">) {
   return (
     <form onSubmit={onSubmit} noValidate className="space-y-4">
       <FormField label="Persona" error={errors.personaId?.message}>
-        <select className={controlClass} {...register("personaId")}>
-          <PersonOptions />
-        </select>
+        <Controller
+          control={control}
+          name="personaId"
+          render={({ field }) => (
+            <PersonSelect
+              value={field.value}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              invalid={Boolean(errors.personaId)}
+            />
+          )}
+        />
       </FormField>
 
       <FormField label="Cargo" error={errors.cargoId?.message}>
-        <select className={controlClass} {...register("cargoId")}>
-          <PositionOptions />
-        </select>
+        <Controller
+          control={control}
+          name="cargoId"
+          render={({ field }) => (
+            <PositionSelect
+              value={field.value}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              invalid={Boolean(errors.cargoId)}
+            />
+          )}
+        />
       </FormField>
 
       <FormField label="Fecha de entrega" error={errors.fechaInicio?.message}>

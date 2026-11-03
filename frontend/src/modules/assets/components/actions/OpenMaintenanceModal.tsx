@@ -16,7 +16,7 @@ import {
   openMaintenanceSchema,
   type OpenMaintenanceInput,
   type OpenMaintenanceValues,
-} from "../../schema/activons.schema";
+} from "../../schema/asset.schema";
 // TYPE - ASSET CARD
 import type { AssetCard } from "../../types";
 

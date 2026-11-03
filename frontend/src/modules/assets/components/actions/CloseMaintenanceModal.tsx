@@ -17,7 +17,7 @@ import {
   closeMaintenanceSchema,
   type CloseMaintenanceInput,
   type CloseMaintenanceValues,
-} from "../../schema/activons.schema";
+} from "../../schema/asset.schema";
 // TYPES
 import type { AssetCard } from "../../types";
 

@@ -11,6 +11,7 @@ export default function ExportAssetsButton({
     <ExportButton
       fetchFile={() => downloadAssets(filters)}
       label="Exportar lista (CSV)"
+      variant="secondary"
     />
   );
 }

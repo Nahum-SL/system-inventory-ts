@@ -11,7 +11,7 @@ export default function ExportAssetsPdfButton({
     <ExportButton
       fetchFile={() => downloadAssetsPdf(filters)}
       label="Exportar lista (PDF)"
-      variant="secondary"
+      variant="primary"
     />
   );
 }

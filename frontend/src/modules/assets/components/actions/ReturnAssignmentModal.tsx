@@ -17,7 +17,7 @@ import {
   returnAssignmentSchema,
   type ReturnAssignmentInput,
   type ReturnAssignmentValues,
-} from "../../schema/activons.schema";
+} from "../../schema/asset.schema";
 // TYPES
 import type { AssetCard } from "../../types";
 

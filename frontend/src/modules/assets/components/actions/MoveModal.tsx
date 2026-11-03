@@ -16,7 +16,7 @@ import {
   moveSchema,
   type MoveInput,
   type MoveValues,
-} from "../../schema/activons.schema";
+} from "../../schema/asset.schema";
 // TYPES
 import type { AssetCard } from "../../types";
 
