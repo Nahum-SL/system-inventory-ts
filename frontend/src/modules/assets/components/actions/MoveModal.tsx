@@ -1,4 +1,4 @@
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 // COMPONENTES ATOMICOS
@@ -7,8 +7,6 @@ import Button from "@/shared/components/ui/Buttons/button";
 import FormField from "@/shared/components/ui/form/FormField";
 import Modal from "@/shared/components/ui/dialog/Modal";
 import { controlClass } from "@/shared/components/ui/Buttons/style.button";
-// MODULO - CATALOGS
-import { AreaOptions } from "@/modules/catalogs";
 // HOOKS
 import { useMoveAsset } from "../../hooks/use-asset-mutation";
 // SCHEMA
@@ -19,6 +17,7 @@ import {
 } from "../../schema/asset.schema";
 // TYPES
 import type { AssetCard } from "../../types";
+import { AreaSelect } from "@/modules/catalogs/components/select";
 
 interface Props {
   asset: AssetCard;
@@ -30,6 +29,7 @@ function MoveForm({ asset, onClose }: Omit<Props, "open">) {
   const mutation = useMoveAsset(asset.id);
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors },
   } = useForm<MoveInput, unknown, MoveValues>({
@@ -51,9 +51,18 @@ function MoveForm({ asset, onClose }: Omit<Props, "open">) {
       <p className="text-sm text-slate-600">Área actual: {asset.areaNombre}</p>
 
       <FormField label="Área de destino" error={errors.areaDestinoId?.message}>
-        <select className={controlClass} {...register("areaDestinoId")}>
-          <AreaOptions excludeId={asset.areaId} />
-        </select>
+        <Controller
+          control={control}
+          name="areaDestinoId"
+          render={({ field }) => (
+            <AreaSelect
+              value={field.value}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              invalid={Boolean(errors.areaDestinoId)}
+            />
+          )}
+        />
       </FormField>
 
       <FormField label="Motivo (opcional)" error={errors.motivo?.message}>
