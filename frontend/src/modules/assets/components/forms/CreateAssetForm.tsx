@@ -1,13 +1,15 @@
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-// ATOMICS COMPONENTS 
+// ATOMICS COMPONENTS
 import Alert from "@/shared/components/ui/Alert";
 import Button from "@/shared/components/ui/Buttons/button";
+import { LoadingState } from "@/shared/components/ui/states/LoadingState";
 // LIB - LOCAL DATE
 import { todayLocal } from "@/shared/lib/date";
 // HOOKS
 import { useCreateAsset } from "../../hooks/use-asset-mutation";
+import { useNextAssetCode } from "../../hooks/use-next-asset-code";
 // SCHEMA - ASSET
 import {
   createAssetSchema,
@@ -26,7 +28,20 @@ interface Props {
   onCancel: () => void;
 }
 
-export default function CreateAssetForm({ onCreated, onCancel }: Props) {
+export default function CreateAssetForm(props: Props) {
+  const { data: suggestedCode, isPending } = useNextAssetCode();
+
+  if (isPending) return <LoadingState />;
+
+  // Si no se pudo sugerir un código, el campo queda vacío y se escribe a mano.
+  return <CreateAssetFormBody {...props} initialCode={suggestedCode ?? ""} />;
+}
+
+function CreateAssetFormBody({
+  onCreated,
+  onCancel,
+  initialCode,
+}: Props & { initialCode: string }) {
   const mutation = useCreateAsset();
 
   const methods = useForm<CreateAssetInput, unknown, CreateAssetValues>({
@@ -35,7 +50,7 @@ export default function CreateAssetForm({ onCreated, onCancel }: Props) {
       marcaId: "",
       categoriaId: "",
       areaId: "",
-      codigoInventario: "",
+      codigoInventario: initialCode,
       fechaIngreso: todayLocal(),
       descripcion: "",
     },

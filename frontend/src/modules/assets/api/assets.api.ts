@@ -66,3 +66,7 @@ export const getMovementHistory = async (
 /** Requiere sesión, por eso se pide con fetch y no con <img src>. */
 export const getAssetImage = (id: number): Promise<Blob> =>
   api.getBlob(`/assets/${id}/imagen`);
+
+export const getNextAssetCode = async (): Promise<string> =>
+  (await api.get<ApiResponse<{ codigo: string }>>("/assets/next-code")).data
+    .codigo;

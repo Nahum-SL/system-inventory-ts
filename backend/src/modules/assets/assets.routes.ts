@@ -33,13 +33,14 @@ assetsRoutes.use(authenticate);
 
 // Lectura (cualquier usuario autenticado)
 assetsRoutes.get("/", validate(listAssetsQuerySchema, "query"), listAssets);
+
 assetsRoutes.get(
   "/code/:codigo",
   validate(assetCodeParamSchema, "params"),
   getAssetByCode,
 );
-assetsRoutes.get("/:id", getAssetById);
-assetsRoutes.get("/:id/qr", getAssetQr);
+// Invoca el endpoint que sugiere el próximo código de activo. Solo admin puede ver esto.
+assetsRoutes.get("/next-code", authorize("admin"), getNextAssetCode);
 
 // Escritura (solo admin)
 assetsRoutes.post(
@@ -49,8 +50,9 @@ assetsRoutes.post(
   createAsset,
 );
 
-// Invoca el endpoint que sugiere el próximo código de activo. Solo admin puede ver esto.
-assetsRoutes.get("/next-code", authorize("admin"), getNextAssetCode);
+assetsRoutes.get("/:id", getAssetById);
+
+assetsRoutes.get("/:id/qr", getAssetQr);
 
 assetsRoutes.patch(
   "/:id",
@@ -84,6 +86,5 @@ assetsRoutes.put(
   uploadAssetImage,
 );
 assetsRoutes.delete("/:id/imagen", authorize("admin"), deleteAssetImage);
-
 
 export default assetsRoutes;
