@@ -17,6 +17,7 @@
 #>
 
 param(
+    [switch]$SinCrearBase,   # traslado: el .sql no trae CREATE DATABASE/USE
     [string]$Database = "system_inventory_prod",
     [string]$Dest = "C:\respaldos\database",
     [string]$Log = "C:\respaldos\database-backup.log",
@@ -73,19 +74,17 @@ try {
 
     # Ejecutar mysqldump.
     # defaults-extra-file debe ser la primera opcion.
-    & $DumpExe `
-        "--defaults-extra-file=$Config" `
-        "--single-transaction" `
-        "--quick" `
-        "--routines" `
-        "--triggers" `
-        "--events" `
-        "--hex-blob" `
-        "--no-tablespaces" `
-        "--default-character-set=utf8mb4" `
-        "--databases" `
-        "$Database" `
+        $dumpArgs = @(
+        "--defaults-extra-file=$Config",   # debe ir primero
+        "--single-transaction", "--quick", "--routines", "--triggers", "--events",
+        "--hex-blob", "--no-tablespaces", "--default-character-set=utf8mb4",
         "--result-file=$tempFile"
+    )
+
+    if ($SinCrearBase) { $dumpArgs += $Database }
+    else { $dumpArgs += @("--databases", $Database) }
+
+    & $DumpExe @dumpArgs
 
     $code = $LASTEXITCODE
 
