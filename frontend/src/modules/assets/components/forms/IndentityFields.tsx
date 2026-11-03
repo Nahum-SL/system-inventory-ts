@@ -1,15 +1,15 @@
-import { useFormContext } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 // COMPONENTES ATOMICOS
 import FormField from "@/shared/components/ui/form/FormField";
 import { controlClass } from "@/shared/components/ui/Buttons/style.button";
-// MODULO CATALOGS
-import { AreaOptions } from "@/modules/catalogs";
 // SCHEMA
 import type { CreateAssetInput } from "../../schema/asset-form.schema";
+import { AreaSelect } from "@/modules/catalogs/components/select";
 
 export default function IdentityFields() {
   const {
     register,
+    control,
     formState: { errors },
   } = useFormContext<CreateAssetInput>();
 
@@ -28,9 +28,18 @@ export default function IdentityFields() {
       </FormField>
 
       <FormField label="Área inicial" error={errors.areaId?.message}>
-        <select className={controlClass} {...register("areaId")}>
-          <AreaOptions />
-        </select>
+        <Controller
+          control={control}
+          name="areaId"
+          render={({ field }) => (
+            <AreaSelect
+              value={field.value}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              invalid={Boolean(errors.areaId)}
+            />
+          )}
+        />
       </FormField>
     </div>
   );
