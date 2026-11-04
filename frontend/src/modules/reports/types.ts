@@ -25,13 +25,6 @@ export interface RecentMovement {
   fechaMovimiento: string;
 }
 
-export interface DashboardSummary {
-  totals: DashboardTotals;
-  byArea: CountByName[];
-  byCategory: CountByName[];
-  recentMovements: RecentMovement[];
-}
-
 export interface DashboardStats {
   activos: number;
   operativo: number;
@@ -61,4 +54,43 @@ export interface AssetExportFilters {
 export interface DateRange {
   desde?: string;
   hasta?: string;
+}
+
+// ==================
+// GRAFICOS DE DISTRIBUCION DE ACTIVOS
+
+export interface DashboardSummary {
+  totals: DashboardTotals;
+  byArea: CountByName[];
+  byCategory: CountByName[];
+  recentMovements: RecentMovement[];
+}
+
+export interface DistributionFilters {
+  areaId?: number;
+  categoriaId?: number;
+  estado?: "operativo" | "mantenimiento" | "fuera_de_servicio";
+}
+
+/** Una celda de la matriz área × categoría (salida cruda del repositorio). */
+export interface DistributionCell {
+  areaId: number;
+  areaNombre: string;
+  categoriaId: number;
+  categoriaNombre: string;
+  total: number;
+}
+
+export interface AreaDistribution {
+  id: number;
+  nombre: string;
+  total: number;
+  categorias: CountByName[];
+}
+
+export interface DistributionSummary {
+  total: number;
+  /** Leyenda global, de mayor a menor. */
+  categorias: CountByName[];
+  areas: AreaDistribution[];
 }
