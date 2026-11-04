@@ -10,18 +10,31 @@ import {
   exportAssetsPdf,
   exportMaintenance,
   exportMovements,
+  getDistribution,
   getSummary,
 } from "./reports.controller.js";
 // SCHEMA - ASSETS
 import { listAssetsQuerySchema } from "../assets/assets.schema.js";
 // SCHEMA - REPORTS
-import { exportAssetsPdfQuerySchema, exportRangeQuerySchema } from "./reports.schema.js";
+import {
+  distributionQuerySchema,
+  exportAssetsPdfQuerySchema,
+  exportRangeQuerySchema,
+} from "./reports.schema.js";
 
 const reportsRoutes = Router();
 
 // ENDPOINTS
 reportsRoutes.use(authenticate, authorize("admin"));
+
 reportsRoutes.get("/summary", getSummary);
+
+// RUTA PARA LOS GRAFICOS CON FILTROS
+reportsRoutes.get(
+  "/distribution",
+  validate(distributionQuerySchema, "query"),
+  getDistribution,
+);
 
 reportsRoutes.get(
   "/export/assets",

@@ -18,3 +18,11 @@ export const exportAssetsPdfQuerySchema = listAssetsQuerySchema.extend({
     .transform((v) => v === "true")
     .optional(),
 });
+
+export const distributionQuerySchema = z.object({
+  areaId: z.coerce.number().int().positive().optional(),
+  categoriaId: z.coerce.number().int().positive().optional(),
+  estado: z
+    .enum(["operativo", "mantenimiento", "fuera_de_servicio"])
+    .optional(),
+});

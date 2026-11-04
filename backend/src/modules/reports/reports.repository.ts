@@ -3,6 +3,8 @@ import db from "../../database/knex.js";
 import type {
   CountByName,
   DashboardTotals,
+  DistributionCell,
+  DistributionFilters,
   ExportRange,
   MaintenanceExportRow,
   MovementExportRow,
@@ -122,6 +124,36 @@ export class ReportsRepository {
     }));
   }
 
+  /** Activos vigentes agrupados por área y categoría, con filtros opcionales. */
+  async countByAreaAndCategory(
+    filters: DistributionFilters,
+  ): Promise<DistributionCell[]> {
+    const query = db("activos as a")
+      .innerJoin("areas as ar", "ar.id", "a.area_id")
+      .innerJoin("categorias as c", "c.id", "a.categoria_id")
+      .where("a.eliminado", false)
+      .select({
+        areaId: "ar.id",
+        areaNombre: "ar.nombre",
+        categoriaId: "c.id",
+        categoriaNombre: "c.nombre",
+      })
+      .count({ total: "a.id" })
+      .groupBy("ar.id", "ar.nombre", "c.id", "c.nombre");
+
+    if (filters.areaId) query.where("a.area_id", filters.areaId);
+    if (filters.categoriaId) query.where("a.categoria_id", filters.categoriaId);
+    if (filters.estado) query.where("a.estado", filters.estado);
+
+    return ((await query) as Row[]).map((r) => ({
+      areaId: Number(r.areaId),
+      areaNombre: String(r.areaNombre),
+      categoriaId: Number(r.categoriaId),
+      categoriaNombre: String(r.categoriaNombre),
+      total: Number(r.total),
+    }));
+  }
+
   /** Todas las asignaciones abiertas, indexadas por activo. */
   async findOpenAssignments(): Promise<Map<number, OpenAssignmentInfo>> {
     const rows = await db("asignaciones as asi")
@@ -215,7 +247,7 @@ export class ReportsRepository {
       fecha: String(r.fecha).slice(0, 10),
       fechaFin: r.fechaFin == null ? null : String(r.fechaFin).slice(0, 10),
       detalle: String(r.detalle),
-      observaciones: r.observaciones == null ? null : String(r.observaciones)
+      observaciones: r.observaciones == null ? null : String(r.observaciones),
     }));
   }
 }

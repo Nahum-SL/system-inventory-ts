@@ -7,7 +7,7 @@ import { asyncHandler } from "../../shared/utils/asyncHandler.js";
 import { assetSheetService } from "./asset-sheet.service.js";
 
 // TYPES
-import type { CsvFile, ExportRange } from "./reports.types.js";
+import type { CsvFile, DistributionFilters, ExportRange } from "./reports.types.js";
 import type { AssetFilters } from "../assets/assets.types.js";
 // SERVICE
 import { reportsService } from "./reports.service.js";
@@ -30,6 +30,14 @@ export const getSummary = asyncHandler(async (_req, res) => {
   const summary = await reportsService.getSummary();
 
   res.status(200).json({ status: "success", data: summary });
+});
+
+/** Distribución de activos por área y categoría, con filtros (solo admin). */
+export const getDistribution = asyncHandler(async (req, res) => {
+  const filters = req.query as DistributionFilters; // ya validado por distributionQuerySchema
+  const data = await reportsService.getDistribution(filters);
+
+  res.status(200).json({ status: "success", data });
 });
 
 /** Activos con los filtros de la lista. El query llega validado. */

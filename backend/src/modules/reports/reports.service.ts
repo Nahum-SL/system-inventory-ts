@@ -9,8 +9,12 @@ import { toCsv } from "../../shared/utils/csv.js";
 import { reportsRepository } from "./reports.repository.js";
 // TYPEs
 import type {
+  AreaDistribution,
+  CountByName,
   CsvFile,
   DashboardSummary,
+  DistributionFilters,
+  DistributionSummary,
   ExportRange,
 } from "./reports.types.js";
 
@@ -41,6 +45,62 @@ export class ReportsService {
 
     return { totals, byArea, byCategory, recentMovements };
   }
+
+  /** Matriz área × categoría lista para graficar; el orden lo fija el servidor. */
+  async getDistribution(
+    filters: DistributionFilters,
+  ): Promise<DistributionSummary> {
+    const cells = await reportsRepository.countByAreaAndCategory(filters);
+
+    const byCategory = new Map<number, CountByName>();
+    const byArea = new Map<number, AreaDistribution>();
+
+    for (const c of cells) {
+      const cat = byCategory.get(c.categoriaId) ?? {
+        id: c.categoriaId,
+        nombre: c.categoriaNombre,
+        total: 0,
+      };
+      cat.total += c.total;
+      byCategory.set(c.categoriaId, cat);
+
+      const area = byArea.get(c.areaId) ?? {
+        id: c.areaId,
+        nombre: c.areaNombre,
+        total: 0,
+        categorias: [],
+      };
+      area.total += c.total;
+      area.categorias.push({
+        id: c.categoriaId,
+        nombre: c.categoriaNombre,
+        total: c.total,
+      });
+      byArea.set(c.areaId, area);
+    }
+
+    const byTotalDesc = (a: CountByName, b: CountByName) =>
+      b.total - a.total || a.nombre.localeCompare(b.nombre, "es");
+
+    const categorias = [...byCategory.values()].sort(byTotalDesc);
+    const order = new Map(categorias.map((c, i) => [c.id, i]));
+
+    const areas = [...byArea.values()]
+      .map((a) => ({
+        ...a,
+        categorias: a.categorias.sort(
+          (x, y) => (order.get(x.id) ?? 0) - (order.get(y.id) ?? 0),
+        ),
+      }))
+      .sort(byTotalDesc);
+
+    return {
+      total: categorias.reduce((sum, c) => sum + c.total, 0),
+      categorias,
+      areas,
+    };
+  }
+
   /** Activos con los mismos filtros de la lista, más su responsable actual. */
   async exportAssets(filters: AssetFilters): Promise<CsvFile> {
     const [assets, assignments] = await Promise.all([
