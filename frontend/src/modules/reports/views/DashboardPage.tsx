@@ -4,7 +4,6 @@ import Alert from "@/shared/components/ui/Alert";
 import { LoadingState } from "@/shared/components/ui/states/LoadingState";
 
 // COMPONENTS
-import BarList from "../components/BarList";
 import KpiCard from "../components/KpiCard";
 import RecentMovements from "../components/RecentMovements";
 
