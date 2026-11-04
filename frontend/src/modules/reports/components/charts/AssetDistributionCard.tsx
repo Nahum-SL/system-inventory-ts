@@ -1,14 +1,19 @@
 import { useState } from "react";
 import { FilterX } from "lucide-react";
+// ATOMIC COMPONTENTS
+import Alert from "@/shared/components/ui/Alert";
+import { LoadingState } from "@/shared/components/ui/states/LoadingState";
+// UTILS
+import { cn } from "@/shared/lib/utils";
+// HOOKS
+import { useDistribution } from "../../hooks/use-distribution";
 import {
   AreaSelect,
   CategorySelect,
 } from "@/modules/catalogs/components/select";
-import Alert from "@/shared/components/ui/Alert";
-import { LoadingState } from "@/shared/components/ui/states/LoadingState";
-import { cn } from "@/shared/lib/utils";
-import { useDistribution } from "../../hooks/use-distribution";
+// TYPES
 import type { DistributionFilters } from "../../types";
+// CHART COMPONENTS
 import { AssetDistributionChart } from "./AssetDistributionChart";
 import ChartCard from "./ChartCard";
 
@@ -85,7 +90,7 @@ export default function AssetDistributionCard() {
                 aria-pressed={estado === e.value}
                 onClick={() => setEstado(e.value)}
                 className={cn(
-                  "rounded-full border px-3 py-1.5 text-sm transition-colors",
+                  "rounded-full border px-3 py-1.5 text-sm transition-colors cursor-pointer",
                   estado === e.value
                     ? "border-slate-900 bg-slate-900 text-white dark:border-slate-100 dark:bg-slate-100 dark:text-slate-900"
                     : "border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-gray-700 dark:text-slate-300 dark:hover:bg-gray-800",
@@ -101,7 +106,7 @@ export default function AssetDistributionCard() {
           <button
             type="button"
             onClick={clear}
-            className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
+            className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 cursor-pointer"
           >
             <FilterX className="size-4" aria-hidden />
             Limpiar filtros

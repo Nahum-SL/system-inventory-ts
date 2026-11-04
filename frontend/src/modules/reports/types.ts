@@ -61,8 +61,6 @@ export interface DateRange {
 
 export interface DashboardSummary {
   totals: DashboardTotals;
-  byArea: CountByName[];
-  byCategory: CountByName[];
   recentMovements: RecentMovement[];
 }
 

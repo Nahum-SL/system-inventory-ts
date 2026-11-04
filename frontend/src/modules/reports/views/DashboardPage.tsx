@@ -45,7 +45,7 @@ export default function DashboardPage({
     );
   }
 
-  const { totals, byArea, byCategory, recentMovements } = data;
+  const { totals, recentMovements } = data;
 
   return (
     <section className="min-w-0 space-y-6">
@@ -87,12 +87,6 @@ export default function DashboardPage({
           value={totals.fueraDeServicio}
           tone="red"
         />
-      </div>
-
-      {/* Distribución */}
-      <div className="grid min-w-0 gap-4 lg:grid-cols-2">
-        <BarList title="Activos por área" items={byArea} />
-        <BarList title="Activos por categoría" items={byCategory} />
       </div>
 
       {/* Actividad reciente */}
