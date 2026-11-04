@@ -48,7 +48,6 @@ const PROTECTED_ROUTES: Array<[Method, string]> = [
     ],
   ),
 
-  ["get", "/api/reports/summary"],
   ["get", "/api/reports/export/assets"],
   ["get", "/api/reports/export/movements"],
   ["get", "/api/reports/export/maintenance"],
