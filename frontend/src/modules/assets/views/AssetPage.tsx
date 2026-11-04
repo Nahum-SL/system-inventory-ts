@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Package, Plus, SearchX } from "lucide-react";
+import { Package, SearchX } from "lucide-react";
 
 // COMPONENTS - SHARED
 import Alert from "@/shared/components/ui/Alert";

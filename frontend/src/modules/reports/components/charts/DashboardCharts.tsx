@@ -1,8 +1,7 @@
-import { groupTop } from "../../utils/group-top";
 import type { DashboardSummary } from "../../types";
 
+import AssetDistributionCard from "./AssetDistributionCard";
 import ChartCard from "./ChartCard";
-import CountBarChart from "./CountBarChart";
 import StatusDonutChart from "./StatusDonutChart";
 
 export default function DashboardCharts({
@@ -10,11 +9,11 @@ export default function DashboardCharts({
 }: {
   summary: DashboardSummary;
 }) {
-  const { totals, byArea, byCategory } = summary;
+  const { totals } = summary;
 
   return (
     <div className="grid min-w-0 gap-4 lg:grid-cols-2 lg:gap-5">
-      <ChartCard title="Activos por estado">
+      <ChartCard title="Activos por estado" className="lg:col-span-2">
         <StatusDonutChart
           operativos={totals.operativos}
           enMantenimiento={totals.enMantenimiento}
@@ -22,16 +21,7 @@ export default function DashboardCharts({
         />
       </ChartCard>
 
-      <ChartCard title="Activos por área">
-        <CountBarChart items={groupTop(byArea)} label="Activos por área" />
-      </ChartCard>
-
-      <ChartCard title="Activos por categoría" className="lg:col-span-2">
-        <CountBarChart
-          items={groupTop(byCategory)}
-          label="Activos por categoría"
-        />
-      </ChartCard>
+      <AssetDistributionCard />
     </div>
   );
 }

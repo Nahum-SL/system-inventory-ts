@@ -19,6 +19,9 @@ interface SelectProps {
   invalid?: boolean;
 }
 
+/** `allLabel`: agrega una primera opción con valor "" (para filtros: "Todas las áreas"). */
+type NamedProps = SelectProps & { allLabel?: string };
+
 const NONE: number[] = [];
 const LOAD_ERROR = "No se pudo cargar la lista";
 
@@ -70,32 +73,35 @@ function NamedSelect<T extends { id: number; nombre: string }>({
   query,
   placeholder,
   excludeId,
+  allLabel,
   ...props
-}: SelectProps & {
+}: NamedProps & {
   query: UseQueryResult<T[]>;
   placeholder: string;
   excludeId?: number;
 }) {
-  const options: SearchSelectOption[] = (query.data ?? [])
+  const items: SearchSelectOption[] = (query.data ?? [])
     .filter((item) => item.id !== excludeId)
     .map((item) => ({ value: String(item.id), label: item.nombre }));
+
+  const options = allLabel ? [{ value: "", label: allLabel }, ...items] : items;
 
   return (
     <SearchSelect
       {...props}
       options={options}
-      placeholder={placeholder}
+      placeholder={allLabel ?? placeholder}
       loading={query.isPending}
       errorMessage={query.error ? LOAD_ERROR : undefined}
     />
   );
 }
 
-export const BrandSelect = (props: SelectProps) => (
+export const BrandSelect = (props: NamedProps) => (
   <NamedSelect {...props} query={useBrands()} placeholder="Busca una marca…" />
 );
 
-export const CategorySelect = (props: SelectProps) => (
+export const CategorySelect = (props: NamedProps) => (
   <NamedSelect
     {...props}
     query={useCategories()}
@@ -103,11 +109,10 @@ export const CategorySelect = (props: SelectProps) => (
   />
 );
 
-/** `excludeId`: el área actual, en el traslado (no tiene sentido mover a la misma). */
 export const AreaSelect = ({
   excludeId,
   ...props
-}: SelectProps & { excludeId?: number }) => (
+}: NamedProps & { excludeId?: number }) => (
   <NamedSelect
     {...props}
     query={useAreas()}
