@@ -3,7 +3,7 @@ import { LoaderCircle } from "lucide-react";
 
 import { cn } from "@/shared/lib/utils";
 
-type Variant = "primary" | "secondary" | "danger";
+type Variant = "primary" | "secondary" | "danger" | "danger-outline";
 
 const VARIANTS: Record<Variant, string> = {
   primary: cn(
@@ -23,6 +23,12 @@ const VARIANTS: Record<Variant, string> = {
     "border border-red-200 bg-red-600 text-white",
     "hover:bg-red-700",
     "dark:border-red-900/70 dark:bg-red-700 dark:hover:bg-red-600",
+  ),
+
+  "danger-outline": cn(
+    "border border-red-200 bg-transparent text-red-600",
+    "hover:bg-red-100",
+    "dark:border-red-900/70 dark:bg-transparent dark:text-red-400 dark:hover:bg-red-950/30",
   ),
 };
 

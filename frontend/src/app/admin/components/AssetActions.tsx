@@ -2,17 +2,18 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import {
   ArrowLeftRight,
-  ClipboardEdit,
   CirclePower,
+  ClipboardEdit,
   RotateCcw,
   UserRoundPlus,
   Wrench,
   XCircle,
+  type LucideIcon,
 } from "lucide-react";
-
+// UTILS
+// ATOMIC COMPONENTS
 import Button from "@/shared/components/ui/Buttons/button";
-import { cn } from "@/shared/lib/utils";
-
+// COMPONENTES DE ACCIONES - MODULO ASSETS
 import {
   AssetImageButtons,
   AssignModal,
@@ -25,192 +26,161 @@ import {
   ReturnAssignmentModal,
   type AssetCard,
 } from "@/modules/assets";
+// COMPONENTS UI - ASSET ACTIONS
+import type { ActionTone } from "@/shared/components/ui/Buttons/ActionTittle";
+import type { ActionItem } from "@/shared/components/ui/actions/ExpandableActionGrid";
+import ExpandableActionGrid from "@/shared/components/ui/actions/ExpandableActionGrid";
 import { AssetSheetButton } from "@/modules/reports";
 
-type ModalName =
+type ActionId =
   | "status"
   | "open-maintenance"
   | "close-maintenance"
   | "move"
   | "assign"
   | "return"
-  | "decommission"
-  | "edit"
-  | null;
+  | "edit";
+type ModalName = ActionId | "decommission" | null;
+
+interface ActionDef {
+  label: string;
+  Icon: LucideIcon;
+  /** Si existe, el botón queda bloqueado y se muestra este texto. */
+  disabledReason?: string;
+}
 
 export default function AssetActions({ asset }: { asset: AssetCard }) {
   const [modal, setModal] = useState<ModalName>(null);
   const navigate = useNavigate();
-
   const close = () => setModal(null);
 
+  const assigned = Boolean(asset.asignacionActual);
   const inMaintenance = asset.estado === "mantenimiento";
-  const canAssign = asset.estado === "operativo" && !asset.asignacionActual;
+  const hasOpenMaintenance = Boolean(asset.mantenimientoAbierto);
+  const canAssign = asset.estado === "operativo" && !assigned;
 
-  const actionButtonClass =
-    "min-h-10 justify-center gap-2 rounded-xl px-3 sm:px-4";
+  const defs: Record<ActionId, ActionDef> = {
+    assign: {
+      label: "Asignar",
+      Icon: UserRoundPlus,
+      disabledReason: canAssign
+        ? undefined
+        : "Solo se pueden asignar activos operativos.",
+    },
+    return: { label: "Registrar devolución", Icon: RotateCcw },
+    move: { label: "Trasladar", Icon: ArrowLeftRight },
+    status: {
+      label: "Cambiar estado",
+      Icon: CirclePower,
+      disabledReason: inMaintenance
+        ? "Hay un mantenimiento abierto. Ciérralo para cambiar el estado."
+        : undefined,
+    },
+    "open-maintenance": { label: "Abrir mantenimiento", Icon: Wrench },
+    "close-maintenance": { label: "Cerrar mantenimiento", Icon: Wrench },
+    edit: { label: "Editar datos", Icon: ClipboardEdit },
+  };
+
+  const primaryId: ActionId = assigned
+    ? "return"
+    : hasOpenMaintenance
+      ? "close-maintenance"
+      : canAssign
+        ? "assign"
+        : "status";
+
+  const available: ActionId[] = [
+    assigned ? "return" : "assign",
+    "move",
+    hasOpenMaintenance ? "close-maintenance" : "open-maintenance",
+    "status",
+    "edit",
+  ];
+  const moreIds = available.filter((id) => id !== primaryId && id !== "move");
+
+  const toItem = (id: ActionId, tone: ActionTone = "neutral"): ActionItem => ({
+    id,
+    label: defs[id].label,
+    icon: defs[id].Icon,
+    tone,
+    disabledReason: defs[id].disabledReason,
+    onClick: () => setModal(id),
+  });
+
+  // Mismas reglas que `decommission` en el backend.
+  const decommissionBlock =
+    inMaintenance || hasOpenMaintenance
+      ? "Para dar de baja, primero cierra el mantenimiento."
+      : assigned
+        ? "Para dar de baja, primero registra la devolución."
+        : undefined;
 
   return (
     <section
       aria-labelledby="asset-actions-title"
-      className={cn(
-        "min-w-0 rounded-2xl border p-4 shadow-sm sm:p-5",
-        "border-slate-200 bg-white",
-        "dark:border-gray-700 dark:bg-gray-900",
-      )}
+      className="w-full min-w-0 rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5 dark:border-gray-700 dark:bg-gray-800/40"
     >
-      <div className="mb-4 flex items-start gap-3">
-        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-300">
-          <ClipboardEdit size={20} aria-hidden="true" />
-        </div>
+      <h2
+        id="asset-actions-title"
+        className="mb-4 text-base font-semibold text-slate-900 dark:text-slate-100"
+      >
+        ¿Qué quieres hacer con este activo?
+      </h2>
 
-        <div className="min-w-0">
-          <h2
-            id="asset-actions-title"
-            className="text-sm font-semibold text-slate-900 dark:text-slate-100"
-          >
-            Acciones de administrador
-          </h2>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            Gestiona la asignación, ubicación y estado de este activo.
-          </p>
-        </div>
-      </div>
+      <ExpandableActionGrid
+        main={[toItem(primaryId, "primary"), toItem("move")]}
+        more={moreIds.map((id) => toItem(id))}
+        moreExtra={
+          // TEMPORAL: pasan a bloques en las partes 2 y 3.
+          <div className="flex flex-wrap gap-2">
+            <AssetSheetButton
+              codigo={asset.codigoInventario}
+              label="Hoja de vida (PDF)"
+              variant="primary"
+            />
+            <AssetImageButtons asset={asset}/>
+          </div>
+        }
+      />
 
-      <div className="flex flex-wrap items-center gap-2">
-        {asset.asignacionActual ? (
-          <Button
-            variant="secondary"
-            className={actionButtonClass}
-            onClick={() => setModal("return")}
-          >
-            <RotateCcw size={16} aria-hidden="true" />
-            Registrar devolución
-          </Button>
-        ) : (
-          <Button
-            variant="secondary"
-            className={actionButtonClass}
-            disabled={!canAssign}
-            onClick={() => setModal("assign")}
-          >
-            <UserRoundPlus size={16} aria-hidden="true" />
-            Asignar
-          </Button>
-        )}
-
+      {/* Zona de cuidado */}
+      <div className="mt-5 border-t border-slate-200 pt-4 dark:border-gray-700">
         <Button
-          variant="secondary"
-          className={actionButtonClass}
-          onClick={() => setModal("move")}
-        >
-          <ArrowLeftRight size={16} aria-hidden="true" />
-          Trasladar
-        </Button>
-
-        <Button
-          variant="secondary"
-          className={actionButtonClass}
-          disabled={inMaintenance}
-          onClick={() => setModal("status")}
-        >
-          <CirclePower size={16} aria-hidden="true" />
-          Cambiar estado
-        </Button>
-
-        {asset.mantenimientoAbierto ? (
-          <Button
-            variant="secondary"
-            className={actionButtonClass}
-            onClick={() => setModal("close-maintenance")}
-          >
-            <Wrench size={16} aria-hidden="true" />
-            Cerrar mantenimiento
-          </Button>
-        ) : (
-          <Button
-            variant="secondary"
-            className={actionButtonClass}
-            onClick={() => setModal("open-maintenance")}
-          >
-            <Wrench size={16} aria-hidden="true" />
-            Abrir mantenimiento
-          </Button>
-        )}
-
-        <Button
-          variant="secondary"
-          className={actionButtonClass}
-          onClick={() => setModal("edit")}
-        >
-          <ClipboardEdit size={16} aria-hidden="true" />
-          Editar datos
-        </Button>
-
-        <AssetImageButtons asset={asset} buttonClassName={actionButtonClass} />
-        
-        <AssetSheetButton
-          codigo={asset.codigoInventario}
-          label="Hoja de vida (PDF)"
-          variant="secondary"
-          className={actionButtonClass}
-        />
-        
-        <Button
-          variant="danger"
-          className={actionButtonClass}
+          variant="danger-outline"
+          disabled={Boolean(decommissionBlock)}
           onClick={() => setModal("decommission")}
         >
           <XCircle size={16} aria-hidden="true" />
           Dar de baja
         </Button>
+        <p className="mt-2 text-sm leading-5 text-slate-500 dark:text-slate-400">
+          {decommissionBlock ??
+            "Deja de contar en los totales; el historial se conserva."}
+        </p>
       </div>
-
-      {(inMaintenance || (!asset.asignacionActual && !canAssign)) && (
-        <div className="mt-4 space-y-2 border-t border-slate-100 pt-3 dark:border-gray-800">
-          {inMaintenance && (
-            <p className="text-xs leading-5 text-amber-800 dark:text-amber-300">
-              El cambio de estado está deshabilitado durante el mantenimiento.
-              Para modificarlo, primero cierra el mantenimiento.
-            </p>
-          )}
-
-          {!asset.asignacionActual && !canAssign && (
-            <p className="text-xs leading-5 text-slate-500 dark:text-slate-400">
-              Solo se pueden asignar activos que estén operativos.
-            </p>
-          )}
-        </div>
-      )}
 
       <ChangeStatusModal
         asset={asset}
         open={modal === "status"}
         onClose={close}
       />
-
       <OpenMaintenanceModal
         asset={asset}
         open={modal === "open-maintenance"}
         onClose={close}
       />
-
       <CloseMaintenanceModal
         asset={asset}
         open={modal === "close-maintenance"}
         onClose={close}
       />
-
       <MoveModal asset={asset} open={modal === "move"} onClose={close} />
-
       <AssignModal asset={asset} open={modal === "assign"} onClose={close} />
-
       <ReturnAssignmentModal
         asset={asset}
         open={modal === "return"}
         onClose={close}
       />
-
       <EditAssetModal asset={asset} open={modal === "edit"} onClose={close} />
 
       <DecommissionModal

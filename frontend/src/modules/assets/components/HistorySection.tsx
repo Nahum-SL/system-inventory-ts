@@ -2,6 +2,7 @@ import { useState, type ReactNode } from "react";
 import { ArrowLeftRight, ClipboardList, Wrench } from "lucide-react";
 
 import { cn } from "@/shared/lib/utils";
+import { formatDate, titleCase } from "@/shared/lib/date/format";
 import { LoadingState } from "@/shared/components/ui/states/LoadingState";
 
 import {
@@ -12,11 +13,7 @@ import {
 
 type Tab = "assignments" | "maintenance" | "movements";
 
-const TABS: {
-  id: Tab;
-  label: string;
-  icon: typeof ClipboardList;
-}[] = [
+const TABS: { id: Tab; label: string; icon: typeof ClipboardList }[] = [
   { id: "assignments", label: "Asignaciones", icon: ClipboardList },
   { id: "maintenance", label: "Mantenimientos", icon: Wrench },
   { id: "movements", label: "Traslados", icon: ArrowLeftRight },
@@ -32,11 +29,13 @@ function State({
   isPending,
   error,
   empty,
+  emptyText,
   children,
 }: {
   isPending: boolean;
   error: Error | null;
   empty: boolean;
+  emptyText: string;
   children: ReactNode;
 }) {
   if (isPending) {
@@ -61,25 +60,45 @@ function State({
   if (empty) {
     return (
       <p className="rounded-xl border border-dashed border-slate-200 px-4 py-8 text-center text-sm text-slate-500 dark:border-gray-700 dark:text-slate-400">
-        No hay registros en esta sección.
+        {emptyText}
       </p>
     );
   }
 
+  // Línea de tiempo: la línea vertical une los puntos de cada registro.
   return (
-    <ul className="divide-y divide-slate-100 dark:divide-gray-800">
+    <ul className="ml-1.5 border-l border-slate-200 pl-6 dark:border-gray-700">
       {children}
     </ul>
   );
 }
 
-function HistoryItem({ children }: { children: ReactNode }) {
-  return <li className="space-y-1.5 py-4 first:pt-1 last:pb-1">{children}</li>;
+function HistoryItem({
+  active = false,
+  children,
+}: {
+  active?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <li className="relative space-y-1.5 py-3.5">
+      <span
+        aria-hidden="true"
+        className={cn(
+          "absolute top-5.25 -left-[29.5px] size-2.5 rounded-full border-2",
+          active
+            ? "border-emerald-500 bg-emerald-500"
+            : "border-slate-300 bg-white dark:border-gray-600 dark:bg-gray-900",
+        )}
+      />
+      {children}
+    </li>
+  );
 }
 
 function PrimaryText({ children }: { children: ReactNode }) {
   return (
-    <p className="wrap-break-word text-sm font-semibold text-slate-800 dark:text-slate-100">
+    <p className="wrap-break-word text-base font-semibold text-slate-800 dark:text-slate-100">
       {children}
     </p>
   );
@@ -87,7 +106,7 @@ function PrimaryText({ children }: { children: ReactNode }) {
 
 function SecondaryText({ children }: { children: ReactNode }) {
   return (
-    <p className="wrap-break-word text-sm text-slate-600 dark:text-slate-400">
+    <p className="wrap-break-word text-sm text-slate-600 dark:text-slate-300">
       {children}
     </p>
   );
@@ -95,30 +114,48 @@ function SecondaryText({ children }: { children: ReactNode }) {
 
 function MutedText({ children }: { children: ReactNode }) {
   return (
-    <p className="wrap-break-word text-xs leading-5 text-slate-500 dark:text-slate-400">
+    <p className="wrap-break-word text-sm leading-5 text-slate-500 dark:text-slate-400">
       {children}
     </p>
   );
 }
 
-function Assignments({ id }: { id: number }) {
-  const { data, isPending, error } = useAssignmentHistory(id);
+function Period({ from, to }: { from: string; to: string | null }) {
+  return (
+    <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-slate-600 dark:text-slate-300">
+      {formatDate(from)} →{" "}
+      {to ? (
+        formatDate(to)
+      ) : (
+        <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300">
+          En curso
+        </span>
+      )}
+    </p>
+  );
+}
+
+function Assignments({
+  query,
+}: {
+  query: ReturnType<typeof useAssignmentHistory>;
+}) {
+  const { data, isPending, error } = query;
 
   return (
     <State
       isPending={isPending}
       error={error}
-      empty={!isPending && !error && (data?.length ?? 0) === 0}
+      empty={!data?.length}
+      emptyText="Este activo todavía no ha sido asignado."
     >
       {data?.map((assignment) => (
-        <HistoryItem key={assignment.id}>
+        <HistoryItem key={assignment.id} active={!assignment.fechaFin}>
           <PrimaryText>
-            {assignment.personaNombre} · {assignment.cargoNombre}
+            {titleCase(assignment.personaNombre)} · {assignment.cargoNombre}
           </PrimaryText>
 
-          <SecondaryText>
-            {assignment.fechaInicio} → {assignment.fechaFin ?? "En curso"}
-          </SecondaryText>
+          <Period from={assignment.fechaInicio} to={assignment.fechaFin} />
 
           <MutedText>
             Condición de entrega: {assignment.condicionEntrega}
@@ -135,17 +172,22 @@ function Assignments({ id }: { id: number }) {
   );
 }
 
-function Maintenance({ id }: { id: number }) {
-  const { data, isPending, error } = useMaintenanceHistory(id);
+function Maintenance({
+  query,
+}: {
+  query: ReturnType<typeof useMaintenanceHistory>;
+}) {
+  const { data, isPending, error } = query;
 
   return (
     <State
       isPending={isPending}
       error={error}
-      empty={!isPending && !error && (data?.length ?? 0) === 0}
+      empty={!data?.length}
+      emptyText="Este activo no tiene mantenimientos registrados."
     >
       {data?.map((maintenance) => (
-        <HistoryItem key={maintenance.id}>
+        <HistoryItem key={maintenance.id} active={!maintenance.fechaFin}>
           <PrimaryText>
             {maintenance.descripcion}
             <span className="ml-1 font-normal text-slate-500 dark:text-slate-400">
@@ -153,28 +195,30 @@ function Maintenance({ id }: { id: number }) {
             </span>
           </PrimaryText>
 
-          <SecondaryText>
-            {maintenance.fecha} → {maintenance.fechaFin ?? "En curso"}
-          </SecondaryText>
+          <Period from={maintenance.fecha} to={maintenance.fechaFin} />
 
           {maintenance.observaciones && (
             <MutedText>Observaciones: {maintenance.observaciones}</MutedText>
           )}
-
         </HistoryItem>
       ))}
     </State>
   );
 }
 
-function Movements({ id }: { id: number }) {
-  const { data, isPending, error } = useMovementHistory(id);
+function Movements({
+  query,
+}: {
+  query: ReturnType<typeof useMovementHistory>;
+}) {
+  const { data, isPending, error } = query;
 
   return (
     <State
       isPending={isPending}
       error={error}
-      empty={!isPending && !error && (data?.length ?? 0) === 0}
+      empty={!data?.length}
+      emptyText="Este activo no ha sido trasladado."
     >
       {data?.map((movement) => (
         <HistoryItem key={movement.id}>
@@ -184,7 +228,8 @@ function Movements({ id }: { id: number }) {
           </PrimaryText>
 
           <SecondaryText>
-            {movement.fechaMovimiento} · Responsable: {movement.username}
+            {formatDate(movement.fechaMovimiento)} · Registrado por
+            {movement.username}
           </SecondaryText>
 
           {movement.motivo && <MutedText>Motivo: {movement.motivo}</MutedText>}
@@ -196,6 +241,16 @@ function Movements({ id }: { id: number }) {
 
 export default function HistorySection({ assetId }: { assetId: number }) {
   const [tab, setTab] = useState<Tab>("assignments");
+
+  const assignments = useAssignmentHistory(assetId);
+  const maintenance = useMaintenanceHistory(assetId);
+  const movements = useMovementHistory(assetId);
+
+  const counts: Record<Tab, number | undefined> = {
+    assignments: assignments.data?.length,
+    maintenance: maintenance.data?.length,
+    movements: movements.data?.length,
+  };
 
   return (
     <section className={panelClass}>
@@ -215,6 +270,7 @@ export default function HistorySection({ assetId }: { assetId: number }) {
       >
         {TABS.map(({ id, label, icon: Icon }) => {
           const selected = tab === id;
+          const count = counts[id];
 
           return (
             <button
@@ -235,15 +291,20 @@ export default function HistorySection({ assetId }: { assetId: number }) {
             >
               <Icon size={16} aria-hidden="true" />
               {label}
+              {count !== undefined && (
+                <span className="rounded-full bg-black/5 px-2 py-0.5 text-xs font-semibold dark:bg-white/10">
+                  {count}
+                </span>
+              )}
             </button>
           );
         })}
       </div>
 
       <div className="min-w-0">
-        {tab === "assignments" && <Assignments id={assetId} />}
-        {tab === "maintenance" && <Maintenance id={assetId} />}
-        {tab === "movements" && <Movements id={assetId} />}
+        {tab === "assignments" && <Assignments query={assignments} />}
+        {tab === "maintenance" && <Maintenance query={maintenance} />}
+        {tab === "movements" && <Movements query={movements} />}
       </div>
     </section>
   );

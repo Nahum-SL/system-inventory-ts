@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 // UTIL
 import { cn } from "@/shared/lib/utils";
+import { formatDate, titleCase } from "@/shared/lib/date/format";
 // MANAGE ERROR
 import { ApiError } from "@/shared/lib/api-error";
 // COMPONENT ATOMICO
@@ -60,7 +61,7 @@ function SectionHeading({
     <div className="mb-3 flex items-center gap-2">
       <Icon
         size={17}
-        className="text-amber-600 dark:text-amber-400"
+        className="text-slate-500 dark:text-slate-400"
         aria-hidden="true"
       />
       <h2 className={sectionTitle}>{children}</h2>
@@ -186,6 +187,17 @@ export default function AssetCardPage({
     );
   }
 
+  const situation = [
+    asset.asignacionActual
+      ? `Asignado a ${titleCase(asset.asignacionActual.personaNombre)}`
+      : asset.estado === "operativo"
+        ? "Disponible para asignar"
+        : null,
+    asset.areaNombre,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
   return (
     <article className="min-w-0 space-y-5">
       {/* Navegación */}
@@ -232,16 +244,27 @@ export default function AssetCardPage({
               <p className="mt-2 wrap-break-word text-sm leading-6 text-slate-600 dark:text-slate-300 sm:text-base">
                 {asset.descripcion}
               </p>
+
+              {/* Estado y situación actual */}
+              <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
+                <StatusBadge estado={asset.estado} />
+
+                {situation && (
+                  <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                    {situation}
+                  </p>
+                )}
+              </div>
             </div>
           </div>
         </div>
-
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4 dark:border-gray-800">
-          <StatusBadge estado={asset.estado} />
-          <div className="flex flex-wrap items-center gap-2">
-            {actions?.(asset)}
+        {actions && (
+          <div className="border-t border-slate-100 pt-4 dark:border-gray-800">
+            <div className="flex justify-center">
+              <div className="w-full max-w-sm">{actions(asset)}</div>
+            </div>
           </div>
-        </div>
+        )}
       </header>
 
       {/* Mantenimiento activo */}
@@ -273,7 +296,7 @@ export default function AssetCardPage({
 
               <p className="mt-3 flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
                 <CalendarDays size={14} aria-hidden="true" />
-                Desde {asset.mantenimientoAbierto.fecha}
+                Desde {formatDate(asset.mantenimientoAbierto.fecha)}
               </p>
             </div>
           </div>
@@ -289,21 +312,22 @@ export default function AssetCardPage({
             <dl className="divide-y divide-slate-100 dark:divide-gray-800">
               <Row
                 label="Persona"
-                value={asset.asignacionActual.personaNombre}
+                value={titleCase(asset.asignacionActual.personaNombre)}
               />
               <Row label="Cargo" value={asset.asignacionActual.cargoNombre} />
               <Row
                 label="Asignado desde"
-                value={asset.asignacionActual.fechaInicio}
+                value={formatDate(asset.asignacionActual.fechaInicio)}
               />
             </dl>
           ) : (
             <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 dark:border-emerald-900/60 dark:bg-emerald-950/30">
               <p className="text-sm font-medium text-emerald-800 dark:text-emerald-300">
-                Disponible para asignación
+                Sin responsable asignado
               </p>
+
               <p className="mt-1 text-xs text-emerald-700 dark:text-emerald-400">
-                Este activo no tiene un responsable asignado actualmente.
+                Este activo puede ser asignado a una persona.
               </p>
             </div>
           )}
@@ -316,7 +340,10 @@ export default function AssetCardPage({
             <Row label="Marca" value={asset.marcaNombre} />
             <Row label="Categoría" value={asset.categoriaNombre} />
             <Row label="Área" value={asset.areaNombre} />
-            <Row label="Fecha de ingreso" value={asset.fechaIngreso} />
+            <Row
+              label="Fecha de ingreso"
+              value={formatDate(asset.fechaIngreso)}
+            />
           </dl>
         </section>
       </div>

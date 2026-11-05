@@ -1,12 +1,16 @@
+// MANEJO DE ERRORES
 import {
   ConflictError,
   NotFoundError,
   BadRequestError,
 } from "../../shared/errors/AppError.js";
+// UTIL PARA TRATAR EL HTTP 409 (conflicto) DE FORMA AMIGABLE
 import { withConflictHandling } from "../../shared/utils/withConflictHandling.js";
+// REPOSITORY
 import { maintenanceRepository } from "./maintenance.repository.js";
+// TYPES
 import type { Maintenance } from "./maintenance.types.js";
-
+// SCHEMA
 import type {
   CloseMaintenanceInput,
   CreateMaintenanceInput,
