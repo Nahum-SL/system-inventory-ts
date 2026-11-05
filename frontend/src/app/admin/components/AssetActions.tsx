@@ -8,9 +8,13 @@ import {
   UserRoundPlus,
   Wrench,
   XCircle,
+  FileDown,
   type LucideIcon,
 } from "lucide-react";
-// UTILS
+// HOOKS SHARED
+import { useFileDownload } from "@/shared/hooks/use-file-download";
+// HOOKS MODULES REPORTS
+import { downloadAssetSheet } from "@/modules/reports/api/export.api";
 // ATOMIC COMPONENTS
 import Button from "@/shared/components/ui/Buttons/button";
 // COMPONENTES DE ACCIONES - MODULO ASSETS
@@ -26,10 +30,11 @@ import {
   ReturnAssignmentModal,
   type AssetCard,
 } from "@/modules/assets";
-// COMPONENTS UI - ASSET ACTIONS
+// COMPONENTS UI / UX - ASSET ACTIONS
 import type { ActionTone } from "@/shared/components/ui/Buttons/ActionTittle";
 import type { ActionItem } from "@/shared/components/ui/actions/ExpandableActionGrid";
 import ExpandableActionGrid from "@/shared/components/ui/actions/ExpandableActionGrid";
+// MODULE REPORTS
 import { AssetSheetButton } from "@/modules/reports";
 
 type ActionId =
@@ -58,6 +63,9 @@ export default function AssetActions({ asset }: { asset: AssetCard }) {
   const inMaintenance = asset.estado === "mantenimiento";
   const hasOpenMaintenance = Boolean(asset.mantenimientoAbierto);
   const canAssign = asset.estado === "operativo" && !assigned;
+  const sheet = useFileDownload(() =>
+    downloadAssetSheet(asset.codigoInventario),
+  );
 
   const defs: Record<ActionId, ActionDef> = {
     assign: {
@@ -107,6 +115,14 @@ export default function AssetActions({ asset }: { asset: AssetCard }) {
     onClick: () => setModal(id),
   });
 
+  const sheetItem: ActionItem = {
+    id: "sheet",
+    label: "Hoja de vida",
+    icon: FileDown,
+    loading: sheet.isPending,
+    onClick: () => sheet.mutate(),
+  };
+
   // Mismas reglas que `decommission` en el backend.
   const decommissionBlock =
     inMaintenance || hasOpenMaintenance
@@ -128,17 +144,17 @@ export default function AssetActions({ asset }: { asset: AssetCard }) {
       </h2>
 
       <ExpandableActionGrid
-        main={[toItem(primaryId, "primary"), toItem("move")]}
+        main={[toItem(primaryId, "primary"), toItem("move"), sheetItem]}
         more={moreIds.map((id) => toItem(id))}
         moreExtra={
-          // TEMPORAL: pasan a bloques en las partes 2 y 3.
+          // TEMPORAL: pasa al formulario "Editar datos" en la parte 2.
           <div className="flex flex-wrap gap-2">
             <AssetSheetButton
               codigo={asset.codigoInventario}
               label="Hoja de vida (PDF)"
               variant="primary"
             />
-            <AssetImageButtons asset={asset}/>
+            <AssetImageButtons asset={asset} />
           </div>
         }
       />

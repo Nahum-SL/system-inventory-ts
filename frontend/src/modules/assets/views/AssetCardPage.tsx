@@ -261,7 +261,7 @@ export default function AssetCardPage({
         {actions && (
           <div className="border-t border-slate-100 pt-4 dark:border-gray-800">
             <div className="flex justify-center">
-              <div className="w-full max-w-sm">{actions(asset)}</div>
+              <div className="w-full max-w-4xl">{actions(asset)}</div>
             </div>
           </div>
         )}

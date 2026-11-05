@@ -1,14 +1,15 @@
 import type { ComponentProps } from "react";
-
-import { useMutation } from "@tanstack/react-query";
 import { Download } from "lucide-react";
-import { toast } from "sonner";
-
+// ATOMIC COMPONENTS
 import Button from "@/shared/components/ui/Buttons/button";
-import { saveBlob } from "@/shared/lib/download";
+// HOOKS
+import {
+  useFileDownload,
+  type FetchFile,
+} from "@/shared/hooks/use-file-download";
 
 interface Props {
-  fetchFile: () => Promise<{ blob: Blob; filename: string }>;
+  fetchFile: FetchFile;
   label?: string;
   disabled?: boolean;
   variant?: ComponentProps<typeof Button>["variant"];
@@ -22,26 +23,17 @@ export default function ExportButton({
   variant = "primary",
   className,
 }: Props) {
-  const mutation = useMutation({
-    mutationFn: fetchFile,
-    onSuccess: ({ blob, filename }) => {
-      saveBlob(blob, filename);
-      toast.success(`Descargado: ${filename}`);
-    },
-    onError: (error) => {
-      toast.error(error.message || "No se pudo exportar el archivo.");
-    },
-  });
+  const download = useFileDownload(fetchFile);
 
   return (
     <Button
       variant={variant}
-      loading={mutation.isPending}
+      loading={download.isPending}
       disabled={disabled}
-      onClick={() => mutation.mutate()}
+      onClick={() => download.mutate()}
       className={className ?? "w-full shrink-0 sm:w-auto"}
     >
-      {!mutation.isPending && <Download size={16} aria-hidden="true" />}
+      {!download.isPending && <Download size={16} aria-hidden="true" />}
       {label}
     </Button>
   );

@@ -13,6 +13,8 @@ export interface ActionItem {
   tone?: ActionTone;
   onClick: () => void;
   disabledReason?: string;
+  /** Muestra el spinner y bloquea el bloque (p. ej. durante una descarga). */
+  loading?: boolean;
 }
 
 interface Props {
@@ -54,6 +56,7 @@ export default function ExpandableActionGrid({
       icon={item.icon}
       label={item.label}
       tone={item.tone}
+      loading={item.loading}
       disabledReason={item.disabledReason}
       onClick={item.onClick}
     />
