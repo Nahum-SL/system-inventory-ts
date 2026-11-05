@@ -1,29 +1,26 @@
+
 import type { ReactNode } from "react";
 import { Link, useLocation, useParams } from "react-router";
 import {
   ArrowLeft,
   CalendarDays,
-  ClipboardList,
-  Package,
+  FileDown,
+  Layers3,
+  MapPin,
+  Tag,
   UserRound,
   Wrench,
+  type LucideIcon,
 } from "lucide-react";
-// UTIL
-import { cn } from "@/shared/lib/utils";
-import { formatDate, titleCase } from "@/shared/lib/date/format";
-// MANAGE ERROR
-import { ApiError } from "@/shared/lib/api-error";
-// COMPONENT ATOMICO
-import { LoadingState } from "@/shared/components/ui/states/LoadingState";
-// COMPONENTS
-import AssetQr from "../components/AssetQr";
-import HistorySection from "../components/HistorySection";
-import StatusBadge from "../components/StatusBadge";
-// HOOKS
-import { useAssetCard } from "../hooks/useAssetCard";
-// TYPES
-import type { AssetCard } from "../types";
+
+import { useFileDownload } from "@/shared/hooks/use-file-download";
+import { downloadAssetSheet } from "@/modules/reports/api/export.api";
+
 import AssetImage from "../components/AssetImage";
+import StatusBadge from "../components/StatusBadge";
+import { useAssetCard } from "../hooks/useAssetCard";
+
+import type { AssetCard } from "../types";
 
 interface Props {
   actions?: (asset: AssetCard) => ReactNode;
@@ -31,40 +28,64 @@ interface Props {
   backTo?: string;
 }
 
-const panelClass = cn(
-  "min-w-0 rounded-2xl border p-4 sm:p-5",
+const panelClass = [
+  "min-w-0 rounded-2xl border",
   "border-slate-200 bg-white shadow-sm",
-  "dark:border-gray-700 dark:bg-gray-900",
-);
+  "dark:border-[#34415f] dark:bg-[#1e2943]",
+].join(" ");
 
-const sectionTitle = "text-sm font-semibold text-slate-900 dark:text-slate-100";
-
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-start justify-between gap-4 py-3">
-      <dt className="text-sm text-slate-500 dark:text-slate-400">{label}</dt>
-      <dd className="max-w-[65%] wrap-break-word text-right text-sm font-medium text-slate-800 dark:text-slate-200">
-        {value}
-      </dd>
-    </div>
-  );
+function display(value?: string | null) {
+  return value?.trim() || "No registrado";
 }
 
-function SectionHeading({
+function formatAssetDate(value?: string | null) {
+  if (!value) return "No registrada";
+
+  const parts = value.slice(0, 10).split("-");
+
+  if (parts.length === 3) {
+    const [year, month, day] = parts;
+    return `${day}/${month}/${year}`;
+  }
+
+  return value;
+}
+
+function SummaryCard({
   icon: Icon,
-  children,
+  label,
+  value,
 }: {
-  icon: typeof Package;
-  children: ReactNode;
+  icon: LucideIcon;
+  label: string;
+  value: string;
 }) {
   return (
-    <div className="mb-3 flex items-center gap-2">
-      <Icon
-        size={17}
-        className="text-slate-500 dark:text-slate-400"
-        aria-hidden="true"
-      />
-      <h2 className={sectionTitle}>{children}</h2>
+    <div className={`${panelClass} flex items-center gap-3 p-4`}>
+      <div
+        className="
+          flex size-11 shrink-0 items-center justify-center
+          rounded-xl bg-indigo-500/10
+          text-indigo-600 dark:text-indigo-400
+        "
+      >
+        <Icon size={20} aria-hidden="true" />
+      </div>
+
+      <div className="min-w-0">
+        <p className="text-xs text-slate-500 dark:text-slate-400">
+          {label}
+        </p>
+
+        <p
+          className="
+            mt-1 break-words text-sm font-semibold
+            text-slate-900 dark:text-white
+          "
+        >
+          {value}
+        </p>
+      </div>
     </div>
   );
 }
@@ -73,64 +94,303 @@ function ErrorState({
   title,
   message,
   back,
-  warning = false,
   children,
 }: {
   title: string;
   message: string;
   back: string;
-  warning?: boolean;
   children?: ReactNode;
 }) {
   return (
     <section
       role="alert"
-      className={cn(
-        "rounded-2xl border p-5 sm:p-6",
-        warning
-          ? "border-amber-200 bg-amber-50 dark:border-amber-900/60 dark:bg-amber-950/30"
-          : "border-red-200 bg-red-50 dark:border-red-900/60 dark:bg-red-950/30",
-      )}
+      className={`${panelClass} space-y-4 p-6`}
     >
-      <h1
-        className={cn(
-          "font-semibold",
-          warning
-            ? "text-amber-900 dark:text-amber-200"
-            : "text-red-800 dark:text-red-300",
-        )}
-      >
+      <h1 className="text-lg font-semibold text-slate-900 dark:text-white">
         {title}
       </h1>
 
-      <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+      <p className="text-sm text-slate-600 dark:text-slate-300">
         {message}
       </p>
 
       {children && (
-        <div className="mt-4 flex flex-wrap items-center gap-2">{children}</div>
+        <div className="flex flex-wrap gap-2">
+          {children}
+        </div>
       )}
+
       <Link
         to={back}
-        className={cn(
-          "mt-4 inline-flex items-center gap-2 rounded-lg px-3 py-2",
-          "text-sm font-medium transition-colors",
-          "text-slate-700 hover:bg-black/5",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500",
-          "dark:text-slate-200 dark:hover:bg-white/5",
-        )}
+        className="
+          inline-flex items-center gap-2
+          text-sm font-medium text-indigo-600
+          hover:text-indigo-500 dark:text-indigo-400
+        "
       >
-        <ArrowLeft size={16} aria-hidden="true" />
-        Volver a la lista
+        <ArrowLeft size={16} />
+        Volver a activos
       </Link>
     </section>
   );
 }
 
+/**
+ * Separamos el contenido de la ficha para poder usar
+ * el hook de descarga únicamente cuando el activo existe.
+ */
+function AssetDetail({
+  asset,
+  actions,
+  back,
+}: {
+  asset: AssetCard;
+  actions?: (asset: AssetCard) => ReactNode;
+  back: string;
+}) {
+  const pdf = useFileDownload(() =>
+    downloadAssetSheet(asset.codigoInventario),
+  );
+
+  const responsible =
+    asset.asignacionActual?.personaNombre ?? "Sin asignar";
+
+  return (
+    <article className="min-w-0 space-y-5 pb-8">
+      {/* NAVEGACIÓN SUPERIOR */}
+      <nav
+        aria-label="Navegación del activo"
+        className="flex items-center gap-3"
+      >
+        <Link
+          to={back}
+          aria-label="Volver a activos"
+          className="
+            flex size-10 shrink-0 items-center justify-center
+            rounded-xl border border-slate-200
+            bg-white text-slate-600
+            transition-colors hover:bg-slate-100
+            dark:border-[#34415f] dark:bg-[#202b45]
+            dark:text-slate-200 dark:hover:bg-[#293756]
+          "
+        >
+          <ArrowLeft size={19} aria-hidden="true" />
+        </Link>
+
+        <div className="flex flex-wrap items-center gap-2 text-sm">
+          <span className="text-slate-500 dark:text-slate-400">
+            Activos
+          </span>
+          <span className="text-slate-400">/</span>
+          <span className="font-semibold text-slate-900 dark:text-white">
+            Detalle del activo
+          </span>
+        </div>
+      </nav>
+
+      {/* FICHA PRINCIPAL */}
+      <section
+        aria-labelledby="asset-detail-title"
+        className={`${panelClass} p-4 sm:p-6`}
+      >
+        <div className="flex flex-col gap-5 md:flex-row md:items-center">
+          {/* IMAGEN */}
+          <div className="w-full shrink-0 md:w-48 lg:w-52">
+            <AssetImage asset={asset} />
+          </div>
+
+          {/* INFORMACIÓN */}
+          <div className="min-w-0 flex-1">
+            <p
+              className="
+                text-xs font-semibold uppercase tracking-wider
+                text-indigo-600 dark:text-indigo-400
+              "
+            >
+              Ficha del activo
+            </p>
+
+            {/* CÓDIGO + PDF EN LA MISMA FILA */}
+            <div className="mt-2 flex flex-wrap items-start justify-between gap-3">
+              <h1
+                id="asset-detail-title"
+                className="
+                  min-w-0 break-words font-mono
+                  text-2xl font-bold tracking-tight
+                  text-slate-900 dark:text-white
+                  sm:text-3xl
+                "
+              >
+                {asset.codigoInventario}
+              </h1>
+
+              <button
+                type="button"
+                disabled={pdf.isPending}
+                onClick={() => pdf.mutate()}
+                className="
+                  inline-flex min-h-10 shrink-0 items-center
+                  justify-center gap-2 rounded-xl
+                  bg-indigo-600 px-4 py-2
+                  text-sm font-semibold text-white
+                  transition-colors hover:bg-indigo-500
+                  focus-visible:outline-none
+                  focus-visible:ring-2 focus-visible:ring-indigo-500
+                  disabled:cursor-not-allowed disabled:opacity-50
+                "
+              >
+                <FileDown size={17} aria-hidden="true" />
+                {pdf.isPending ? "Generando..." : "Exportar PDF"}
+              </button>
+            </div>
+
+            <p
+              className="
+                mt-2 text-sm leading-6
+                text-slate-600 dark:text-slate-200
+                sm:text-base
+              "
+            >
+              {asset.descripcion}
+            </p>
+
+            <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-3">
+              <StatusBadge estado={asset.estado} />
+
+              <span
+                className="
+                  inline-flex items-center gap-2 text-sm
+                  text-slate-600 dark:text-slate-300
+                "
+              >
+                <MapPin size={16} aria-hidden="true" />
+                {display(asset.areaNombre)}
+              </span>
+
+              <span
+                className="
+                  inline-flex items-center gap-2 text-sm
+                  text-slate-600 dark:text-slate-300
+                "
+              >
+                <UserRound size={16} aria-hidden="true" />
+                {responsible}
+              </span>
+            </div>
+
+            <p
+              className="
+                mt-4 flex items-center gap-2
+                text-xs text-slate-500 dark:text-slate-400
+              "
+            >
+              <CalendarDays size={14} aria-hidden="true" />
+              Fecha de ingreso: {formatAssetDate(asset.fechaIngreso)}
+            </p>
+
+            {pdf.error && (
+              <p
+                role="alert"
+                className="mt-3 text-sm text-red-600 dark:text-red-400"
+              >
+                No se pudo exportar el PDF: {pdf.error.message}
+              </p>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* RESUMEN */}
+      <section
+        aria-label="Resumen del activo"
+        className="grid grid-cols-2 gap-3 xl:grid-cols-4"
+      >
+        <SummaryCard
+          icon={Tag}
+          label="Marca"
+          value={display(asset.marcaNombre)}
+        />
+
+        <SummaryCard
+          icon={Layers3}
+          label="Categoría"
+          value={display(asset.categoriaNombre)}
+        />
+
+        <SummaryCard
+          icon={MapPin}
+          label="Ubicación"
+          value={display(asset.areaNombre)}
+        />
+
+        <SummaryCard
+          icon={UserRound}
+          label="Responsable"
+          value={responsible}
+        />
+      </section>
+
+      {/* MANTENIMIENTO ACTIVO */}
+      {asset.mantenimientoAbierto && (
+        <section
+          className="
+            rounded-xl border border-amber-500/30
+            bg-amber-500/10 p-4
+          "
+        >
+          <div className="flex items-start gap-3">
+            <Wrench
+              size={19}
+              className="mt-0.5 shrink-0 text-amber-500"
+              aria-hidden="true"
+            />
+
+            <div className="min-w-0">
+              <h2
+                className="
+                  text-sm font-semibold
+                  text-amber-700 dark:text-amber-300
+                "
+              >
+                Mantenimiento en curso
+              </h2>
+
+              <p className="mt-1 text-sm text-slate-700 dark:text-slate-300">
+                {asset.mantenimientoAbierto.tipo}
+
+                {asset.mantenimientoAbierto.descripcion
+                  ? ` · ${asset.mantenimientoAbierto.descripcion}`
+                  : ""}
+              </p>
+
+              <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                Desde{" "}
+                {formatAssetDate(
+                  asset.mantenimientoAbierto.fecha,
+                )}
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ACCIONES Y PESTAÑAS */}
+      {actions && (
+        <section
+          aria-label="Gestión del activo"
+          className={`${panelClass} overflow-hidden p-4 sm:p-5`}
+        >
+          {actions(asset)}
+        </section>
+      )}
+    </article>
+  );
+}
+
 export default function AssetCardPage({
   actions,
-  backTo,
   errorActions,
+  backTo,
 }: Props) {
   const { codigo = "" } = useParams();
   const { state } = useLocation();
@@ -140,23 +400,33 @@ export default function AssetCardPage({
 
   const back = `${backTo ?? ".."}${listSearch}`;
 
-  const { data: asset, isPending, error } = useAssetCard(codigo);
+  const {
+    data: asset,
+    isPending,
+    error,
+  } = useAssetCard(codigo);
 
   if (isPending) {
     return (
-      <section className="space-y-4" aria-label="Detalle del activo">
-        <div className="h-6 w-32 animate-pulse rounded bg-slate-200 dark:bg-gray-800" />
-        <div className={cn(panelClass, "space-y-4")}>
-          <div className="h-7 w-48 animate-pulse rounded bg-slate-200 dark:bg-gray-800" />
-          <div className="h-4 w-3/4 animate-pulse rounded bg-slate-100 dark:bg-gray-800" />
-          <LoadingState />
-        </div>
+      <section
+        aria-label="Cargando detalle del activo"
+        className="space-y-4"
+      >
+        <div className="h-10 w-64 animate-pulse rounded-xl bg-slate-200 dark:bg-[#202b45]" />
+        <div className="h-48 animate-pulse rounded-2xl bg-slate-200 dark:bg-[#202b45]" />
+        <div className="h-20 animate-pulse rounded-2xl bg-slate-200 dark:bg-[#202b45]" />
+        <div className="h-64 animate-pulse rounded-2xl bg-slate-200 dark:bg-[#202b45]" />
       </section>
     );
   }
 
   if (error) {
-    const status = error instanceof ApiError ? error.status : 0;
+    const status =
+      typeof error === "object" &&
+      error !== null &&
+      "status" in error
+        ? Number(error.status)
+        : 0;
 
     const title =
       status === 410
@@ -170,7 +440,6 @@ export default function AssetCardPage({
         title={title}
         message={error.message}
         back={back}
-        warning={status === 410}
       >
         {status === 410 && errorActions?.(codigo)}
       </ErrorState>
@@ -181,177 +450,17 @@ export default function AssetCardPage({
     return (
       <ErrorState
         title="Activo no disponible"
-        message="No se recibieron datos del activo. Vuelve a la lista e inténtalo de nuevo."
+        message="No se recibieron datos del activo."
         back={back}
       />
     );
   }
 
-  const situation = [
-    asset.asignacionActual
-      ? `Asignado a ${titleCase(asset.asignacionActual.personaNombre)}`
-      : asset.estado === "operativo"
-        ? "Disponible para asignar"
-        : null,
-    asset.areaNombre,
-  ]
-    .filter(Boolean)
-    .join(" · ");
-
   return (
-    <article className="min-w-0 space-y-5">
-      {/* Navegación */}
-      <nav aria-label="Navegación del activo">
-        <Link
-          to={back}
-          className={cn(
-            "inline-flex items-center gap-2 rounded-lg py-1 text-sm font-medium",
-            "text-slate-500 transition-colors hover:text-amber-700",
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500",
-            "dark:text-slate-400 dark:hover:text-amber-300",
-          )}
-        >
-          <ArrowLeft size={16} aria-hidden="true" />
-          Volver a activos
-        </Link>
-      </nav>
-
-      {/* Encabezado principal */}
-      <header
-        className={cn(
-          "flex min-w-0 flex-col gap-4 rounded-2xl border p-4 sm:p-6",
-          "border-slate-200 bg-white shadow-sm",
-          "dark:border-gray-700 dark:bg-gray-900",
-        )}
-      >
-        <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start">
-          <AssetImage asset={asset} className="sm:w-56 sm:shrink-0" />
-
-          <div className="flex min-w-0 flex-1 items-start gap-3">
-            <div className="flex size-11 shrink-0 items-center justify-center rounded-xl border border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-300">
-              <Package size={22} aria-hidden="true" />
-            </div>
-
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                Detalle del activo
-              </p>
-
-              <h1 className="mt-1 wrap-break-word font-mono text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-2xl">
-                {asset.codigoInventario}
-              </h1>
-
-              <p className="mt-2 wrap-break-word text-sm leading-6 text-slate-600 dark:text-slate-300 sm:text-base">
-                {asset.descripcion}
-              </p>
-
-              {/* Estado y situación actual */}
-              <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
-                <StatusBadge estado={asset.estado} />
-
-                {situation && (
-                  <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
-                    {situation}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-        {actions && (
-          <div className="border-t border-slate-100 pt-4 dark:border-gray-800">
-            <div className="flex justify-center">
-              <div className="w-full max-w-4xl">{actions(asset)}</div>
-            </div>
-          </div>
-        )}
-      </header>
-
-      {/* Mantenimiento activo */}
-      {asset.mantenimientoAbierto && (
-        <section
-          className={cn(
-            "rounded-2xl border p-4 sm:p-5",
-            "border-amber-200 bg-amber-50/80",
-            "dark:border-amber-900/60 dark:bg-amber-950/30",
-          )}
-        >
-          <div className="flex items-start gap-3">
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300">
-              <Wrench size={20} aria-hidden="true" />
-            </div>
-
-            <div className="min-w-0 flex-1">
-              <h2 className="font-semibold text-amber-950 dark:text-amber-200">
-                Mantenimiento en curso
-              </h2>
-
-              <p className="mt-1 text-xs font-medium uppercase tracking-wide text-amber-800 dark:text-amber-300">
-                {asset.mantenimientoAbierto.tipo}
-              </p>
-
-              <p className="mt-2 wrap-break-word text-sm text-slate-700 dark:text-slate-300">
-                {asset.mantenimientoAbierto.descripcion}
-              </p>
-
-              <p className="mt-3 flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
-                <CalendarDays size={14} aria-hidden="true" />
-                Desde {formatDate(asset.mantenimientoAbierto.fecha)}
-              </p>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Información del activo */}
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <section className={panelClass}>
-          <SectionHeading icon={UserRound}>Responsable actual</SectionHeading>
-
-          {asset.asignacionActual ? (
-            <dl className="divide-y divide-slate-100 dark:divide-gray-800">
-              <Row
-                label="Persona"
-                value={titleCase(asset.asignacionActual.personaNombre)}
-              />
-              <Row label="Cargo" value={asset.asignacionActual.cargoNombre} />
-              <Row
-                label="Asignado desde"
-                value={formatDate(asset.asignacionActual.fechaInicio)}
-              />
-            </dl>
-          ) : (
-            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 dark:border-emerald-900/60 dark:bg-emerald-950/30">
-              <p className="text-sm font-medium text-emerald-800 dark:text-emerald-300">
-                Sin responsable asignado
-              </p>
-
-              <p className="mt-1 text-xs text-emerald-700 dark:text-emerald-400">
-                Este activo puede ser asignado a una persona.
-              </p>
-            </div>
-          )}
-        </section>
-
-        <section className={panelClass}>
-          <SectionHeading icon={ClipboardList}>Datos del activo</SectionHeading>
-
-          <dl className="divide-y divide-slate-100 dark:divide-gray-800">
-            <Row label="Marca" value={asset.marcaNombre} />
-            <Row label="Categoría" value={asset.categoriaNombre} />
-            <Row label="Área" value={asset.areaNombre} />
-            <Row
-              label="Fecha de ingreso"
-              value={formatDate(asset.fechaIngreso)}
-            />
-          </dl>
-        </section>
-      </div>
-
-      {/* Historial y QR */}
-      <HistorySection assetId={asset.id} />
-
-      <AssetQr id={asset.id} codigo={asset.codigoInventario} />
-    </article>
+    <AssetDetail
+      asset={asset}
+      actions={actions}
+      back={back}
+    />
   );
 }

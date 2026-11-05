@@ -1,34 +1,59 @@
-import { useForm, Controller } from "react-hook-form";
+
+import {
+  Controller,
+  useForm,
+} from "react-hook-form";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-// Componentes Atomicos
+
+import {
+  Check,
+  History,
+  MapPin,
+  Package,
+  UserRound,
+  UserRoundPlus,
+} from "lucide-react";
+
 import Alert from "@/shared/components/ui/Alert";
-import Button from "@/shared/components/ui/Buttons/button";
 import FormField from "@/shared/components/ui/form/FormField";
 import Modal from "@/shared/components/ui/dialog/Modal";
+
 import { controlClass } from "@/shared/components/ui/Buttons/style.button";
-/// LIB - MANEJO DEL DATE
 import { todayLocal } from "@/shared/lib/date";
-// MODULO - CATALOGS
-import { PersonSelect, PositionSelect } from "@/modules/catalogs";
-// HOOKS
+
+import {
+  PersonSelect,
+  PositionSelect,
+} from "@/modules/catalogs";
+
 import { useAssignAsset } from "../../hooks/use-asset-mutation";
-// SCHEMA - ACTIONS
+
 import {
   assignSchema,
   type AssignInput,
   type AssignValues,
 } from "../../schema/asset.schema";
-// TYPES
+
 import type { AssetCard } from "../../types";
+
+import type { AssignablePerson } from "./AssignPersonPicker";
 
 interface Props {
   asset: AssetCard;
   open: boolean;
   onClose: () => void;
+  selectedPerson?: AssignablePerson | null;
+  onViewHistory?: () => void;
 }
 
-function AssignForm({ asset, onClose }: Omit<Props, "open">) {
+function AssignForm({
+  asset,
+  onClose,
+  selectedPerson,
+  onViewHistory,
+}: Omit<Props, "open">) {
   const mutation = useAssignAsset(asset.id);
 
   const {
@@ -39,95 +64,392 @@ function AssignForm({ asset, onClose }: Omit<Props, "open">) {
   } = useForm<AssignInput, unknown, AssignValues>({
     resolver: zodResolver(assignSchema),
     defaultValues: {
-      personaId: "",
+      personaId: selectedPerson?.id ?? "",
       cargoId: "",
       fechaInicio: todayLocal(),
       condicionEntrega: "",
     },
   });
 
-  const onSubmit = handleSubmit((values) =>
+  const onSubmit = handleSubmit((values) => {
     mutation.mutate(values, {
       onSuccess: () => {
-        toast.success("Activo asignado");
+        toast.success("Activo asignado correctamente");
         onClose();
       },
-    }),
-  );
+    });
+  });
 
   return (
-    <form onSubmit={onSubmit} noValidate className="space-y-4">
-      <FormField label="Persona" error={errors.personaId?.message}>
-        <Controller
-          control={control}
-          name="personaId"
-          render={({ field }) => (
-            <PersonSelect
-              value={field.value}
-              onChange={field.onChange}
-              onBlur={field.onBlur}
-              invalid={Boolean(errors.personaId)}
-            />
-          )}
-        />
-      </FormField>
+    <form
+      onSubmit={onSubmit}
+      noValidate
+      className="space-y-5"
+    >
+      {/* PERSONA SELECCIONADA */}
+      {selectedPerson ? (
+        <div
+          className="
+            flex items-center gap-4
+            rounded-xl border border-[#34415f]
+            bg-[#141e33] p-4
+          "
+        >
+          <div
+            className="
+              flex size-16 shrink-0
+              items-center justify-center
+              rounded-full bg-indigo-500/15
+              text-indigo-300
+            "
+          >
+            <UserRound size={30} />
+          </div>
 
-      <FormField label="Cargo" error={errors.cargoId?.message}>
-        <Controller
-          control={control}
-          name="cargoId"
-          render={({ field }) => (
-            <PositionSelect
-              value={field.value}
-              onChange={field.onChange}
-              onBlur={field.onBlur}
-              invalid={Boolean(errors.cargoId)}
-            />
-          )}
-        />
-      </FormField>
+          <div className="min-w-0 flex-1">
+            <h3
+              className="
+                truncate text-lg font-bold
+                text-white
+              "
+            >
+              {selectedPerson.nombre}
+            </h3>
 
-      <FormField label="Fecha de entrega" error={errors.fechaInicio?.message}>
-        <input
-          type="date"
-          className={controlClass}
-          {...register("fechaInicio")}
-        />
-      </FormField>
+            {selectedPerson.documento && (
+              <p className="mt-1 text-sm text-slate-400">
+                Documento: {selectedPerson.documento}
+              </p>
+            )}
 
-      <FormField
-        label="Condición de entrega"
-        error={errors.condicionEntrega?.message}
+            <span
+              className="
+                mt-2 inline-flex items-center gap-1
+                rounded-full bg-emerald-500/15
+                px-2.5 py-1 text-xs font-semibold
+                text-emerald-300
+              "
+            >
+              <Check size={13} />
+              Persona seleccionada
+            </span>
+          </div>
+        </div>
+      ) : (
+        <FormField
+          label="Persona responsable"
+          error={errors.personaId?.message}
+        >
+          <Controller
+            control={control}
+            name="personaId"
+            render={({ field }) => (
+              <PersonSelect
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                invalid={Boolean(errors.personaId)}
+              />
+            )}
+          />
+        </FormField>
+      )}
+
+      {/* VALIDACIÓN DE PERSONA */}
+      {selectedPerson && errors.personaId && (
+        <Alert>{errors.personaId.message}</Alert>
+      )}
+
+      {/* ACCIONES SUPERIORES */}
+      <div
+        className="
+          grid grid-cols-2 gap-3
+          border-t border-[#394764] pt-5
+        "
       >
-        <textarea
-          rows={2}
-          className={controlClass}
-          {...register("condicionEntrega")}
-        />
-      </FormField>
+        <button
+          type="button"
+          onClick={() => {
+            document
+              .getElementById("assign-form-fields")
+              ?.scrollIntoView({
+                behavior: "smooth",
+                block: "nearest",
+              });
+          }}
+          className="
+            flex min-h-20 flex-col
+            items-center justify-center
+            gap-2 rounded-xl
+            bg-indigo-600 px-3 py-4
+            text-sm font-semibold text-white
+            transition-colors
+            hover:bg-indigo-500
+            focus-visible:outline-none
+            focus-visible:ring-2
+            focus-visible:ring-indigo-400
+          "
+        >
+          <UserRoundPlus size={23} />
+          Completar datos
+        </button>
 
-      {mutation.error && <Alert>{mutation.error.message}</Alert>}
+        <button
+          type="button"
+          onClick={onViewHistory}
+          disabled={!onViewHistory}
+          className="
+            flex min-h-20 flex-col
+            items-center justify-center
+            gap-2 rounded-xl
+            bg-emerald-600 px-3 py-4
+            text-sm font-semibold text-white
+            transition-colors
+            hover:bg-emerald-500
+            focus-visible:outline-none
+            focus-visible:ring-2
+            focus-visible:ring-emerald-400
+            disabled:cursor-not-allowed
+            disabled:opacity-50
+          "
+        >
+          <History size={23} />
+          Ver historial
+        </button>
+      </div>
 
-      <div className="flex justify-end gap-2">
-        <Button variant="secondary" onClick={onClose}>
+      {/* DATOS DEL ACTIVO */}
+      <div
+        className="
+          space-y-3 rounded-xl
+          border border-[#34415f]
+          bg-[#141e33] p-4
+        "
+      >
+        <p
+          className="
+            text-xs font-semibold uppercase
+            tracking-wide text-slate-400
+          "
+        >
+          Datos del activo
+        </p>
+
+        <div className="flex justify-between gap-3 text-sm">
+          <span
+            className="
+              flex items-center gap-2
+              text-slate-400
+            "
+          >
+            <Package size={15} />
+            Código
+          </span>
+
+          <strong className="text-right text-white">
+            {asset.codigoInventario}
+          </strong>
+        </div>
+
+        <div className="flex justify-between gap-3 text-sm">
+          <span className="text-slate-400">
+            Descripción
+          </span>
+
+          <span
+            className="
+              max-w-[60%] text-right
+              font-medium text-white
+            "
+          >
+            {asset.descripcion}
+          </span>
+        </div>
+
+        <div className="flex justify-between gap-3 text-sm">
+          <span className="text-slate-400">
+            Marca
+          </span>
+
+          <span className="text-right font-medium text-white">
+            {asset.marcaNombre ?? "Sin marca"}
+          </span>
+        </div>
+
+        <div className="flex justify-between gap-3 text-sm">
+          <span className="text-slate-400">
+            Categoría
+          </span>
+
+          <span className="text-right font-medium text-white">
+            {asset.categoriaNombre ?? "Sin categoría"}
+          </span>
+        </div>
+
+        <div className="flex justify-between gap-3 text-sm">
+          <span
+            className="
+              flex items-center gap-2
+              text-slate-400
+            "
+          >
+            <MapPin size={15} />
+            Ubicación
+          </span>
+
+          <span className="text-right font-medium text-white">
+            {asset.areaNombre ?? "Sin área"}
+          </span>
+        </div>
+
+        <div className="flex justify-between gap-3 text-sm">
+          <span className="text-slate-400">
+            Estado
+          </span>
+
+          <span
+            className="
+              text-right font-semibold
+              text-emerald-400
+            "
+          >
+            {asset.estado}
+          </span>
+        </div>
+      </div>
+
+      {/* FORMULARIO DE ASIGNACIÓN */}
+      <div
+        id="assign-form-fields"
+        className="
+          space-y-4 rounded-xl
+          border border-[#34415f]
+          bg-[#141e33] p-4
+        "
+      >
+        <p
+          className="
+            text-xs font-semibold uppercase
+            tracking-wide text-slate-400
+          "
+        >
+          Datos de la asignación
+        </p>
+
+        <FormField
+          label="Cargo"
+          error={errors.cargoId?.message}
+        >
+          <Controller
+            control={control}
+            name="cargoId"
+            render={({ field }) => (
+              <PositionSelect
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                invalid={Boolean(errors.cargoId)}
+              />
+            )}
+          />
+        </FormField>
+
+        <FormField
+          label="Fecha de entrega"
+          error={errors.fechaInicio?.message}
+        >
+          <input
+            type="date"
+            className={`${controlClass} w-full`}
+            {...register("fechaInicio")}
+          />
+        </FormField>
+
+        <FormField
+          label="Condición de entrega"
+          error={errors.condicionEntrega?.message}
+        >
+          <textarea
+            rows={3}
+            placeholder="Describe el estado del equipo al entregarlo..."
+            className={`${controlClass} w-full resize-y`}
+            {...register("condicionEntrega")}
+          />
+        </FormField>
+      </div>
+
+      {/* ERROR DE LA API */}
+      {mutation.error && (
+        <Alert>{mutation.error.message}</Alert>
+      )}
+
+      {/* ACCIONES FINALES */}
+      <div className="grid grid-cols-2 gap-3">
+        <button
+          type="button"
+          onClick={onClose}
+          disabled={mutation.isPending}
+          className="
+            min-h-12 rounded-xl
+            border border-[#394764]
+            bg-[#141e33] px-3
+            text-sm font-semibold text-white
+            transition-colors
+            hover:bg-[#26334e]
+            disabled:opacity-50
+          "
+        >
           Cancelar
-        </Button>
-        <Button type="submit" loading={mutation.isPending}>
-          Asignar
-        </Button>
+        </button>
+
+        <button
+          type="submit"
+          disabled={mutation.isPending}
+          className="
+            flex min-h-12 items-center
+            justify-center gap-2 rounded-xl
+            bg-indigo-600 px-3
+            text-sm font-semibold text-white
+            transition-colors
+            hover:bg-indigo-500
+            disabled:cursor-not-allowed
+            disabled:opacity-50
+          "
+        >
+          <Check size={18} />
+
+          {mutation.isPending
+            ? "Asignando..."
+            : "Confirmar asignación"}
+        </button>
       </div>
     </form>
   );
 }
 
-export default function AssignModal({ asset, open, onClose }: Props) {
+export default function AssignModal({
+  asset,
+  open,
+  onClose,
+  selectedPerson,
+  onViewHistory,
+}: Props) {
   return (
     <Modal
       open={open}
       onClose={onClose}
-      title={`Asignar ${asset.codigoInventario}`}
+      title="Asignar activo"
+      size="lg"
     >
-      <AssignForm asset={asset} onClose={onClose} />
+      {open && (
+        <AssignForm
+          key={selectedPerson?.id ?? "manual"}
+          asset={asset}
+          onClose={onClose}
+          selectedPerson={selectedPerson}
+          onViewHistory={onViewHistory}
+        />
+      )}
     </Modal>
   );
 }
