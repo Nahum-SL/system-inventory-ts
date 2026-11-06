@@ -7,7 +7,7 @@ import {
   RotateCcw,
   UserRoundPlus,
   Wrench,
-  XCircle,
+  // XCircle,
   FileDown,
   type LucideIcon,
 } from "lucide-react";
@@ -16,7 +16,8 @@ import { useFileDownload } from "@/shared/hooks/use-file-download";
 // HOOKS MODULES REPORTS
 import { downloadAssetSheet } from "@/modules/reports/api/export.api";
 // ATOMIC COMPONENTS
-import Button from "@/shared/components/ui/Buttons/button";
+// import Button from "@/shared/components/ui/Buttons/button";
+
 // COMPONENTES DE ACCIONES - MODULO ASSETS
 import {
   AssignModal,
@@ -30,9 +31,9 @@ import {
   type AssetCard,
 } from "@/modules/assets";
 // COMPONENTS UI / UX - ASSET ACTIONS
-import type { ActionTone } from "@/shared/components/ui/Buttons/ActionTittle";
 import type { ActionItem } from "@/shared/components/ui/actions/ExpandableActionGrid";
 import ExpandableActionGrid from "@/shared/components/ui/actions/ExpandableActionGrid";
+import type { ActionTone } from "@/shared/lib/themes/action-theme";
 
 type ActionId =
   | "status"
@@ -120,13 +121,16 @@ export default function AssetActions({ asset }: { asset: AssetCard }) {
     onClick: () => sheet.mutate(),
   };
 
+  // ================================================================
+  // PAUSADO - HASTA GENERAR UN ENDPOINT PARA RESTAURAR UN DADO DE BAJA
+  // ================================================================
   // Mismas reglas que `decommission` en el backend.
-  const decommissionBlock =
-    inMaintenance || hasOpenMaintenance
-      ? "Para dar de baja, primero cierra el mantenimiento."
-      : assigned
-        ? "Para dar de baja, primero registra la devolución."
-        : undefined;
+  // const decommissionBlock =
+  //   inMaintenance || hasOpenMaintenance
+  //     ? "Para dar de baja, primero cierra el mantenimiento."
+  //     : assigned
+  //       ? "Para dar de baja, primero registra la devolución."
+  //       : undefined;
 
   return (
     <section
@@ -146,7 +150,10 @@ export default function AssetActions({ asset }: { asset: AssetCard }) {
       />
 
       {/* Zona de cuidado */}
-      <div className="mt-5 border-t border-slate-200 pt-4 dark:border-gray-700">
+
+      {/**BOTON INHABILITADO HASTA AGREGAR UN ENDPOITN DEL BACKEND PARA RESTAURAR UN DADO DE BAJA */}
+
+      {/* <div className="mt-5 border-t border-slate-200 pt-4 dark:border-gray-700">
         <Button
           variant="danger-outline"
           disabled={Boolean(decommissionBlock)}
@@ -159,7 +166,7 @@ export default function AssetActions({ asset }: { asset: AssetCard }) {
           {decommissionBlock ??
             "Deja de contar en los totales; el historial se conserva."}
         </p>
-      </div>
+      </div> */}
 
       <ChangeStatusModal
         asset={asset}

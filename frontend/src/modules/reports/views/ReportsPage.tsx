@@ -11,7 +11,6 @@ import {
 import Alert from "@/shared/components/ui/Alert";
 import FormField from "@/shared/components/ui/form/FormField";
 import { controlClass } from "@/shared/components/ui/Buttons/style.button";
-import { cn } from "@/shared/lib/utils";
 
 import {
   downloadAssets,
@@ -23,6 +22,7 @@ import {
 import ExportButton from "../components/ExportButton";
 import type { DateRange } from "../types";
 import SectionHeader from "@/shared/components/ui/SectionHeader";
+import Card from "@/shared/components/ui/Card";
 
 function ReportCard({
   title,
@@ -36,13 +36,7 @@ function ReportCard({
   icon: ReactNode;
 }) {
   return (
-    <section
-      className={cn(
-        "min-w-0 space-y-4 rounded-2xl border p-4 shadow-sm sm:p-5",
-        "border-slate-200 bg-white",
-        "dark:border-gray-700 dark:bg-gray-900",
-      )}
-    >
+    <Card>
       <div className="flex items-start gap-3">
         <div className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-300">
           {icon}
@@ -61,7 +55,7 @@ function ReportCard({
       <div className="border-t border-slate-100 pt-4 dark:border-gray-800">
         {children}
       </div>
-    </section>
+    </Card>
   );
 }
 

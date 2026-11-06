@@ -19,6 +19,7 @@ import {
   useAssetFilters,
 } from "@/modules/assets";
 import { cn } from "@/shared/lib/utils";
+import Card from "@/shared/components/ui/Card";
 
 export default function LabelsPage() {
   const [size, setSize] = useState<LabelSizeId>("pequena");
@@ -67,7 +68,7 @@ export default function LabelsPage() {
   const clearSelection = () => setSelected(new Map());
 
   return (
-    <section className="min-w-0 space-y-6">
+    <Card>
       <div className="space-y-5 print:hidden">
         {/* Encabezado */}
         <header className="flex items-start gap-3">
@@ -278,6 +279,6 @@ export default function LabelsPage() {
       </div>
 
       {selected.size > 0 && <LabelSheet items={items} size={size} />}
-    </section>
+    </Card>
   );
 }
