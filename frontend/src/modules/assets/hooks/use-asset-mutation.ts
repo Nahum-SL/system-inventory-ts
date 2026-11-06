@@ -13,6 +13,8 @@ import {
   updateAsset,
   uploadAssetImage,
 } from "../api/assets.mutation";
+// ATOMIC COMPONENTS
+import type { ImageValue } from "@/shared/components/ui/form/ImagePicker";
 // SCHEMA - Mutations
 import type { ChangeStatusValues } from "../schema/asset-status.schema";
 // SCHEMA - ACTIONS ASSET
@@ -134,4 +136,14 @@ export function useDeleteAssetImage(assetId: number) {
     mutationFn: () => deleteAssetImage(assetId),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: assetKeys.all }),
   });
+}
+
+export function useApplyImageChange(assetId: number) {
+  const upload = useUploadAssetImage(assetId);
+  const remove = useDeleteAssetImage(assetId);
+
+  return async (change: ImageValue) => {
+    if (change.kind === "replace") await upload.mutateAsync(change.file);
+    else if (change.kind === "remove") await remove.mutateAsync(undefined);
+  };
 }

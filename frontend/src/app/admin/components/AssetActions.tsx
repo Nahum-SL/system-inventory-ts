@@ -19,7 +19,6 @@ import { downloadAssetSheet } from "@/modules/reports/api/export.api";
 import Button from "@/shared/components/ui/Buttons/button";
 // COMPONENTES DE ACCIONES - MODULO ASSETS
 import {
-  AssetImageButtons,
   AssignModal,
   ChangeStatusModal,
   CloseMaintenanceModal,
@@ -34,8 +33,6 @@ import {
 import type { ActionTone } from "@/shared/components/ui/Buttons/ActionTittle";
 import type { ActionItem } from "@/shared/components/ui/actions/ExpandableActionGrid";
 import ExpandableActionGrid from "@/shared/components/ui/actions/ExpandableActionGrid";
-// MODULE REPORTS
-import { AssetSheetButton } from "@/modules/reports";
 
 type ActionId =
   | "status"
@@ -146,17 +143,6 @@ export default function AssetActions({ asset }: { asset: AssetCard }) {
       <ExpandableActionGrid
         main={[toItem(primaryId, "primary"), toItem("move"), sheetItem]}
         more={moreIds.map((id) => toItem(id))}
-        moreExtra={
-          // TEMPORAL: pasa al formulario "Editar datos" en la parte 2.
-          <div className="flex flex-wrap gap-2">
-            <AssetSheetButton
-              codigo={asset.codigoInventario}
-              label="Hoja de vida (PDF)"
-              variant="primary"
-            />
-            <AssetImageButtons asset={asset} />
-          </div>
-        }
       />
 
       {/* Zona de cuidado */}
