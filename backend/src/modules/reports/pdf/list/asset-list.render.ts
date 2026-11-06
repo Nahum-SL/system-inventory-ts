@@ -12,16 +12,14 @@ import {
 import type { SheetImage } from "../sheet/asset-sheet.types.js";
 import { createKit } from "./pdf-kit.js";
 
-// Columnas: foto | código | descripción | marca y categoría | responsable | estado
-const COL_FOTO = 52;
-const COL_CODIGO = 66;
-const COL_MARCA = 90;
-const COL_RESP = 90;
-const COL_ESTADO = 84;
-const COL_DESC =
-  CONTENT_W - COL_FOTO - COL_CODIGO - COL_MARCA - COL_RESP - COL_ESTADO;
+// Columnas: código | descripción | marca y categoría | responsable | estado
+const COL_CODIGO = 72;
+const COL_MARCA = 96;
+const COL_RESP = 100;
+const COL_ESTADO = 92;
+const COL_DESC = CONTENT_W - COL_CODIGO - COL_MARCA - COL_RESP - COL_ESTADO;
 
-const THUMB = 44;
+const CHIP_H = 15; // alto del chip de estado: marca la altura mínima de una fila
 const PAD = 5;
 const LINE = 11;
 const COLS_H = 18;
@@ -61,7 +59,6 @@ export async function renderAssetList(
     k.rect(MARGIN_X, y, CONTENT_W, COLS_H, COLOR.zebra);
     let x = MARGIN_X;
     const cols: Array<[string, number]> = [
-      ["Foto", COL_FOTO],
       ["Código", COL_CODIGO],
       ["Descripción", COL_DESC],
       ["Marca / Categoría", COL_MARCA],
@@ -190,7 +187,7 @@ export async function renderAssetList(
       cat,
       respName,
       respCargo,
-      height: Math.max(THUMB, textH) + PAD * 2,
+      height: Math.max(CHIP_H, textH) + PAD * 2,
     };
   };
 
@@ -233,29 +230,8 @@ export async function renderAssetList(
     if (rowIndex % 2 === 1)
       k.rect(MARGIN_X, y, CONTENT_W, row.height, COLOR.zebra);
 
-    // Foto
-    const tx = MARGIN_X + (COL_FOTO - THUMB) / 2;
-    const ty = y + (row.height - THUMB) / 2;
-    const thumb = await embed(a.foto);
-    if (thumb) {
-      k.strokeRect(tx, ty, THUMB, THUMB, COLOR.line);
-      k.drawContained(thumb, tx + 1, ty + 1, THUMB - 2, THUMB - 2);
-    } else {
-      k.rect(tx, ty, THUMB, THUMB, COLOR.emptyBox);
-      k.strokeRect(tx, ty, THUMB, THUMB, COLOR.line);
-      const label = "Sin foto";
-      k.text(
-        label,
-        tx + (THUMB - k.width(label, italic, 7)) / 2,
-        ty + THUMB / 2 - 3,
-        7,
-        italic,
-        COLOR.muted,
-      );
-    }
-
     // Textos
-    let x = MARGIN_X + COL_FOTO;
+    let x = MARGIN_X;
     row.code.forEach((l, i) =>
       k.text(l, x + PAD, y + PAD + i * LINE, 9, bold, COLOR.ink),
     );
@@ -305,11 +281,11 @@ export async function renderAssetList(
       );
     }
     x += COL_RESP;
-    
+
     // Estado (el aviso de baja prevalece sobre el estado operativo guardado)
     const style = a.eliminado ? STATUS_STYLE.baja : STATUS_STYLE[a.estado];
     const chipW = k.width(style.label, bold, 7.5) + 12;
-    k.rect(x + PAD, y + PAD, chipW, 15, style.bg);
+    k.rect(x + PAD, y + PAD, chipW, CHIP_H, style.bg);
     k.text(style.label, x + PAD + 6, y + PAD + 3.5, 7.5, bold, style.fg);
 
     y += row.height;
