@@ -24,6 +24,7 @@ import { useAssetCard } from "../hooks/useAssetCard";
 // TYPES
 import type { AssetCard } from "../types";
 import AssetImage from "../components/AssetImage";
+import Card from "@/shared/components/ui/Card";
 
 interface Props {
   actions?: (asset: AssetCard) => ReactNode;
@@ -146,11 +147,11 @@ export default function AssetCardPage({
     return (
       <section className="space-y-4" aria-label="Detalle del activo">
         <div className="h-6 w-32 animate-pulse rounded bg-slate-200 dark:bg-gray-800" />
-        <div className={cn(panelClass, "space-y-4")}>
+         <Card as="div" className="space-y-4">
           <div className="h-7 w-48 animate-pulse rounded bg-slate-200 dark:bg-gray-800" />
           <div className="h-4 w-3/4 animate-pulse rounded bg-slate-100 dark:bg-gray-800" />
           <LoadingState />
-        </div>
+        </Card>
       </section>
     );
   }
@@ -305,7 +306,7 @@ export default function AssetCardPage({
 
       {/* Información del activo */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <section className={panelClass}>
+        <Card>
           <SectionHeading icon={UserRound}>Responsable actual</SectionHeading>
 
           {asset.asignacionActual ? (
@@ -331,7 +332,7 @@ export default function AssetCardPage({
               </p>
             </div>
           )}
-        </section>
+        </Card>
 
         <section className={panelClass}>
           <SectionHeading icon={ClipboardList}>Datos del activo</SectionHeading>

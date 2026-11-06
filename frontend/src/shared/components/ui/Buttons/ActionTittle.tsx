@@ -2,30 +2,7 @@ import { motion, type HTMLMotionProps } from "motion/react";
 import { LoaderCircle, type LucideIcon } from "lucide-react";
 
 import { cn } from "@/shared/lib/utils";
-
-export type ActionTone = "primary" | "neutral" | "danger";
-
-const TILE: Record<ActionTone, string> = {
-  primary: cn(
-    "border-amber-300 bg-amber-50 text-amber-950 hover:bg-amber-100",
-    "dark:border-amber-900/70 dark:bg-amber-950/30 dark:text-amber-100 dark:hover:bg-amber-950/50",
-  ),
-  neutral: cn(
-    "border-slate-200 bg-white text-slate-700 hover:bg-slate-50",
-    "dark:border-gray-700 dark:bg-gray-900 dark:text-slate-200 dark:hover:bg-gray-800",
-  ),
-  danger: cn(
-    "border-red-200 bg-white text-red-700 hover:bg-red-50",
-    "dark:border-red-900/60 dark:bg-gray-900 dark:text-red-400 dark:hover:bg-red-950/30",
-  ),
-};
-
-const ICON_BOX: Record<ActionTone, string> = {
-  primary:
-    "bg-amber-200/70 text-amber-800 dark:bg-amber-500/20 dark:text-amber-300",
-  neutral: "bg-slate-100 text-slate-600 dark:bg-gray-800 dark:text-slate-300",
-  danger: "bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-400",
-};
+import { ICON_BOX, TILE, type ActionTone } from "@/shared/lib/themes/action-theme";
 
 interface Props extends Omit<HTMLMotionProps<"button">, "children"> {
   icon: LucideIcon;

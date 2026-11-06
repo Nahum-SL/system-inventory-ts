@@ -13,13 +13,15 @@ import {
 } from "@/modules/catalogs/components/select";
 // TYPES
 import type { DistributionFilters } from "../../types";
+// UI COMPONENTS
+import ChipGroup, { type ChipOption } from "@/shared/components/ui/ChiGroup";
 // CHART COMPONENTS
 import { AssetDistributionChart } from "./AssetDistributionChart";
 import ChartCard from "./ChartCard";
 
 type EstadoFilter = NonNullable<DistributionFilters["estado"]> | "";
 
-const ESTADOS: { value: EstadoFilter; label: string }[] = [
+const ESTADOS: ChipOption<EstadoFilter>[] = [
   { value: "", label: "Todos" },
   { value: "operativo", label: "Operativos" },
   { value: "mantenimiento", label: "En mantenimiento" },
@@ -78,27 +80,14 @@ export default function AssetDistributionCard() {
 
         <div>
           <span className={labelClass}>Estado</span>
-          <div
-            role="group"
-            aria-label="Filtrar por estado"
-            className="flex flex-wrap gap-1.5"
-          >
-            {ESTADOS.map((e) => (
-              <button
-                key={e.value}
-                type="button"
-                aria-pressed={estado === e.value}
-                onClick={() => setEstado(e.value)}
-                className={cn(
-                  "rounded-full border px-3 py-1.5 text-sm transition-colors cursor-pointer",
-                  estado === e.value
-                    ? "border-slate-900 bg-slate-900 text-white dark:border-slate-100 dark:bg-slate-100 dark:text-slate-900"
-                    : "border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-gray-700 dark:text-slate-300 dark:hover:bg-gray-800",
-                )}
-              >
-                {e.label}
-              </button>
-            ))}
+          <div>
+            <span className={labelClass}>Estado</span>
+            <ChipGroup
+              label="Filtrar por estado"
+              options={ESTADOS}
+              value={estado}
+              onChange={setEstado}
+            />
           </div>
         </div>
 

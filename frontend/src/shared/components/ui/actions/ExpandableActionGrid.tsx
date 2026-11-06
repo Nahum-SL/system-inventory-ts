@@ -4,7 +4,8 @@ import { Ellipsis, type LucideIcon } from "lucide-react";
 // UTIL
 import { cn } from "@/shared/lib/utils";
 // ATOMIC COMPONENTS
-import ActionTile, { type ActionTone } from "../Buttons/ActionTittle";
+import ActionTile from "../Buttons/ActionTittle";
+import type { ActionTone } from "@/shared/lib/themes/action-theme";
 
 export interface ActionItem {
   id: string;
