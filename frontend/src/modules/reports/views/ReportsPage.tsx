@@ -101,7 +101,7 @@ export default function ReportsPage() {
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <ExportButton
                 fetchFile={() => downloadAssetsPdf({ incluirBajas: true })}
-                label="Inventario con fotos (PDF)"
+                label="Exportar Inventario (PDF)"
                 variant="primary"
               />
               <ExportButton

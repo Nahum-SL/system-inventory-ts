@@ -79,7 +79,6 @@ export default function AssetDistributionCard() {
         </div>
 
         <div>
-          <span className={labelClass}>Estado</span>
           <div>
             <span className={labelClass}>Estado</span>
             <ChipGroup

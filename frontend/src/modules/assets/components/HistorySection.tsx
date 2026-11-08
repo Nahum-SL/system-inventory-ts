@@ -85,7 +85,7 @@ export default function HistorySection({ assetId }: { assetId: number }) {
           Historial del activo
         </h2>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          Asignaciones, mantenimientos y traslados, del más reciente al más
+          Linea del tiempo - Asignaciones, mantenimientos y traslados, del más reciente al más
           antiguo.
         </p>
       </div>
