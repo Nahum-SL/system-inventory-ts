@@ -21,7 +21,8 @@ param(
     [string]$Database = "system_inventory_prod",
     [string]$Dest = "C:\respaldos\database",
     [string]$Log = "C:\respaldos\database-backup.log",
-    [string]$Config = (Join-Path $PSScriptRoot "backup.cnf")
+    [string]$Config = (Join-Path $PSScriptRoot "backup.cnf"),
+    [string]$DumpExe = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -42,21 +43,30 @@ try {
         throw "El nombre de la base de datos no puede estar vacio."
     }
 
-    # # Localizar mysqldump
-    # $command = Get-Command mysqldump.exe -ErrorAction SilentlyContinue
 
-    # if (-not $command) {
-    #     throw "No se encontro mysqldump.exe. Agrega MySQL Server\bin al PATH o configura su ruta."
-    # }
+    # Localizar mariadb-dump de MariaDB instalado mediante MSI
+    if (-not $DumpExe) {
+        $candidates = @(
+            Get-ChildItem -Path "C:\Program Files\MariaDB*\bin\mariadb-dump.exe" `
+                -File -ErrorAction SilentlyContinue
+        )
 
-    # $DumpExe = $command.Source
+        if ($candidates.Count -eq 0) {
+            throw "No se encontro mariadb-dump.exe. Indica su ruta con -DumpExe."
+        }
 
-    # Localizar mysqldump de XAMPP
-    $DumpExe = "C:\xampp\mysql\bin\mysqldump.exe"
+        if ($candidates.Count -gt 1) {
+            throw "Se encontraron varias versiones de mariadb-dump.exe. Indica la ruta exacta mediante -DumpExe."
+        }
+
+        $DumpExe = $candidates[0].FullName
+    }
 
     if (-not (Test-Path -LiteralPath $DumpExe -PathType Leaf)) {
-        throw "No se encontro mysqldump.exe en: $DumpExe"
+        throw "No se encontro el cliente de volcado en: $DumpExe"
     }
+
+    Write-Log "Cliente de respaldo: $DumpExe"
 
     # Preparar directorios
     New-Item -ItemType Directory -Force -Path $Dest | Out-Null

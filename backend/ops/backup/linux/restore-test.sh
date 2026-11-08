@@ -21,7 +21,7 @@ DEST="${BACKUP_DEST:-$HOME/backups/mariadb}"
 CONTAINER="${BACKUP_CONTAINER:-mariadb}"
 CNF="${BACKUP_CNF:-/etc/backup/backup.cnf}"
 CONF_D="${RESTORE_CONF_D:-$HOME/infra/mariadb/conf.d}"
-TEST="mariadb-restore-test"
+TEST="mariadb-restore-test-$$"
 
 FILE="${1:-}"
 if [[ -z "$FILE" ]]; then
