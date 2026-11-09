@@ -1,20 +1,20 @@
 import type { ReactNode } from "react";
 import { Package, SearchX } from "lucide-react";
-
-// COMPONENTS - SHARED
+// ATOMIC COMPONENTS
 import Alert from "@/shared/components/ui/Alert";
+// ----- STATE
 import { EmptyState } from "@/shared/components/ui/states/EmptyState";
 import { LoadingState } from "@/shared/components/ui/states/LoadingState";
-
-// COMPONENTS - ASSETS
+// ----- HEADER
+import SectionHeader from "@/shared/components/ui/SectionHeader";
+// COMPONENTS - ASSET
 import AssetFiltersBar from "../components/AssetFilters";
 import AssetListItem from "../components/AssetListItem";
-
 // HOOKS
 import { useAssetFilters } from "../hooks/useAssetFilters";
 import { useAssets } from "../hooks/useAsset";
-import type { AssetFilters } from "../types";
-import SectionHeader from "@/shared/components/ui/SectionHeader";
+// TYPES
+import type { AssetFilters } from "../types"
 
 interface Props {
   basePath: string;

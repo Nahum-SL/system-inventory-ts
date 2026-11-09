@@ -4,12 +4,16 @@ import { getAssetImage } from "../api/assets.api";
 import { assetKeys } from "../utils/asset-query-keys";
 
 /** Descarga la imagen con el token y la expone como URL temporal para <img>. */
-export function useAssetImage(id: number, archivo: string | null) {
+export function useAssetImage(
+  id: number,
+  archivo: string | null,
+  enabled = true,
+) {
   const query = useQuery({
     queryKey: assetKeys.image(id, archivo ?? ""),
     queryFn: () => getAssetImage(id),
-    enabled: archivo !== null,
-    staleTime: Infinity, // el nombre del archivo cambia con cada imagen nueva
+    enabled: archivo !== null && enabled,
+    staleTime: Infinity,
   });
 
   const [url, setUrl] = useState<string | null>(null);

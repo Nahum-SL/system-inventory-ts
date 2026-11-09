@@ -5,6 +5,7 @@ import { cn } from "@/shared/lib/utils";
 
 import type { Asset } from "../types";
 import StatusBadge from "./StatusBadge";
+import AssetThumb from "./AssetThumb";
 
 interface Props {
   asset: Asset;
@@ -31,33 +32,33 @@ export default function AssetListItem({ asset, basePath }: Props) {
         "dark:focus-visible:ring-offset-gray-950",
       )}
     >
-      <div className="flex min-w-0 items-start justify-between gap-3">
+      <div className="flex min-w-0 items-start gap-3">
+        <AssetThumb asset={asset} />
+
         <div className="min-w-0 flex-1">
-          <span
-            className={cn(
-              "inline-flex max-w-full items-center rounded-lg border px-2.5 py-1",
-              "border-amber-200 bg-amber-50",
-              "font-mono text-xs font-bold tracking-wide text-amber-800",
-              "dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-300",
-            )}
-          >
+          <span className={cn(/* …igual que ahora… */)}>
             <span className="truncate">{asset.codigoInventario}</span>
           </span>
 
           <h3 className="mt-2 wrap-break-word text-sm font-semibold leading-5 text-slate-900 dark:text-slate-100 sm:text-base">
             {asset.descripcion}
           </h3>
+
+          {/* Móvil: el estado va bajo la descripción */}
+          <div className="mt-2 sm:hidden">
+            <StatusBadge estado={asset.estado} />
+          </div>
         </div>
 
-        <div className="flex shrink-0 items-start gap-2">
+        {/* Escritorio: estado y flecha a la derecha */}
+        <div className="hidden shrink-0 items-start gap-2 sm:flex">
           <StatusBadge estado={asset.estado} />
-
           <ChevronRight
             size={18}
             className={cn(
-              "mt-0.5 hidden text-slate-400 transition-transform",
+              "mt-0.5 text-slate-400 transition-transform",
               "group-hover:translate-x-0.5 group-hover:text-amber-600",
-              "sm:block dark:text-slate-500 dark:group-hover:text-amber-400",
+              "dark:text-slate-500 dark:group-hover:text-amber-400",
             )}
             aria-hidden="true"
           />

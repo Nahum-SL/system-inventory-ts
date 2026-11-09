@@ -1,18 +1,27 @@
 import { ImageOff, Loader2 } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
+import ZoomableImage from "@/shared/components/ui/image/ZoomableImage";
 import { useAssetImage } from "../hooks/useAssetImage";
 import type { AssetCard } from "../types";
 
 interface Props {
   asset: Pick<AssetCard, "id" | "codigoInventario" | "imagenArchivo">;
   className?: string;
+  /** Permite ampliar la imagen al tocarla (solo vistas de lectura, no formularios). */
+  zoomable?: boolean;
 }
 
-export default function AssetImage({ asset, className }: Props) {
+export default function AssetImage({
+  asset,
+  className,
+  zoomable = false,
+}: Props) {
   const { url, isLoading, isError } = useAssetImage(
     asset.id,
     asset.imagenArchivo,
   );
+
+  const alt = `Imagen del activo ${asset.codigoInventario}`;
 
   const frame = cn(
     "flex aspect-4/3 w-full items-center justify-center overflow-hidden rounded-xl border",
@@ -21,13 +30,13 @@ export default function AssetImage({ asset, className }: Props) {
   );
 
   if (url) {
+    if (zoomable) {
+      return <ZoomableImage src={url} alt={alt} className={className} />;
+    }
+
     return (
       <div className={frame}>
-        <img
-          src={url}
-          alt={`Imagen del activo ${asset.codigoInventario}`}
-          className="size-full object-contain"
-        />
+        <img src={url} alt={alt} className="size-full object-contain" />
       </div>
     );
   }

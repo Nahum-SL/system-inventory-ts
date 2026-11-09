@@ -147,7 +147,7 @@ export default function AssetCardPage({
     return (
       <section className="space-y-4" aria-label="Detalle del activo">
         <div className="h-6 w-32 animate-pulse rounded bg-slate-200 dark:bg-gray-800" />
-         <Card as="div" className="space-y-4">
+        <Card as="div" className="space-y-4">
           <div className="h-7 w-48 animate-pulse rounded bg-slate-200 dark:bg-gray-800" />
           <div className="h-4 w-3/4 animate-pulse rounded bg-slate-100 dark:bg-gray-800" />
           <LoadingState />
@@ -226,7 +226,7 @@ export default function AssetCardPage({
         )}
       >
         <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start">
-          <AssetImage asset={asset} className="sm:w-56 sm:shrink-0" />
+          <AssetImage asset={asset} zoomable className="sm:w-56 sm:shrink-0" />
 
           <div className="flex min-w-0 flex-1 items-start gap-3">
             <div className="flex size-11 shrink-0 items-center justify-center rounded-xl border border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-300">
