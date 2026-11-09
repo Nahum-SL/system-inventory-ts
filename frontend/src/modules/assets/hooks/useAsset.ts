@@ -8,5 +8,7 @@ export function useAssets(filters: AssetFilters) {
     queryKey: assetKeys.list(filters),
     queryFn: () => listAssets(filters),
     placeholderData: (previous) => previous, // evita parpadeos al escribir
+    staleTime: 30_000,
+    gcTime: 5 * 60_000
   });
 }

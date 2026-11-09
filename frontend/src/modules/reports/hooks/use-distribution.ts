@@ -7,4 +7,6 @@ export const useDistribution = (filters: DistributionFilters) =>
     queryKey: ["reports", "distribution", filters],
     queryFn: () => getDistribution(filters),
     placeholderData: keepPreviousData, // al cambiar el filtro, el gráfico no parpadea
+    staleTime: 30_000,
+    gcTime: 5 * 60_000
   });
