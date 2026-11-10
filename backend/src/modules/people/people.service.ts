@@ -39,8 +39,9 @@ export class PeopleService {
   /**
    * Registra una persona después de verificar sus datos únicos.
    */
+
   async create(input: CreatePersonInput): Promise<Person> {
-    const email = input.email.trim().toLowerCase();
+    const email = input.email ?? null;
 
     if (await peopleRepository.documentExists(input.numerodoc)) {
       throw new ConflictError(
@@ -48,7 +49,7 @@ export class PeopleService {
       );
     }
 
-    if (await peopleRepository.emailExists(email)) {
+    if (email !== null && (await peopleRepository.emailExists(email))) {
       throw new ConflictError(
         "Ya existe una persona con ese correo electrónico",
       );
@@ -59,7 +60,7 @@ export class PeopleService {
       nombres: input.nombres,
       tipodoc: input.tipodoc,
       numerodoc: input.numerodoc,
-      telefono: input.telefono,
+      telefono: input.telefono ?? null,
       email,
     });
   }
@@ -71,6 +72,7 @@ export class PeopleService {
    * @param input
    * @returns
    */
+
   async update(id: number, input: UpdatePersonInput): Promise<Person> {
     const existing = await this.getById(id);
 
@@ -84,24 +86,32 @@ export class PeopleService {
       );
     }
 
-    const email = input.email?.trim().toLowerCase();
+    // undefined = no modificar.
+    // null = eliminar el correo.
+    // string = actualizar el correo.
+    const email =
+      input.email === undefined
+        ? undefined
+        : input.email === null
+          ? null
+          : input.email.toLowerCase();
 
     if (
       email !== undefined &&
-      email !== existing.email.toLowerCase() &&
+      email !== null &&
+      email !== existing.email &&
       (await peopleRepository.emailExists(email))
     ) {
       throw new ConflictError(
         "Ya existe una persona con ese correo electrónico",
       );
     }
-    // 4. Preparar los campos que realmente se enviaron.
+
     const data: UpdatePersonData = {
       ...input,
       ...(email !== undefined ? { email } : {}),
     };
 
-    // 5. Actualizar y devolver el registro.
     const updated = await peopleRepository.update(id, data);
 
     if (!updated) {

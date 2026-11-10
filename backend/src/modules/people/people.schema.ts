@@ -1,8 +1,40 @@
 import { z } from "zod";
 
 /**
- * Valida todos los campos para la creacion de nuevos registros
- * en la tabla Personas
+ * Normaliza los campos de contacto:
+ * - undefined: campo no enviado.
+ * - null: campo explícitamente vacío.
+ * - "": se transforma en null.
+ * - string: se valida y conserva.
+ */
+const optionalPhoneSchema = z.preprocess(
+  (value) =>
+    typeof value === "string" && value.trim() === ""
+      ? null
+      : typeof value === "string"
+        ? value.trim()
+        : value,
+  z
+    .string()
+    .regex(/^\d{9}$/, {
+      message: "El teléfono debe contener 9 dígitos",
+    })
+    .nullable()
+    .optional(),
+);
+
+const optionalEmailSchema = z.preprocess(
+  (value) =>
+    typeof value === "string" && value.trim() === ""
+      ? null
+      : typeof value === "string"
+        ? value.trim().toLowerCase()
+        : value,
+  z.email().max(150).nullable().optional(),
+);
+
+/**
+ * Valida todos los campos para la creación de personas.
  */
 export const createPersonSchema = z.object({
   apellidos: z.string().trim().min(1).max(100),
@@ -10,7 +42,6 @@ export const createPersonSchema = z.object({
 
   tipodoc: z.string().trim().min(1).max(20),
 
-  // La columna numerodoc de la base de datos admite 8 caracteres.
   numerodoc: z
     .string()
     .trim()
@@ -18,19 +49,8 @@ export const createPersonSchema = z.object({
       message: "El documento debe contener 8 dígitos",
     }),
 
-  telefono: z
-    .string()
-    .trim()
-    .regex(/^\d{9}$/, {
-      message: "El teléfono debe contener 9 dígitos",
-    }),
-
-  email: z
-    .preprocess(
-      (val) => (typeof val === "string" ? val.trim() : val),
-      z.email().max(150),
-    )
-    .or(z.literal("")),
+  telefono: optionalPhoneSchema,
+  email: optionalEmailSchema,
 });
 
 /**

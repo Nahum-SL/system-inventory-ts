@@ -7,8 +7,8 @@ export interface Person {
   nombres: string;
   tipodoc: string;
   numerodoc: string;
-  telefono: string;
-  email: string;
+  telefono: string | null;
+  email: string | null;
   fechaRegistro: string;
 }
 
@@ -20,8 +20,8 @@ export interface CreatePersonData {
   nombres: string;
   tipodoc: string;
   numerodoc: string;
-  telefono: string;
-  email: string;
+  telefono: string | null;
+  email: string | null;
 }
 
 /**
@@ -32,8 +32,8 @@ export interface UpdatePersonData {
   nombres?: string;
   tipodoc?: string;
   numerodoc?: string;
-  telefono?: string;
-  email?: string;
+  telefono?: string | null;
+  email?: string | null;
 }
 
 /**

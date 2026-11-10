@@ -18,6 +18,7 @@
     "lint:all": "pnpm --filter ./frontend lint",
     "build:all": "pnpm --filter ./backend build && pnpm --filter ./frontend build",
     "start": "pnpm --filter ./backend start",
+    "start:lan": "pnpm --filter ./backend start:lan",
     "migrate:latest": "pnpm --filter ./backend migrate:latest",
     "seed:run": "pnpm --filter ./backend seed:run",
     "migrate:prod": "pnpm --filter ./backend migrate:prod",
