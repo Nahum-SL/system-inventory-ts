@@ -27,7 +27,8 @@
     "backup:db": "powershell -NoProfile -ExecutionPolicy Bypass -File ops/backup/backup-db.ps1",
     "smoke": "node ops/smoke.mjs",
     "lint:frontend": "pnpm --dir frontend lint",
-    "lint:all": "pnpm lint:frontend"
+    "lint:all": "pnpm lint:frontend",
+    "start:lan": "node --env-file=.env.lan dist/server.js"
   },
   "keywords": [],
   "author": "Nahun Miguel Salazar Levano",

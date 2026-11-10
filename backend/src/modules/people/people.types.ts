@@ -7,8 +7,8 @@ export interface Person {
   nombres: string;
   tipodoc: string;
   numerodoc: string;
-  telefono: string;
-  email: string;
+  telefono: string | null;
+  email: string | null;
   fechaRegistro: string;
 }
 
@@ -16,12 +16,12 @@ export interface Person {
  * Interfaz del modulo Persona, para crear un nuevo registro
  */
 export interface CreatePersonData {
-  apellidos: string;
+  apellidos: string;  
   nombres: string;
   tipodoc: string;
   numerodoc: string;
-  telefono: string;
-  email: string;
+  telefono: string | null;
+  email: string | null;
 }
 
 /**
@@ -32,8 +32,8 @@ export interface UpdatePersonData {
   nombres?: string;
   tipodoc?: string;
   numerodoc?: string;
-  telefono?: string;
-  email?: string;
+  telefono?: string | null;
+  email?: string | null;
 }
 
 /**

@@ -43,8 +43,8 @@ export class PeopleRepository {
       nombres: String(row.nombres),
       tipodoc: String(row.tipodoc),
       numerodoc: String(row.numerodoc),
-      telefono: String(row.telefono),
-      email: String(row.email),
+      telefono: row.telefono == null ? null : String(row.telefono), // puede ir null
+      email: row.email == null ? null : String(row.email),
       fechaRegistro: String(row.fechaRegistro),
     };
   }

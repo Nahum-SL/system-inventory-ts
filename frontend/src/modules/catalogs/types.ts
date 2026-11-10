@@ -10,8 +10,8 @@ export interface Person {
   nombres: string;
   tipodoc: string;
   numerodoc: string;
-  telefono: string;
-  email: string;
+  telefono: string | null;
+  email: string | null;
 }
 
 export interface Position {
