@@ -17,7 +17,7 @@ import type { DashboardStats } from "@/modules/reports/types";
 
 
 const assetHref = (codigo: string) =>
-  `/admin/activos/${encodeURIComponent(codigo)}`;
+  `/admin/activos/${encodeURIComponent(codigo)}`;78
 
 export default function AdminDashboardPage() {
   const { data, isPending, error } = useDashboardSummary();

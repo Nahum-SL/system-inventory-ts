@@ -76,16 +76,16 @@ function PersonForm({ item, onClose }: Omit<Props, "open">) {
             {...register("numerodoc")}
           />
         </FormField>
-        <FormField label="Teléfono" error={errors.telefono?.message}>
+        <FormField label="Teléfono (opcional)" error={errors.telefono?.message}>
           <input
             className={controlClass}
-            inputMode="numeric"
+            inputMode="numeric" 
             {...register("telefono")}
           />
         </FormField>
       </div>
 
-      <FormField label="Correo electrónico" error={errors.email?.message}>
+      <FormField label="Correo electrónico (opcional)" error={errors.email?.message}>
         <input
           className={controlClass}
           type="email"

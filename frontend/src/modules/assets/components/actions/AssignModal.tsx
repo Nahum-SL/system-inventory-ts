@@ -109,7 +109,7 @@ function AssignForm({ asset, onClose }: Omit<Props, "open">) {
       {mutation.error && <Alert>{mutation.error.message}</Alert>}
 
       <div className="flex justify-end gap-2">
-        <Button variant="secondary" onClick={onClose}>
+        <Button type="button" variant="secondary" onClick={onClose}>
           Cancelar
         </Button>
         <Button type="submit" loading={mutation.isPending}>

@@ -25,6 +25,8 @@ import { useAssetCard } from "../hooks/useAssetCard";
 import type { AssetCard } from "../types";
 import AssetImage from "../components/AssetImage";
 import Card from "@/shared/components/ui/Card";
+import SectionHeader from "@/shared/components/ui/SectionHeader";
+import { NavigationLink } from "@/shared/components/ui/links/NavigationLink";
 
 interface Props {
   actions?: (asset: AssetCard) => ReactNode;
@@ -202,20 +204,18 @@ export default function AssetCardPage({
   return (
     <article className="min-w-0 space-y-5">
       {/* Navegación */}
-      <nav aria-label="Navegación del activo">
-        <Link
-          to={back}
-          className={cn(
-            "inline-flex items-center gap-2 rounded-lg py-1 text-sm font-medium",
-            "text-slate-500 transition-colors hover:text-amber-700",
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500",
-            "dark:text-slate-400 dark:hover:text-amber-300",
-          )}
-        >
-          <ArrowLeft size={16} aria-hidden="true" />
-          Volver a activos
-        </Link>
-      </nav>
+
+      <SectionHeader
+        title="Gestion del Activo"
+        description="Pagina del activo con opciones de administrador"
+        icon={Package}
+        actions={
+          <NavigationLink to="/admin/activos">
+            <ArrowLeft size={16} aria-hidden="true" />
+            Volver a activos
+          </NavigationLink>
+        }
+      />
 
       {/* Encabezado principal */}
       <header
