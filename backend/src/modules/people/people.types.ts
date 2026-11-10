@@ -16,7 +16,7 @@ export interface Person {
  * Interfaz del modulo Persona, para crear un nuevo registro
  */
 export interface CreatePersonData {
-  apellidos: string;
+  apellidos: string;  
   nombres: string;
   tipodoc: string;
   numerodoc: string;

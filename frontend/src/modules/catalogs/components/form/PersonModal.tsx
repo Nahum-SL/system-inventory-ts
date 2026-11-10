@@ -80,7 +80,6 @@ function PersonForm({ item, onClose }: Omit<Props, "open">) {
           <input
             className={controlClass}
             inputMode="numeric"
-            maxLength={9}
             {...register("telefono")}
           />
         </FormField>
