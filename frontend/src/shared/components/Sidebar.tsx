@@ -13,7 +13,7 @@ import {
   Users,
   User2,
   type LucideIcon,
-  FileDown
+  FileDown,
 } from "lucide-react";
 import { useLogout, useSession } from "@/modules/auth";
 import { cn } from "@/shared/lib/utils";
@@ -83,7 +83,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           </button>
         </div>
 
-        <nav className="flex-1 space-y-2 px-4">
+        <nav className="min-h-0 flex-1 space-y-2 overflow-y-auto px-4 [scrollbar-width:thin] [scrollbar-color:theme(colors.slate.700)_transparent]">
           {menuItems.map((item) => (
             <NavLink
               key={item.href}
