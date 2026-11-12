@@ -28,6 +28,8 @@ export interface ReturnAssignmentData {
   condicionDevolucion: string;
 }
 
+// Unión Discriminata
+// ---- Asociación de datos condicionales | Exhaustividad y Narrowing perfecto
 export type CreateAssignmentResult =
   | { status: "ok"; assignment: Assignment }
   | { status: "asset_not_found" }

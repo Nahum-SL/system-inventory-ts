@@ -13,8 +13,10 @@ import type {
 
 /**
  * Repositorio de la tabla Asignaciones, sera intermediario entre la
- * logica de negocio (servicios, controladores, casos de uso)de la app y
+ * logica de negocio (servicios, controladores, casos de uso) de la app y
  * la fuente de datos (SQL, API)
+ *
+ * Puente de acceso a los datos ``(persistencia)``
  */
 export class AssignmentsRepository {
   private mapRow(row: Record<string, unknown>): Assignment {
@@ -76,14 +78,17 @@ export class AssignmentsRepository {
    */
   async create(data: CreateAssignmentData): Promise<CreateAssignmentResult> {
     return db.transaction<CreateAssignmentResult>(async (trx) => {
+      // Consulta al activo si cumple con lo necesario para el CREATE
       const asset = await trx("activos")
         .select("id", "estado")
         .where({ id: data.activoId, eliminado: false })
         .forUpdate()
         .first();
 
+      // Si no encuentra el activo
       if (!asset) return { status: "asset_not_found" };
 
+      // Si el estado del activo no es operativo
       if (asset.estado !== "operativo") {
         return {
           status: "asset_not_operational",

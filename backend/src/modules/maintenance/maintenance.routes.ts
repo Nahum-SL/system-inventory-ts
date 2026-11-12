@@ -19,12 +19,14 @@ const maintenanceRoutes = Router();
 
 // Router montado en la raíz de /api: cada ruta declara su propia autenticación.
 
+// Obtener el historial de los Mantenimientos
 maintenanceRoutes.get(
   "/assets/:id/maintenance",
   authenticate,
   getMaintenanceHistory,
 );
 
+// POST -> Crea mantenimiento
 maintenanceRoutes.post(
   "/assets/:id/maintenance",
   authenticate,
@@ -33,6 +35,7 @@ maintenanceRoutes.post(
   createMaintenance,
 );
 
+// POST -> Cierra mantenimiento
 maintenanceRoutes.patch(
   "/maintenance/:id/close",
   authenticate,

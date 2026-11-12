@@ -27,37 +27,47 @@ const reportsRoutes = Router();
 // ENDPOINTS
 reportsRoutes.use(authenticate, authorize("admin"));
 
+// RUTA PARA LOS GRAFICOS CON FILTROS -> localhost/admin/
+// ----- ASSETS CARDS FILTER
 reportsRoutes.get("/summary", getSummary);
+// -----
+reportsRoutes.get(
+  "/export/assets",
+  validate(listAssetsQuerySchema, "query"),
+  exportAssets,
+);
 
-// RUTA PARA LOS GRAFICOS CON FILTROS
 reportsRoutes.get(
   "/distribution",
   validate(distributionQuerySchema, "query"),
   getDistribution,
 );
 
-reportsRoutes.get(
-  "/export/assets",
-  validate(listAssetsQuerySchema, "query"),
-  exportAssets,
-);
-reportsRoutes.get(
-  "/export/movements",
-  validate(exportRangeQuerySchema, "query"),
-  exportMovements,
-);
-reportsRoutes.get(
-  "/export/maintenance",
-  validate(exportRangeQuerySchema, "query"),
-  exportMaintenance,
-);
+// ETIQUETAS -> local/admin/etiquetas
 
+// ASSETS | Hoja de vida -> /admin/activos/:codigo
 reportsRoutes.get("/export/asset-sheet/:codigo", exportAssetSheet);
+
+// REPORTS -> local/admin/reports
 
 reportsRoutes.get(
   "/export/assets-pdf",
   validate(exportAssetsPdfQuerySchema, "query"),
   exportAssetsPdf,
+);
+
+// --- Movimientos - CSV
+reportsRoutes.get(
+  "/export/movements",
+  validate(exportRangeQuerySchema, "query"),
+  exportMovements,
+);
+
+// --- Mantenimientos - CSV
+reportsRoutes.get(
+  "/export/maintenance",
+  validate(exportRangeQuerySchema, "query"),
+  exportMaintenance,
 );
 
 export default reportsRoutes;
